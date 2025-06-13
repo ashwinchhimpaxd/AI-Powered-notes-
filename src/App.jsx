@@ -10,6 +10,7 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [status, setStatus] = useState("idle");
   const [showLogs, setShowLogs] = useState(false);
+  cosnt [showSettings, setShowSettings] = useState(false);
 
   const detailsRef = useRef(null);
 
