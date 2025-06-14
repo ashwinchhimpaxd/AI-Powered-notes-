@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@appwrite.io/pink-icons": "^1.0.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4.0.14",
     "appwrite": "^17.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.57.0",
     "tailwindcss": "^4.0.14"
   },
   "devDependencies": {
