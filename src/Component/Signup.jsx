@@ -3,6 +3,7 @@ import SignupForm from "../Pages/SignupForm"
 
 function Signup() {
     return (
+
         <div className="relative w-full min-h-screen">
             <div className="flex flex-col md:flex-row w-full h-full bg-black">
 
