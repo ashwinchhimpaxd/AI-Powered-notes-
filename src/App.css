@@ -10,3 +10,55 @@
 * {
     font-family: "BAHNSCHRIFT";
 }
+
+:root {
+    --white-font-color: #f6f2f2;
+    --para-font-color: #eedff5;
+}
+
+body,
+html {
+
+    background-color: rgb(45, 43, 43);
+}
+
+body::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+}
+
+
+.card-3d {
+    transform-style: preserve-3d;
+    transform-origin: bottom bottom;
+    /* or top left, etc. */
+    transition: transform 0.5s ease;
+}
+
+.card-3d:hover {
+    transform: rotateY(12deg) rotateX(5deg) scale(1.1);
+}
+
+#Home {
+    background-image: url('https://gist.githubusercontent.com/brettlangdon/85942af486eb79118467/raw/2a7409cd3c26a90b2e82bdc40dc7db18b92b3517/H30Q7ME.png');
+
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* rotate logo  */
+@keyframes spin360 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.rotate-logo {
+    animation: spin360 10s linear infinite;
+}

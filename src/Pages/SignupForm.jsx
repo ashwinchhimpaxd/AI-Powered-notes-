@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { User, EnvelopeOpen, LockSimple } from "@phosphor-icons/react";
+import { Link } from 'react-router-dom';
 
 function SignupForm() {
     const {
@@ -39,10 +40,10 @@ function SignupForm() {
                                 {...register('name', { required: 'Name is required' })}
                                 className="pl-10 pr-4 py-2 w-full border font-light bg-transparent text-white rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
                             />
-                            {errors.name && (
-                                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-                            )}
                         </div>
+                        {errors.name && (
+                            <p className="text-red-500 text-sm mt-2">{errors.name.message}</p>
+                        )}
                     </div>
 
                     {/* Email */}
@@ -60,10 +61,10 @@ function SignupForm() {
                                 {...register('email', { required: 'Email is required' })}
                                 className="pl-10 pr-4 py-2 w-full border font-light bg-transparent text-white rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
                             />
-                            {errors.email && (
-                                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                            )}
                         </div>
+                        {errors.email && (
+                            <p className="text-red-500 text-sm mt-2">{errors.email.message}</p>
+                        )}
                     </div>
 
                     {/* Password */}
@@ -91,10 +92,10 @@ function SignupForm() {
                                 })}
                                 className="pl-10 pr-4 py-2 w-full border bg-transparent text-white rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
                             />
-                            {errors.password && (
-                                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-                            )}
                         </div>
+                        {errors.password && (
+                            <p className="text-red-500 text-sm mt-2">{errors.password.message}</p>
+                        )}
                     </div>
 
                     {/* Submit Button */}
@@ -102,7 +103,7 @@ function SignupForm() {
                         type="submit"
                         className="w-full text-[clamp(1rem,2.5vw,1.4rem)] font-medium py-2 rounded-xl 
                        bg-gradient-to-r from-[#6a85f1] to-[#8854d0] 
-                       text-[#e6fdd3] transition duration-300 ease-in-out hover:opacity-90"
+                       text-[#e6fdd3] transition duration-300 ease-in-out hover:opacity-90 cursor-pointer"
                     >
                         Create account
                     </button>
@@ -110,9 +111,11 @@ function SignupForm() {
 
                 <p className="text-[clamp(1rem,2vw,1.2rem)] font-medium text-[#e3fcce] mt-6 text-center">
                     Already have an account?{' '}
-                    <span className="text-[#6a85f1] cursor-pointer underline">
-                        Login
-                    </span>
+                    <Link to="/login">
+                        <span className="text-[#6a85f1] cursor-pointer underline">
+                            Login
+                        </span>
+                    </Link>
                 </p>
             </div>
         </div>
