@@ -3,7 +3,7 @@
 @font-face {
     font-family: "BAHNSCHRIFT";
     src: url('../public/Fonts/BAHNSCHRIFT.TTF') format('truetype');
-    font-weight: normal;
+
     font-style: normal;
 }
 
@@ -13,13 +13,17 @@
 
 :root {
     --white-font-color: #f6f2f2;
-    --para-font-color: #eedff5;
+    --para-font-color: #f2f2f3;
 }
 
 body,
 html {
 
-    background-color: rgb(45, 43, 43);
+    background: linear-gradient(to right, #181a20, #23252b);
+
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 body::-webkit-scrollbar {
@@ -39,14 +43,22 @@ body::-webkit-scrollbar {
     transform: rotateY(12deg) rotateX(5deg) scale(1.1);
 }
 
-#Home {
-    background-image: url('https://gist.githubusercontent.com/brettlangdon/85942af486eb79118467/raw/2a7409cd3c26a90b2e82bdc40dc7db18b92b3517/H30Q7ME.png');
+#Home,
+#dashboard {
+    /* background-image: url('https://images.unsplash.com/photo-1694867978841-12cd4820d4f1?q=80&w=2057&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); */
+    background: linear-gradient(to right, #232526, #534861, #232326);
 
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
 }
 
+/* {
+    background-color: #d985f5;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+} */
 
 /* rotate logo  */
 @keyframes spin360 {
@@ -62,3 +74,90 @@ body::-webkit-scrollbar {
 .rotate-logo {
     animation: spin360 10s linear infinite;
 }
+
+#all-notes-list::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari */
+}
+
+#search-bar:focus {
+    outline: none;
+    border: none;
+}
+
+/*  tiptap editor classes  */
+/* Remove Tiptap default border */
+.ProseMirror {
+    outline: none;
+    border: none !important;
+    box-shadow: none;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.ProseMirror::-webkit-scrollbar {
+
+    display: none;
+    /* Chrome, Safari */
+}
+
+/* Scrollbar Track (Background) */
+::-webkit-scrollbar {
+    width: 10px;
+    /* vertical */
+    height: 10px;
+    /* horizontal */
+}
+
+/* Scrollbar Thumb (Draggable Part) */
+::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 999px;
+    /* fully rounded */
+}
+
+/* On Hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #acabab;
+    cursor: default;
+}
+
+/* Scrollbar Track (empty background area) */
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 999px;
+}
+
+.heading {
+    font-size: 5.5rem;
+    font-weight: 600;
+    color: var(--white-font-color);
+    letter-spacing: 0.1rem;
+}
+
+.ProseMirror h1 {
+    @apply text-5xl font-bold text-white mb-4;
+}
+
+.ProseMirror h2 {
+    @apply text-4xl font-bold text-white mb-2;
+}
+
+
+
+.editorimg {
+    max-width: 50%;
+    height: 50%;
+}
+
+.ProseMirror a {
+    color: #60a5fa;
+    /* Tailwind blue-400 */
+    text-decoration: underline;
+}
+
+.tiptap {
+    border: 2px solid red;
+    padding: 20px;
+}
+

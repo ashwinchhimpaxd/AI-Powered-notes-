@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { Link } from "react-router-dom";
 import { PenNib, Lightning, MagnifyingGlass, Key, Brain } from "@phosphor-icons/react";
@@ -28,6 +27,7 @@ function LandingPage() {
             description: "Optimized performance ensures your note-taking experience is smooth and responsive."
         }
     ];
+
     return (
         <div id='Home' className='relative w-full h-fit selection:bg-purple-200 selection:text-black pt-4 px-2 sm:px-6 md:px-10'>
             <Navbar />
@@ -40,7 +40,10 @@ function LandingPage() {
                         spotlightColor='rgba(240 ,171 ,252, .35)'
                     >
                         <span className='font-light'>AI-powered Note Taking</span>
-                        <img src="public\AI Star logo\AILOGO-01.svg" alt="AI logo" className='w-[8vw] sm:w-[4vw] md:w-[2.5vw] rotate-logo' />
+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 200 200" width="40" height="40" className="coolshapes star-10 rotate-logo "><g clip-path="url(#cs_clip_1_star-10)"><mask id="cs_mask_1_star-10" width="200" height="200" x="0" y="0" maskUnits="userSpaceOnUse"><path fill="#fff" d="M91.317 6.8l.028-.098c2.483-8.71 14.826-8.71 17.31 0l.027.098.083.293a122 122 0 0084.142 84.142l.293.082.098.028c8.709 2.484 8.709 14.826 0 17.31a5.593 5.593 0 01-.098.028l-.293.082c-40.751 11.541-72.602 43.391-84.142 84.142l-.083.293-.027.098c-2.484 8.709-14.827 8.709-17.31 0a21.647 21.647 0 01-.028-.098l-.082-.293a122.002 122.002 0 00-84.143-84.142l-.292-.082-.098-.028c-8.71-2.484-8.71-14.826 0-17.31l.098-.028.292-.082A122 122 0 0091.235 7.093l.082-.293z"></path></mask><g mask="url(#cs_mask_1_star-10)"><path fill="#fff" d="M200 0H0v200h200V0z"></path><path fill="url(#paint0_radial_748_4283)" d="M200 0H0v200h200V0z"></path><path fill="url(#paint1_radial_748_4283)" d="M200 0H0v200h200V0z"></path></g></g><defs><radialGradient id="paint0_radial_748_4283" cx="0" cy="0" r="1" gradientTransform="rotate(116.694 71.023 87.946) scale(199.234)" gradientUnits="userSpaceOnUse"><stop stop-color="#7c3aed"></stop><stop offset="1" stop-color="#8b5cf6" ></stop></radialGradient><radialGradient id="paint1_radial_748_4283" cx="0" cy="0" r="1" gradientTransform="rotate(-20.037 348.972 -25.908) scale(135.715)" gradientUnits="userSpaceOnUse"><stop stop-color="#4f46e5"></stop><stop offset="0.461" stop-color="#6366f1" stop-opacity="0.84"></stop><stop offset="1" stop-color="#818cf8" stop-opacity="0"></stop></radialGradient><clipPath id="cs_clip_1_star-10"><path fill="#fff" d="M0 0H200V200H0z"></path></clipPath></defs></svg>
+
+
                     </SpotlightCard>
 
                     <div className='text-center leading-[1em] font-extrabold capitalize text-[3.5rem] sm:text-[5rem] md:text-[7.5rem] flex flex-col items-center justify-center gap-2 sm:gap-4 md:gap-5'>
@@ -58,7 +61,7 @@ function LandingPage() {
                     {features.map((feature, idx) => (
                         <SpotlightCard
                             key={idx}
-                            className="inline-flex w-auto min-w-[30vw] h-fit  max-w-[95vw]  sm:max-w-[48vw] min-h-[30vh]  md:max-w-[30vw] md:min-h-[60vh] px-4 sm:px-6 py-4 sm:py-8  rounded-2xl flex-col justify-center items-start custom-spotlight-card transition-all duration-500 ease-in-out  hover:rotate-1 hover:scale-105"
+                            className="inline-flex w-auto min-w-[30vw] min-h-[40vh] max-w-[95vw]  sm:max-w-[48vw]  md:max-w-[30vw] px-4 sm:px-6 py-4 sm:py-8  rounded-2xl flex-col justify-center items-start custom-spotlight-card transition-all duration-500 ease-in-out  hover:rotate-1 hover:scale-105"
                             spotlightColor='rgba(240 ,171, 252, .35)'
                         >
                             {idx === 0 && <Brain size={48} sm={62} className='mb-4 sm:mb-8 text-white p-2 rounded-[25%] bg-gradient-to-r from-[#f43f5e] via-[#d946ef] to-[#6366f1]' />}
@@ -80,7 +83,7 @@ function LandingPage() {
                         It's a simple tool i made for better note-taking. Maybe you'll find it useful too.
                     </p>
                     <Link to="/Login">
-                        <Button classNameSting="text-[1.2rem] p-2 px-5 capitalize sm:text-[1.5rem] md:text-[2rem] font-[100] text-white bg-black/55 backdrop-blur-sm hover:bg-black/75 hover:backdrop-blur-md rounded-xl transition-all duration-300 ease-in-out" text="Give it a Try" />
+                        <Button  classNameSting="text-[0.5em] py-[0.3rem] px-[1rem] font-semibold sm:text-[1.2em] md:text-[1em] font-light bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:scale-105 transition-all duration-500 shadow-md hover:shadow-[0_0_50px_rgba(139,92,246,0.6),0_0_30px_rgba(59,130,246,0.5)] rounded-xl whitespace-nowrap  " text="Let's Try" />
                     </Link>
                 </div>
 

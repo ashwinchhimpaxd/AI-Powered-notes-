@@ -4,6 +4,8 @@ import Login from "./Component/Login";
 import LandingPage from "./Pages/LandingPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard";
+import Notfoundpage from "./Pages/Notfoundpage";
+import Editor from "./Pages/Editor";
 function App() {
 
   function AppRoute() {
@@ -12,7 +14,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
-        {/* <Route path="/" element={<LandingPage />} /> */}
+        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/Editor" element={<Editor />} />
+        <Route path="*" element={<Notfoundpage />} />
       </Routes>
     )
   }
@@ -20,10 +24,10 @@ function App() {
     <>
       <div className=" h-screen w-full">
 
-        {/* <BrowserRouter>
+        <BrowserRouter>
+
           <AppRoute />
-        </BrowserRouter> */}
-        <Dashboard />
+        </BrowserRouter>
       </div>
     </>
   );
