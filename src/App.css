@@ -8,18 +8,23 @@
 }
 
 * {
-    font-family: "BAHNSCHRIFT";
+    font-family: "Kufam", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }
 
 :root {
     --white-font-color: #f6f2f2;
     --para-font-color: #f2f2f3;
+    --primary-text-color: #FFD2D2;
+    --primary-landing-page-text-color:#FFD151;
 }
 
 body,
 html {
 
-    background: linear-gradient(to right, #181a20, #23252b);
+    background: black;
 
     background-repeat: no-repeat;
     background-size: cover;
@@ -31,19 +36,6 @@ body::-webkit-scrollbar {
     /* Chrome, Safari */
 }
 
-
-.card-3d {
-    transform-style: preserve-3d;
-    transform-origin: bottom bottom;
-    /* or top left, etc. */
-    transition: transform 0.5s ease;
-}
-
-.card-3d:hover {
-    transform: rotateY(12deg) rotateX(5deg) scale(1.1);
-}
-
-#Home,
 #dashboard {
     /* background-image: url('https://images.unsplash.com/photo-1694867978841-12cd4820d4f1?q=80&w=2057&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); */
     background: linear-gradient(to right, #232526, #534861, #232326);
@@ -160,4 +152,3 @@ body::-webkit-scrollbar {
     border: 2px solid red;
     padding: 20px;
 }
-

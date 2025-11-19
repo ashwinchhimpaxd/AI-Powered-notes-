@@ -2,7 +2,7 @@ import React from 'react'
 
 function Button({ classNameSting, text }) {
     return (
-        <button className={`${classNameSting} w-fit  rounded-xl cursor-pointer`} > {text}</button >
+        <button className={`${classNameSting}  rounded-xl cursor-pointer text-center `} > {text}</button >
     )
 }
 

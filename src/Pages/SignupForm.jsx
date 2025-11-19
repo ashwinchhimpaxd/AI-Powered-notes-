@@ -21,7 +21,7 @@ function SignupForm() {
                     Create Account
                 </h2>
                 <h3 className="text-[clamp(1rem,2.5vw,1.35rem)]  tracking-tight font-[800] text-start mb-6 uppercase  text-[#4b6933]">
-                    Start your AI-powered note-taking journey
+                    Start your AI-powered notes-taking journey
                 </h3>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -70,7 +70,7 @@ function SignupForm() {
                     {/* Password */}
                     <div>
                         <label className="block text-[clamp(1rem,2.5vw,1.4rem)] font-light text-[#e3fcce] mb-1">
-                            Password
+                            Create Password
                         </label>
                         <div className="relative">
                             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
