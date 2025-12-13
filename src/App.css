@@ -7,25 +7,18 @@
     font-style: normal;
 }
 
-* {
-    font-family: "Kufam", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-}
-
 :root {
     --white-font-color: #f6f2f2;
     --para-font-color: #f2f2f3;
-    --primary-text-color: #FFD2D2;
-    --primary-landing-page-text-color:#FFD151;
+    --primary-text-color: #fae7e7;
+    --primary-landing-page-text-color: #FFD151;
 }
 
 body,
 html {
 
+    font-family: "Kufam", sans-serif;
     background: black;
-
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -36,8 +29,16 @@ body::-webkit-scrollbar {
     /* Chrome, Safari */
 }
 
+#text-formatting::-webkit-scrollbar,
+.recent-sec-scroller::-webkit-scrollbar,
+.Dashboard-main-container::-webkit-scrollbar,
+#AI_ASSISTANT_QUICKCHAT::-webkit-scrollbar,
+#Text_Area_SCROLLBAR::-webkit-scrollbar {
+    display: none;
+}
+
 #dashboard {
-    /* background-image: url('https://images.unsplash.com/photo-1694867978841-12cd4820d4f1?q=80&w=2057&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); */
+    background-image: url('https://images.unsplash.com/photo-1694867978841-12cd4820d4f1?q=80&w=2057&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
     background: linear-gradient(to right, #232526, #534861, #232326);
 
     background-repeat: no-repeat;
@@ -45,12 +46,6 @@ body::-webkit-scrollbar {
     background-position: center;
 }
 
-/* {
-    background-color: #d985f5;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-} */
 
 /* rotate logo  */
 @keyframes spin360 {
@@ -69,7 +64,6 @@ body::-webkit-scrollbar {
 
 #all-notes-list::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari */
 }
 
 #search-bar:focus {
@@ -77,8 +71,6 @@ body::-webkit-scrollbar {
     border: none;
 }
 
-/*  tiptap editor classes  */
-/* Remove Tiptap default border */
 .ProseMirror {
     outline: none;
     border: none !important;
@@ -120,27 +112,85 @@ body::-webkit-scrollbar {
     border-radius: 999px;
 }
 
-.heading {
-    font-size: 5.5rem;
-    font-weight: 600;
-    color: var(--white-font-color);
-    letter-spacing: 0.1rem;
-}
 
 .ProseMirror h1 {
-    @apply text-5xl font-bold text-white mb-4;
+    @apply text-[3rem] mb-4;
+    /* white-space: nowrap; */
 }
 
 .ProseMirror h2 {
-    @apply text-4xl font-bold text-white mb-2;
+    @apply text-[2rem] mb-2;
+}
+
+.ProseMirror b,
+.ProseMirror strong {
+    font-weight: 700 !important;
+}
+
+.ProseMirror i,
+.ProseMirror em {
+    font-style: italic !important;
+}
+
+/* ensure combined marks render */
+.ProseMirror strong em,
+.ProseMirror em strong {
+    font-weight: 700 !important;
+    font-style: italic !important;
 }
 
 
-
-.editorimg {
-    max-width: 50%;
-    height: 50%;
+/* ✅ FORCE UNDERLINE TO ALWAYS WORK (even with bold + italic) */
+/* ✅ UNDERLINE SHOULD NOT FORCE ITALIC */
+.ProseMirror u {
+    text-decoration: underline !important;
 }
+
+/* ✅ Bold + Underline */
+.ProseMirror strong u,
+.ProseMirror u strong {
+    text-decoration: underline !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+}
+
+/* ✅ Italic + Underline */
+.ProseMirror em u,
+.ProseMirror u em {
+    text-decoration: underline !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+}
+
+/* ✅ Bold + Italic + Underline (only when user applied all three) */
+.ProseMirror strong em u,
+.ProseMirror u strong em,
+.ProseMirror em strong u {
+    text-decoration: underline !important;
+    font-weight: 700 !important;
+    font-style: italic !important;
+}
+
+.esize-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.resize-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border: 1px solid #333;
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+}
+
+.is-resizing img {
+    opacity: 0.8;
+}
+
 
 .ProseMirror a {
     color: #60a5fa;
@@ -148,7 +198,13 @@ body::-webkit-scrollbar {
     text-decoration: underline;
 }
 
-.tiptap {
-    border: 2px solid red;
-    padding: 20px;
+
+
+
+.ProseMirror img {
+    display: block;
+    margin: 1.5rem auto;
+    /* auto = center horizontally */
+    max-width: 100%;
+    height: auto;
 }

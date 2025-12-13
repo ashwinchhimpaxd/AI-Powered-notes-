@@ -58,7 +58,7 @@ function LandingPage() {
 
             <div id="botton-list-box" className="flex flex-col  m-auto justify-center items-center gap-[4vw] mt-[10%] mb-[5%]">
                 {list.map((item) => (
-                    <div key={item} className="p-4 bg-[#8E86FF] m-2 flex flex-row justify-between items-center w-[80vw] h-[14vw] rounded-[164.24px] 
+                    <div key={item.id} className="p-4 bg-[#8E86FF] m-2 flex flex-row justify-between items-center w-[80vw] h-[14vw] rounded-[164.24px] 
                     px-[3.5vw] py-[2vw] hover:scale-106  transition-all duration-600 ease-in-out ">
                         <p className="text-white w-[30%]  text-[3vw] font-bold!">{item.title}</p>
                         <img src={item.imgurl} alt="imgs" className="w-[12vw] " />
