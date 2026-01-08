@@ -22,7 +22,7 @@ function LoginForm() {
                     Welcome
                 </h2>
                 <h3 className="text-[clamp(1rem,2.5vw,1.35rem)]  tracking-tight font-[800] text-start mb-6 uppercase  text-[#4b6933]">
-                    Login and See your AI-powered notes 
+                    Login and See your AI-powered notes
                 </h3>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

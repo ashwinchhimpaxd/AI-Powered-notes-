@@ -83,9 +83,7 @@ const AIAssistantChat = () => {
             setInputText(''); // Clear input after sending
         }
     };
-
-    const quickchataiState = useSelector(state => state.QuickChatAI.quickchataiState);
-    console.log(quickchataiState)
+    const quickchataiState = useSelector(state => state.ToggleStates.quickchataiState);
     return (
 
 
@@ -103,7 +101,7 @@ const AIAssistantChat = () => {
                             {/* AI Avatar/Icon (only visible for AI messages) */}
                             {message.type === 'ai' && (
                                 <div className="flex-shrink-0 size-8 rounded-full bg-primary/20 flex items-center justify-center border">
-                                    <span className="material-symbols-outlined text-primary text-lg  border border-black/20 border-primary rounded-full p-1 bg-black">
+                                    <span className="material-symbols-outlined text-primary text-lg  border border-black/20  rounded-full p-1 bg-black">
 
                                         <img src="public\AI Star logo\SparklesAIForChat.svg" alt="" className='w-10 relative' />
                                     </span>

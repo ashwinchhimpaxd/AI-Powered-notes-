@@ -42,12 +42,13 @@ function Editor2({ onEditorReady }) {
     content: localStorage.getItem("editor_content") || "start typing here",
     immediatelyRender: true,
 
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      localStorage.setItem("editor_content", html);
+    onUpdate: async ({ editor }) => {
+      const content = JSON.stringify(editor.getJSON());
+      // console.log(content);
+      // console.log(JSON.parse(content));
+      localStorage.setItem("editor_content", content);
     },
   });
-
 
   // ✅ Jaise hi editor ready ho, parent ko bhej diya
   useEffect(() => {
@@ -59,15 +60,15 @@ function Editor2({ onEditorReady }) {
   if (!editor) return null;
 
   return (
-    <div className="flex flex-col  relative w-full h-full border-[0.3px] border-white/30 rounded-2xl overflow-hidden">
+    <div className="flex flex-col gap-5 relative w-full h-full  overflow-hidden">
       {/* ✅ TOOLBAR COMPONENT */}
-      <EditorToolbar editor={editor} className="z-10!" />
+      <EditorToolbar editor={editor} Usertype={" "} className="z-10!" />
 
       {/* ✅ EDITOR */}
       <div className="flex-1 overflow-y-auto ">
         <EditorContent
           editor={editor}
-          className="w-full h-full  p-[0.8rem]  text-[1.5rem] text-black border-2 bg-[#e9e7e7]"
+          className="w-full h-full  px-[3rem] py-[2rem] max-[660px]:px-[2rem]  text-[1.5rem] text-black border-2 bg-[#e9e7e7]"
         />
       </div>
     </div>

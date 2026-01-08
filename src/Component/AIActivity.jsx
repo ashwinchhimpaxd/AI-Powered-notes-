@@ -7,27 +7,14 @@ export default function AIActivityAndStats() {
 
             {/* AI Activity */}
             <div className="lg:col-span-2">
-                <h3 className="text-white text-[3.2rem] font-bold px-4 pb-2 pt-4" style={{ color: "var( --primary-text-color)" }}>
+                <h3 className="text-white text-[2.5rem] font-bold px-4 pb-2 pt-4" style={{ color: "var( --primary-text-color)" }}>
                     AI Assistant
                 </h3>
 
                 <div className="p-4 space-y-6">
 
                     <AIAssistantChat />
-                    {/* Item */}
-                    {/* <div className="flex items-start gap-4">
-                        
-
-                        <div className="flex-1">
-                            <p className="text-sm font-medium text-white">
-                                Summarized 'Project X Plan'
-                            </p>
-                            <p className="text-sm text-white/60">
-                                The AI generated a concise summary of your plan.
-                            </p>
-                            <p className="text-xs text-white/40 mt-1">20 minutes ago</p>
-                        </div>
-                    </div> */}
+                    
                 </div>
             </div>
 

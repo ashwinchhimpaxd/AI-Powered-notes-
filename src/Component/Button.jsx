@@ -1,8 +1,8 @@
 import React from 'react'
 
-function Button({ classNameSting, text }) {
+function Button({ classNameSting, text, onclick }) {
     return (
-        <button className={`${classNameSting}  rounded-xl cursor-pointer text-center `} > {text}</button >
+        <button onClick={onclick} className={`${classNameSting}   rounded-xl cursor-pointer text-center `}   > {text}</button >
     )
 }
 

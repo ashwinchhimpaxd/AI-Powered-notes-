@@ -1,7 +1,25 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from '../Component/Button';
 import Navbar from '../Component/Navbar'
+import userAuthService from '@/AppWrite/auth';
+
 function LandingPage() {
+    const navigate = useNavigate();
+
+    const handleGetStarted = async () => {
+        console.log("Get Started button clicked");
+        try {
+            const user = await userAuthService.getCurrentUser();
+            if (user) {
+                navigate("/dashboard"); // User is logged in, redirect to dashboard
+            } else {
+                navigate("/login"); // User is not logged in, redirect to login page
+            }
+        } catch (error) {
+            console.error("Error checking login status:", error);
+            navigate("/login"); // In case of error, redirect to login page
+        }
+    };
 
     const list = [
 
@@ -24,9 +42,7 @@ function LandingPage() {
             {/* navbar */}
             <nav id="navigation-bar" className="flex justify-between items-center ">
                 <p className="capitalize text-[1.8rem] md:text-[2.5rem] text-[var(--primary-text-color)] text-nowrap cursor-default" style={{ color: "var(--primary-text-color)" }}>Ai note</p>
-                <Link to="/signup">
-                    <Button text="Get start" classNameSting="bg-[#A60003] text-[#FFFFFF] text-[1.2rem] md:text-[1.5rem] text-nowrap  capitalize flex justify-center items-center px-[1.5rem] py-[0.3rem] md:px-[2.5rem] md:py-[0.4rem] hover:scale-105 transition-all duration-300 ease-in-out hover:rotate-3 " />
-                </Link>
+                <Button text="Get start" type="button" onclick={handleGetStarted} classNameSting="bg-[#A60003] text-[#FFFFFF] text-[1.2rem] md:text-[1.5rem] text-nowrap  capitalize flex justify-center items-center px-[1.5rem] py-[0.3rem] md:px-[2.5rem] md:py-[0.4rem] hover:scale-105 transition-all duration-300 ease-in-out hover:rotate-3 " />
             </nav>
 
             {/* maine text of the landing page  */}
@@ -49,7 +65,7 @@ function LandingPage() {
             </div>
 
             {/* features line of landing page */}
-            <div id="feature-box-landingpage" className="mt-[4.5vw] flex flex-col justify-center items-center  ">
+            <div id="feature-box-landingpage" className="mt-[4.5vw] flex flex-col justify-center items-center gap-5 tracking-tighter ">
                 <p className=" text-[2.3vw]  text-center tracking-widest font-[100]" style={{ color: "var(--primary-text-color)" }}>The next-generation note-taking experience that adapts to your thinking patterns.</p>
                 <p className="font-bold! text-[3.3vw] text-white tracking-widest">Powered by AI.</p>
             </div>

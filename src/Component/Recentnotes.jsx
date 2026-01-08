@@ -99,7 +99,7 @@ export default function RecentNotes() {
 
     return (
         <div className="border-b-1 border-gray-400/30 flex flex-col justify-center   ">
-            <h2 className="text-white text-[3.2rem] font-bold px-4 pb-3 pt-5" style={{ color: "var( --primary-text-color)" }}>
+            <h2 className="text-white text-[2.5rem] font-bold px-4 pb-2 pt-4" style={{ color: "var( --primary-text-color)" }}>
                 Recent Notes
             </h2>
 
