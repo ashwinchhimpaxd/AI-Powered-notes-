@@ -6,7 +6,6 @@ import { Plus } from "@phosphor-icons/react"
 import { useState } from "react";
 import { useEffect } from "react";
 import NotesCreationForm from "../Component/NotesCreationForm";
-import getBlogData from "../AppWrite/Gettingdatafromaw"
 import Appsetting from "../Component/Appsettings/Appsetting"
 import { useSelector } from "react-redux";
 export default function Dashboard2() {
@@ -15,10 +14,21 @@ export default function Dashboard2() {
     const settingState = useSelector(state => state.ToggleStates.settingState);
     const [NewNotesClick, setNewNotesClick] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    useEffect(() => {
+        if (NewNotesClick) {
+            document.body.classList.add('no-scroll');
+        } else {
+            document.body.classList.remove('no-scroll');
+        }
+        return () => {
+            document.body.classList.remove('no-scroll');
+        };
+    }, [NewNotesClick]);
 
     useEffect(() => {
         console.log("useEffect called");
-        // getBlogData()
         // Simulate content loading
         const timer = setTimeout(() => {
             setLoading(!loading);
@@ -34,46 +44,51 @@ export default function Dashboard2() {
 
                 <SideNavBar />
 
-                {!settingState && <main className="flex-1 overflow-y-scroll Dashboard-main-container w-full  relative">
+                {!settingState &&
+                    <main className="flex-1 overflow-y-scroll Dashboard-main-container w-full  relative">
 
-                    {/* Search Bar */}
-                    <header className="flex items-center justify-between sticky top-0 bg-background-dark/80 backdrop-blur-sm z-1 px-10 py-5 border-b border-white/30">
+                        {/* Search Bar */}
+                        <header className=" flex items-center justify-between sticky top-0 bg-background-dark/80 backdrop-blur-sm z-1 px-10 py-5 border-b border-white/30">
 
-                        <div className="flex items-center justify-between  ">
-                            <label className="relative flex-col min-w-40 !h-10 max-w-sm ">
+                            <div className="flex items-center justify-between border  h-10 w-80 rounded-lg bg-white/10">
+                                <label className="relative flex w-full h-full">
+                                    <input
+                                        type="search"
+                                        className="w-full h-full pl-5 pr-4 text-white bg-white/10 rounded-lg focus:outline-2 cursor-pointer"
+                                        placeholder="Search notes..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                </label>
+                            </div>
 
-                                <input
-                                    type="search"
-                                    className="w-full h-full pl-5 pr-4 text-white  bg-white/10 rounded-lg focus:outline-2 cursor-pointer"
-                                    placeholder="Search notes..."
+                            <div className="flex items-center ">
+                                <div
+                                    className="bg-center bg-no-repeat bg-cover rounded-full size-10 "
+                                    style={{
+                                        backgroundImage:
+                                            'url("https://i.pinimg.com/736x/e2/7c/a8/e27ca8535e10433175054a362a50f994.jpg")',
+                                    }}
                                 />
-                            </label>
+                            </div>
+                        </header>
+
+                        {/* Sections */}
+                        <div className="p-10">
+                            <RecentNotes searchQuery={searchQuery} />
+                            <AIActivityAndStats />
                         </div>
+                    </main>}
 
-                        <div className="flex items-center ">
-                            <div
-                                className="bg-center bg-no-repeat bg-cover rounded-full size-10 "
-                                style={{
-                                    backgroundImage:
-                                        'url("https://i.pinimg.com/736x/e2/7c/a8/e27ca8535e10433175054a362a50f994.jpg")',
-                                }}
-                            />
-                        </div>
-                    </header>
+                {/* this section is shown when creating a new note */}
 
-                    {/* Sections */}
-                    <div className="p-10">
-
-                        <RecentNotes />
-                        <AIActivityAndStats />
-                    </div>
-                    {NewNotesClick && <NotesCreationForm />}
-                    <div className="bg-purple-200/70 p-1 w-fit h-fit rounded-full fixed bottom-10 right-[5%] ">
-                        <Plus color="white" className="text-[2.5rem] cursor-pointer " weight="bold" onClick={() => setNewNotesClick(!NewNotesClick)} />
-                    </div>
-                </main>}
+                {NewNotesClick && <NotesCreationForm setNewNotesClick={setNewNotesClick} />}
+                <div className="bg-purple-200/70 p-1 w-fit h-fit rounded-full fixed bottom-10 right-[5%] ">
+                    <Plus color="white" className="text-[2.5rem] cursor-pointer " weight="bold" onClick={() => setNewNotesClick(!NewNotesClick)} />
+                </div>
 
 
+                {/* app setting opening previews  */}
                 {settingState && <Appsetting />}
 
             </div >

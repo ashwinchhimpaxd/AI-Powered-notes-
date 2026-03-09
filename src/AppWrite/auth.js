@@ -3,7 +3,7 @@ import { Client, Account, ID } from 'appwrite'
 
 export class UserAuthentication {
     client = new Client();
-    account; // Spelling 'acount' se 'account' sahi ki gayi hai
+    account;
     userid;
 
     constructor() {
@@ -43,25 +43,32 @@ export class UserAuthentication {
 
     // 3. PHASE 1: Send OTP to Email (2025 Standard)
     // Magic URL ki jagah Email Token use karein agar 6-digit code chahiye
-    async sendOtp(email) {
 
+    // send otp to user email
+    async sendOtp(email) {
         // console.log(this.userid);
         try {
             // Appwrite naye user ke liye ID.unique() aur purane ke liye email se handle kar leta hai
             const sessiontoken = await this.account.createEmailToken(
                 ID.unique(),
                 email,
+                true // Add this param to send a 6-digit phrase instead of magic URL
             );
+
             if (!sessiontoken) return;
             this.userid = sessiontoken.userId; // Login ke liye userId ko frontend state mein save karna hoga
+            return sessiontoken;
         } catch (error) {
             console.error("Appwrite service :: sendOtp :: error", error);
             throw error;
+        } finally {
+            console.log("system of otp sender if finiced successfully")
         }
     }
 
     // 4. PHASE 2: Verify OTP and Login
-    async verifyOtp({ otp, userName }) {
+    async verifyOtp(otp, userName) {
+        console.log(otp, userName)
         try {
             // secret hi woh 6-digit OTP hai jo user enter karega
             const usersession = await this.account.createSession(this.userid, otp);
@@ -70,7 +77,8 @@ export class UserAuthentication {
             }
             return usersession;
         } catch (error) {
-            throw error;
+            console.error(error);
+            // throw error;
         }
     }
 
@@ -78,7 +86,7 @@ export class UserAuthentication {
     // update the user current email by using otp verification
     async SendOTPforUpdateUserEmail({ newemail }) {
         try {
-            await this.account.createEmailToken(this.userid, newemail);
+            await this.account.createEmailToken(this.userid, newemail, true);
             return true;
         } catch (error) {
             console.error("Send email otp failed", error);

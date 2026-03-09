@@ -1,41 +1,102 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+// Components
 import Signup from "./Component/Signup";
-import LoginUsingNumber from "./Component/LoginAuthantication/LoginUsingNumber";
 import Login from "./Component/Login";
 import LandingPage from "./Pages/LandingPage";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Notfoundpage from "./Pages/Notfoundpage";
-import Editorpage from "./Pages/Editorpage.jsx";
 import Dashboard2 from "./Pages/Dashboard2.jsx";
+import Editorpage from "./Pages/Editorpage.jsx";
+import EditProfile from "./Component/Appsettings/allappsettingfeatures/EditProfile.jsx";
+import Notfoundpage from "./Pages/Notfoundpage";
 
+const ProtectedRoute = ({ children, authentication = true }) => {
+
+  const authStatus = useSelector(
+    (state) => state.UserAuthantication.Islogin
+  );
+
+  // redux-persist load hone tak kuch render mat karo
+  if (authStatus === undefined) {
+    return null;
+  }
+
+  // Agar page private hai aur login nahi hai
+  if (authentication && !authStatus) {
+    return <Navigate to="/Login" />;
+  }
+
+  // Agar user already login hai aur login/signup open kar raha hai
+  if (!authentication && authStatus) {
+    return <Navigate to="/Dashboard" />;
+  }
+
+  return children;
+};
 
 function App() {
-
-  function AppRoute() {
-    return (
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Signup" element={<Signup />} />
-        <Route path="/Dashboard" element={<Dashboard2 />} />
-        <Route path="/editor" element={<Editorpage />} />
-        <Route path="*" element={<Notfoundpage />} />
-      </Routes>
-    )
-  }
   return (
-    <>
-      <div className=" h-screen w-full">
+    <div className="h-screen w-full">
+      <BrowserRouter>
+        <Routes>
 
-        <BrowserRouter>
-          {/* <Navbar /> */}
-          {/* <Dashboard2 /> */}
+          {/* PUBLIC */}
+          <Route path="/" element={<LandingPage />} />
 
-          {/* <Editor2 /> */}
-          <AppRoute />
-        </BrowserRouter>
-      </div>
-    </>
+          {/* AUTH */}
+          <Route
+            path="/Login"
+            element={
+              <ProtectedRoute authentication={false}>
+                <Login />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/Signup"
+            element={
+              <ProtectedRoute authentication={false}>
+                <Signup />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PRIVATE */}
+          <Route
+            path="/Dashboard"
+            element={
+              <ProtectedRoute authentication={true}>
+                <Dashboard2 />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/editor"
+            element={
+              <ProtectedRoute authentication={true}>
+                <Editorpage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute authentication={true}>
+                <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 */}
+          <Route path="*" element={<Notfoundpage />} />
+
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 

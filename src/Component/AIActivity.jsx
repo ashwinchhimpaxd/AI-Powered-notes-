@@ -1,7 +1,10 @@
 import AIAssistantChat from "./AIAssistantChat";
+import { useSelector } from "react-redux";
 
 // AIActivityAndStats.jsx
 export default function AIActivityAndStats() {
+    const notes = useSelector((state) => state.NotesCreation.notes);
+
     return (
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -13,8 +16,8 @@ export default function AIActivityAndStats() {
 
                 <div className="p-4 space-y-6">
 
-                    <AIAssistantChat />
-                    
+                    <AIAssistantChat showPlusIcon={false} />
+
                 </div>
             </div>
 
@@ -25,10 +28,10 @@ export default function AIActivityAndStats() {
                 <div className="p-4 space-y-4">
                     <div className="p-5 bg-white/5 rounded-lg border border-white/10">
                         <p className="text-sm text-white/60">Total Notes</p>
-                        <p className="text-3xl font-bold text-white mt-1">128</p>
+                        <p className="text-3xl font-bold text-white mt-1">{notes ? notes.length : 0}</p>
                     </div>
                     <div className="p-5 bg-white/5 rounded-lg border border-white/10">
-                        <p className="text-sm text-white/60">Starred Notes</p>
+                        <p className="text-sm text-white/60">Important Notes</p>
                         <p className="text-3xl font-bold text-white mt-1">16</p>
                     </div>
                     <div className="p-5 bg-white/5 rounded-lg border border-white/10">

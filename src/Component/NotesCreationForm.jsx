@@ -2,10 +2,12 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useDispatch } from 'react-redux';
-import { Notetitlesetter } from '../redux/NotesCreation/NotesCreationSlice.js'
-function NotesCreationForm() {
+import { Notetitlesetter, addNote } from '../redux/NotesCreation/NotesCreationSlice.js'
 
 
+function NotesCreationForm({ setNewNotesClick }) {
+
+    console.log(setNewNotesClick)
     const dispatch = useDispatch();
     const {
         register,
@@ -23,7 +25,7 @@ function NotesCreationForm() {
 
 
     return (
-        <div className=" z-99  bg-white/10  backdrop-blur-xs absolute w-full h-full flex justify-center  items-center">
+        <div className=" z-99  bg-white/10 top-0  backdrop-blur-xs absolute  w-full h-full flex justify-center  items-center">
 
             <div className="border border-white/30  relative w-1/3 h-1/2 text-center capitalize flex flex-col justify-start items-center p-10 text-white rounded-4xl bg-[#191919]">
                 <p className="text-white text-4xl font-bold capitalize" style={{ color: "var( --primary-text-color)" }}>note name</p>
@@ -41,16 +43,21 @@ function NotesCreationForm() {
                             <Link to="/editor" className="">
                                 <button type="submit" className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
                                 border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 " style={{ color: "var( --primary-text-color)" }} disabled={isSubmitting}
-                                    onClick={() => dispatch(Notetitlesetter(getValues("title")))}
+                                    onClick={() => {
+                                        const title = getValues("title");
+                                        dispatch(Notetitlesetter(title));
+                                        dispatch(addNote(title));
+                                    }}
                                 >
                                     {isSubmitting ? "Creating..." : "Create"}
                                 </button>
                             </Link>
 
                             <button className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
-                                border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 " onClick={() => {
-
-                                    setNewNotesClick(!NewNotesClick)
+                                border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 "
+                                onClick={() => {
+                                    console.log("Cancel button clicked");
+                                    setNewNotesClick(false)
                                     reset()
                                 }} style={{ color: "var( --primary-text-color)" }}>Cancel</button>
                         </div>

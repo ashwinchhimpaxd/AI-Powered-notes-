@@ -11,8 +11,8 @@
 :root {
     --white-font-color: #f6f2f2;
     --para-font-color: rgb(0, 0, 255);
-    --primary-text-color: 0 0 255;
-    /* --primary-text-color: rgb(250, 231, 231); */
+    /* --primary-text-color: 0 0 255; */
+    --primary-text-color: rgb(250, 231, 231);
     --primary-landing-page-text-color: #FFD151;
     --radius: 0.625rem;
     --background: oklch(1 0 0);
@@ -49,11 +49,7 @@
 }
 
 
-/* @layer components {
-    .primary_text_color {
-        color: rgb(var(--primary-text-color));
-    }
-} */
+/*                                                                                                                                                                           */
 
 body,
 html {
@@ -66,9 +62,28 @@ html {
 }
 
 ::-webkit-scrollbar {
-    display: none;
+    /* display: none; */
     /* Chrome, Safari */
+
 }
+
+
+#Home {
+  background-image: url('../public/landingpagedesign/IPBZLNOFykXPribG9KAtpoMptJs.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+/* #Home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(202, 194, 194, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(1px);
+} */
 
 @theme {
     --color-text-primary: rgb(var(--primary-text-color));
@@ -156,6 +171,41 @@ html {
 .ProseMirror h2 {
     @apply text-[2rem] mb-2;
 }
+
+.ProseMirror ul {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+    margin-bottom: 1rem;
+}
+
+.ProseMirror ul ul {
+    list-style-type: circle !important;
+}
+
+.ProseMirror ol {
+    list-style-type: decimal !important;
+    padding-left: 1.5rem !important;
+    margin-bottom: 1rem;
+}
+
+.ProseMirror li {
+    margin-bottom: 0.25rem;
+}
+
+.ProseMirror p {
+    margin-bottom: 0.5rem;
+}
+
+.ProseMirror blockquote {
+    border-left: 4px solid #94a3b8;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    color: #475569;
+    background-color: #f1f5f9;
+    font-style: italic;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
 
 .ProseMirror b,
 .ProseMirror strong {

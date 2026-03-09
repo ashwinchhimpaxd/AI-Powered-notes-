@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import Button from '../Component/Button';
 import Navbar from '../Component/Navbar'
 import userAuthService from '@/AppWrite/auth';
+import { Sparkle } from "@phosphor-icons/react";
 
 function LandingPage() {
     const navigate = useNavigate();
@@ -41,8 +42,11 @@ function LandingPage() {
         <div id='Home' className='relative w-full max-h-auto min-h-screen selection:bg-purple-200 selection:text-black pt-12 px-8 md:px-12 overflow-x-hidden'>
             {/* navbar */}
             <nav id="navigation-bar" className="flex justify-between items-center ">
-                <p className="capitalize text-[1.8rem] md:text-[2.5rem] text-[var(--primary-text-color)] text-nowrap cursor-default" style={{ color: "var(--primary-text-color)" }}>Ai note</p>
-                <Button text="Get start" type="button" onclick={handleGetStarted} classNameSting="bg-[#A60003] text-[#FFFFFF] text-[1.2rem] md:text-[1.5rem] text-nowrap  capitalize flex justify-center items-center px-[1.5rem] py-[0.3rem] md:px-[2.5rem] md:py-[0.4rem] hover:scale-105 transition-all duration-300 ease-in-out hover:rotate-3 " />
+                <div className="flex justify-center items-center gap-2 ">
+                    <Sparkle className='size-12 text-purple-500' weight={false ? "fill" : "regular"} />
+                    <p className="capitalize relative top-1 text-[1.4rem] md:text-[2.1rem] text-[var(--primary-text-color)] text-nowrap cursor-default font-semibold tracking-wide" style={{ color: "var(--primary-text-color)" }}>noteAi</p>
+                </div>
+                <Button text="Get start" type="button" onclick={handleGetStarted} classNameSting="bg-[#A60003] text-[#FFFFFF] text-[1.3rem] md:text-[1.8rem] tracking-wide font-medium text-nowrap  capitalize bottom-1.5 relative flex justify-center items-center px-[1.5rem] py-[0.3rem] md:px-[2.9rem] md:pt-[0.6rem] hover:scale-105 transition-all duration-300 ease-in-out hover:rotate-3 " />
             </nav>
 
             {/* maine text of the landing page  */}
@@ -74,11 +78,11 @@ function LandingPage() {
 
             <div id="botton-list-box" className="flex flex-col  m-auto justify-center items-center gap-[4vw] mt-[10%] mb-[5%]">
                 {list.map((item) => (
-                    <div key={item.id} className="p-4 bg-[#8E86FF] m-2 flex flex-row justify-between items-center w-[80vw] h-[14vw] rounded-[164.24px] 
+                    <div key={item.id} className="p-2 bg-[#5F4A8B] m-2 flex flex-row justify-between items-center w-[50vw] h-[10vw] rounded-[164.24px] 
                     px-[3.5vw] py-[2vw] hover:scale-106  transition-all duration-600 ease-in-out ">
-                        <p className="text-white w-[30%]  text-[3vw] font-bold!">{item.title}</p>
-                        <img src={item.imgurl} alt="imgs" className="w-[12vw] " />
-                        <p className="text-[2.2vw]  w-[38%]  h-full flex justify-center items-center text-start font-semibold! " style={{ color: "var(--primary-landing-page-text-color)" }}>{item.subtitle}</p>
+                        <p className="text-white w-[30%]  text-[1.6rem] font-bold!">{item.title}</p>
+                        <img src={item.imgurl} alt="imgs" className="w-[7vw] " />
+                        <p className="text-[1.4rem]  w-[38%]  h-full flex justify-center items-center text-start font-semibold! " style={{ color: "var(--primary-landing-page-text-color)" }}>{item.subtitle}</p>
                     </div>
                 ))}
 

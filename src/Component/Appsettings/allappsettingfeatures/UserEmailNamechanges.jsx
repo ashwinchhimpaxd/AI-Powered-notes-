@@ -1,294 +1,96 @@
-
 import React, { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { REGEXP_ONLY_DIGITS } from "input-otp"
+import { Camera, User, PencilSimple, EnvelopeSimple, AppWindow } from "@phosphor-icons/react"
+import { useNavigate } from "react-router-dom"
 
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from "@/components/ui/input-otp"
 function UserEmailNamechanges() {
-    const {
-        register,
-        handleSubmit,
-        getValues,
-        trigger,
-        setValue,
-        setFocus,
-        control,
-        formState: { errors, isSubmitting },
-    } = useForm({});
+    const navigate = useNavigate();
 
-    const emailRegister = register("Email", {
-        required: "Email require",
-        pattern: {
-            value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-            message: "Invalid email address",
-        },
-    });
-
-
-    // cooldown state for resend otp button
-    const [cooldown, setCooldown] = useState(0);
+    // In a real app, these would come from your auth context or global state
     const [username, setusername] = useState("ashwin");
     const [useremail, setuseremail] = useState("nuni@gmail.com");
 
-    const [IsNameEdit, setIsNameEdit] = useState(false);
-    const [IsEmailEdit, setIsEmailEdit] = useState(false);
-
-    const OnSendOtp = async () => {
-
-        console.log("Send OTP clicked");
-        // validate email first
-        // const isValid = await trigger("Email");
-        // if (!isValid) {
-        //     setIsEmailEdit(true);
-        //     setFocus && setFocus("Email");
-        //     return;
-        // }
-        // setCooldown(5);
-        // const { Email } = getValues();
-        // try {
-        //     if (typeof userAuthService !== "undefined" && userAuthService.sendOtp) {
-        //         await userAuthService.sendOtp(Email);
-        //     } else {
-        //         console.log("sendOtp placeholder, Email:", Email);
-        //     }
-        // } catch (error) {
-        //     console.log(error.message)
-        // }
+    const handleEditProfile = () => {
+        // Redirect to the dedicated profile editing page
+        // You'll need to create this route in your App.jsx, e.g., <Route path="/profile/edit" ... />
+        navigate('/profile/edit');
     };
 
-    React.useEffect(() => {
-        if (cooldown <= 0) return;
-
-        const timer = setInterval(() => {
-            setCooldown((prev) => prev - 1);
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [cooldown]);
-
-    // const [Name, setName] = useState("ashwin")
-    const CheckName = () => {
-        if (username.trim().length === 0) {
-            setusername("ashwin");
-            return;
-        }
-        setusername(username.replace(/\s+/g, ' ').trim());
-    }
-
-    const checkuseremail = () => {
-        if (useremail.trim().length === 0) {
-            setuseremail("ashwin@gmail.com");
-            return;
-        }
-        return;
-    }
-
-    const onSubmit = data => {
-        console.log('Profile data:', data)
-    }
-
     return (
+        <section className="relative overflow-hidden group bg-card/80 backdrop-blur-2xl border border-border rounded-3xl p-6 sm:p-10 transition-all duration-500 hover:border-primary/50 shadow-sm">
+            {/* Background Glow */}
+            <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/10 rounded-full blur-[80px] opacity-50 pointer-events-none group-hover:bg-primary/20 group-hover:scale-150 transition-all duration-700"></div>
 
-        <section className="space-y-6 border-white/20 border-y p-6 min-h-fit relative  bg-black/20 backdrop-blur-sm shadow-glass">
-            <h2 className="text-[2rem] font-bold  text-white uppercase tracking-wider pl-1">Profile</h2>
-            <div className="glass-panel rounded-2xl space-y-10 s  p-8 flex flex-col md:flex-row items-start justify-between gap-10  shadow-glass">
-                <div className="relative group ">
-                    <img alt="Profile" className="size-20 rounded-full object-cover ring-4 ring-white/5 shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1qc4tvjBVPlfp3DnDnxMofgyKvIqfegNplSnqH6UiTtl8mNjD0bUbAt1QOhqH1PyAVLaX77MxtHV1_czTSZ3cSMEdBlE2XfiowN-SYUhNPaoOGKaSlxmx9yZjxdv64LE6fnX4GZ8taUiHxU81MgCI_iSFwH-NnJYH24BR_owKrG_zjuPT-GQWgb3bn8ILyXz1eUnTVXpvVbHO4M4Xh8MK6fajTCOCKdPT6nHEm7zaammop9Zl7T7_D4xyJhXNWNZ1csj72IqyVg" />
-                    <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer backdrop-blur-sm">
-                        <span class="material-icons-round text-white">camera_alt</span>
+            <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12">
+
+                {/* Profile Image Section */}
+                <div className="flex flex-col items-center gap-6 shrink-0 w-full lg:w-1/3">
+                    <div className="w-full text-center lg:text-left mb-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+                            <User size={14} weight="bold" />
+                            Personal Info
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-wide">Profile Details</h2>
+                        <p className="text-sm text-muted-foreground mt-2 leading-relaxed">View your current profile credentials. Click Edit Profile to make changes.</p>
+                    </div>
+
+                    <div className="relative group/avatar">
+                        <div className="absolute inset-0 bg-primary/30 rounded-full blur opacity-30 group-hover/avatar:opacity-60 transition-opacity duration-500"></div>
+                        <img
+                            alt="Profile"
+                            className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover ring-[6px] ring-background shadow-lg transition-all duration-500 group-hover/avatar:ring-primary/50 group-hover/avatar:scale-105"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1qc4tvjBVPlfp3DnDnxMofgyKvIqfegNplSnqH6UiTtl8mNjD0bUbAt1QOhqH1PyAVLaX77MxtHV1_czTSZ3cSMEdBlE2XfiowN-SYUhNPaoOGKaSlxmx9yZjxdv64LE6fnX4GZ8taUiHxU81MgCI_iSFwH-NnJYH24BR_owKrG_zjuPT-GQWgb3bn8ILyXz1eUnTVXpvVbHO4M4Xh8MK6fajTCOCKdPT6nHEm7zaammop9Zl7T7_D4xyJhXNWNZ1csj72IqyVg"
+                        />
                     </div>
                 </div>
 
+                {/* Info Display Section (Read-Only) */}
+                <div className='w-full lg:w-2/3 relative'>
+                    <div className="relative bg-background/40 border border-border rounded-2xl p-6 sm:p-8 shadow-inner overflow-hidden flex flex-col justify-center h-full min-h-[300px]">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none"></div>
 
-                <form onSubmit={handleSubmit(onSubmit)} class=" w-full  px-2 h-fit grid grid-cols-1 md:grid-cols-2  gap-3  justify-center ">
-                    {/* user name field  */}
-                    <div className="space-y-2  w-full  relative">
-                        <label className="text-4xl font-semibold ml-2" style={{ color: "var(--primary-text-color)" }}>
-                            Name
-                        </label>
-                        <div className="flex gap-3 ">
-                            {/* userName Input */}
-                            <div className="flex-1">
-                                {!IsNameEdit ? (
-                                    <h2 onClick={() => setIsNameEdit(true)} className='text-xl border text-text-primary/50 font-semibold p-3 text-debugred' >
-                                        {username}
-                                    </h2>
-                                ) : (
+                        <div className="space-y-8 relative z-10">
 
-                                    <input
-                                        type="text"
-                                        placeholder="User name"
-                                        autoFocus
-                                        value={username}
-                                        {...register("User", { required: false })}
-                                        onBlur={() => {
-                                            CheckName();
-                                            setIsNameEdit(false)
-                                        }}
-                                        onChange={(e) => setusername(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
-                                                CheckName();
-                                                setIsNameEdit(false)
-                                            };
-                                        }}
-                                        style={{ color: "var(--primary-text-color)" }}
-                                        className="form-input w-full text-xl font-semibold  bg-surface-light dark:bg-surface-dark   dark:border-slate-700 rounded-xl p-3 placeholder:text-slate-400  focus:ring-0 focus:outline-0   "
-                                    />
-                                )}
-                            </div>
-                        </div>
-                        <div>
-                            {errors.User && (
-                                <p className="text-1xs text-red-500 ml-2 mt-2">
-                                    {errors.User.message}
-                                </p>
-                            )}
-
-                        </div>
-
-                    </div>
-
-                    {/* email section and otp section  */}
-                    <div className="space-y-2 relative  w-full flex flex-col ">
-                        <label className="text-4xl font-semibold ml-2" style={{ color: "var(--primary-text-color)" }}>
-                            Email
-                        </label>
-                        <div className=' '>
-                            <div className="flex  ">
-                                {/* email Input */}
-                                <div className="flex-1">
-                                    {!IsEmailEdit ? (
-                                        <h2 onClick={() => setIsEmailEdit(true)} className='text-xl   font-semibold p-3' style={{ color: "var(--primary-text-color)" }}>
-                                            {useremail}
-                                        </h2>
-                                    ) : (
-
-                                        <input
-                                            type="email"
-                                            placeholder="you@gmail.com"
-                                            autoFocus
-                                            value={useremail}
-                                            {...emailRegister}
-                                            onBlur={(e) => {
-                                                const related = e.relatedTarget || document.activeElement;
-                                                const clickedSendButton = related && related.id === 'send-otp-btn';
-                                                const otpfieldUsing = related && related.id === 'otp-input-field';
-                                                if (clickedSendButton || otpfieldUsing) {
-                                                    // keep edit open because user clicked Send
-                                                    return;
-                                                }
-                                                if (emailRegister.onBlur) emailRegister.onBlur(e);
-                                                checkuseremail();
-                                                setIsEmailEdit(false);
-                                            }}
-                                            onChange={(e) => {
-                                                setuseremail(e.target.value);
-                                                if (emailRegister.onChange) emailRegister.onChange(e);
-                                                setValue && setValue("Email", e.target.value, { shouldValidate: true, shouldDirty: true });
-                                            }}
-                                            style={{ color: "var(--primary-text-color)" }}
-                                            className="form-input w-full text-xl font-semibold  bg-surface-light dark:bg-surface-dark   dark:border-slate-700 rounded-xl p-3 placeholder:text-slate-400  focus:ring-0 focus:outline-0   "
-                                        />
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* otp send button and error show div  */}
-                            <div className="  flex justify-between pr-1 relative  h-7  ">
-
-                                {errors.Email && (
-                                    <p className="text-1xs text-red-500 ml-2 mt-2 ">
-                                        {errors.Email.message}
-                                    </p>
-                                )}
-                                {IsEmailEdit &&
-                                    <button
-                                        id="send-otp-btn"
-                                        type="button"
-                                        // onMouseDown={(e) => {
-                                        //     // run send before input blur/unmount
-                                        //     e.preventDefault();
-                                        //     OnSendOtp();
-                                        // }}
-                                        onClick={OnSendOtp}
-                                        disabled={cooldown > 0}
-                                        className={`absolute right-2 top-2 text-[1rem] transition
-                                        ${cooldown > 0
-                                                ? "text-gray-400 cursor-not-allowed"
-                                                : "text-blue-500 hover:underline cursor-pointer"}
-                                        `}
-                                    >
-                                        {cooldown > 0 ? `Resend in ${cooldown}s` : "send code"}
-                                    </button>
-                                }
-                            </div>
-
-
-                            {/* OTP Section */}
-                            {IsEmailEdit && <div className="mt-4   text-2xl space-y-2 relative w-full    ">
-                                <label className="text-xl font-semibold ml-2" style={{ color: "var(--primary-text-color)" }}>
-                                    Verification Code
+                            {/* Read-only Username */}
+                            <div className="group/field">
+                                <label className="text-sm font-semibold text-muted-foreground ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
+                                    <AppWindow size={16} weight="bold" />
+                                    Name
                                 </label>
-
-                                <Controller
-                                    name="OTP"
-                                    control={control}
-                                    rules={{
-                                        required: "Enter OTP Code",
-                                        minLength: {
-                                            value: 6,
-                                            message: "Your OTP must be 6 characters"
-                                        }
-                                    }}
-                                    render={({ field }) => (
-                                        <InputOTP
-                                            maxLength={6}
-                                            pattern={REGEXP_ONLY_DIGITS}
-                                            className="w-full"
-                                            id="otp-input-field"
-                                            value={field.value}       // Connect value from RHF
-                                            onChange={field.onChange} // Connect onChange from RHF
-                                        >
-                                            <InputOTPGroup
-                                                className="w-[18em] flex input-otp-slot"
-                                                style={{ "--slot-width": "100%" }}
-                                            >
-                                                {[0, 1, 2, 3, 4, 5].map((i) => (
-                                                    <InputOTPSlot
-                                                        key={i}
-                                                        index={i}
-                                                        className="flex-1 text-white h-10 text-[1.3rem]"
-                                                    />
-                                                ))}
-                                            </InputOTPGroup>
-                                        </InputOTP>
-                                    )}
-                                />
-                                <div>
-                                    {errors.OTP && (
-                                        <p className=" text-red-500 ml-2 text-[1rem] ">
-                                            {errors.OTP.message}
-                                        </p>
-                                    )}
+                                <div className="w-full h-14 bg-input/5 border border-border/50 rounded-xl px-4 flex items-center transition-all group-hover/field:bg-input/10 group-hover/field:border-border">
+                                    <span className="text-foreground text-lg font-medium">{username}</span>
                                 </div>
-                            </div>}
+                            </div>
+
+                            {/* Read-only Email */}
+                            <div className="group/field">
+                                <label className="text-sm font-semibold text-muted-foreground ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
+                                    <EnvelopeSimple size={16} weight="bold" />
+                                    Email Address
+                                </label>
+                                <div className="w-full h-14 bg-input/5 border border-border/50 rounded-xl px-4 flex items-center transition-all group-hover/field:bg-input/10 group-hover/field:border-border">
+                                    <span className="text-foreground text-lg font-medium">{useremail}</span>
+                                </div>
+                            </div>
+
+                            {/* Redirect Button */}
+                            <div className="pt-4">
+                                <button
+                                    onClick={handleEditProfile}
+                                    className="w-full relative overflow-hidden rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-3.5 text-lg font-bold transition-all duration-300 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] flex justify-center items-center gap-3 group">
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        Edit Profile
+                                        <PencilSimple weight="bold" className="text-xl transform group-hover:scale-110 group-hover:rotate-12 transition-transform" />
+                                    </span>
+                                </button>
+                                <p className="text-center text-xs text-muted-foreground mt-3">You will be redirected to a secure page to update your credentials.</p>
+                            </div>
+
                         </div>
                     </div>
+                </div>
 
-                    <div class="md:col-span-2 flex justify-end">
-                        <button type="submit" class="shrink-0 px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition-colors shadow-lg shadow-white/5">
-                            Save Changes
-                        </button>
-                    </div>
-                </form>
             </div>
         </section>
-
     )
 }
 

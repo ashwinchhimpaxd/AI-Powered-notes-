@@ -8,20 +8,20 @@ function Editorpage() {
         console.log(editorInstance.getJSON())
     }
     return (
-        <div className='flex flex-col md:flex-row w-full h-full px-3 py-4 '>
+        <div className='flex flex-col w-full h-[100vh]'>
 
-            <div className='w-full md:w-3/4 h-full'>
+            <div className='w-full h-full flex flex-col'>
                 {/* upper div for note name and save button */}
 
 
                 <Editor2 onEditorReady={seteditorInstance} />
-
+                {/* <div className="w-full h-full">
+                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Et quis alias aperiam consequatur non soluta porro, reiciendis corrupti dicta mollitia perferendis exercitationem explicabo nesciunt commodi. A illo necessitatibus sed perferendis.
+                </div> */}
             </div>
             {/* <AIPanel editor={editorInstance}  /> */}
 
         </div>
     )
 }
-<button class="inline-flex h-12 items-center justify-center rounded-md bg-neutral-950 px-6 font-medium text-neutral-50 shadow-lg shadow-neutral-500/20 transition active:scale-95">Click me</button>
-
 export default Editorpage

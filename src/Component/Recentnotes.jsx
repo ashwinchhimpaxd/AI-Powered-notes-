@@ -3,46 +3,27 @@ import {
     TrashSimple,
     Star, DotsThreeVertical
 } from "@phosphor-icons/react";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteNote } from "../redux/NotesCreation/NotesCreationSlice.js";
 // import { databases } from "../appwrite"; // <-- adjust import according to your setup
 
-export default function RecentNotes() {
-    const [notes, setNotes] = useState([
-        {
-            $id: "temp1",
-            title: "Welcome Note",
-            description: "Your notes will appear here once you start writing!",
-            $updatedAt: new Date().toISOString(),
-        },
-        {
-            $id: "temp2",
-            title: "How to Use",
-            description: "Create notes using the editor and they will show up here.",
-            $updatedAt: new Date().toISOString(),
-        },
-        {
-            $id: "temp3", // Ensure unique ID
-            title: "How to Use this AI powered Notes for better workflow", // Longer title for testing
-            description: "Create notes using the editor and they will show up here.",
-            $updatedAt: new Date().toISOString(),
-        },
-        {
-            $id: "temp4", // Ensure unique ID
-            title: "Another Note Title",
-            description: "This is another description.",
-            $updatedAt: new Date().toISOString(),
-        },
-        {
-            $id: "temp5", // Ensure unique ID
-            title: "Short Title",
-            description: "A short description.",
-            $updatedAt: new Date().toISOString(),
-        },
-    ]);
+export default function RecentNotes({ searchQuery = "" }) {
+    const notes = useSelector((state) => state.NotesCreation.notes);
+    const dispatch = useDispatch();
+
+    const filteredNotes = notes.filter((note) => {
+        const titleMatch = note.title?.toLowerCase().includes(searchQuery.toLowerCase());
+        const descMatch = note.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        return titleMatch || descMatch;
+    });
+
     const [loading, setLoading] = useState(true);
     // State to hold the ID of the note whose menu is open
     const [openNoteMenuId, setOpenNoteMenuId] = useState(null);
     // Changed ISimportant to a Set to store multiple important note IDs
     const [importantNoteIds, setImportantNoteIds] = useState(new Set());
+    // State for the note to be deleted, controls the modal visibility
+    const [noteToDelete, setNoteToDelete] = useState(null);
 
     useEffect(() => {
         async function getNotes() {
@@ -96,6 +77,14 @@ export default function RecentNotes() {
         });
     };
 
+    // Function to confirm and execute deletion
+    const confirmDelete = () => {
+        if (noteToDelete) {
+            dispatch(deleteNote(noteToDelete));
+            setNoteToDelete(null);
+        }
+    };
+
 
     return (
         <div className="border-b-1 border-gray-400/30 flex flex-col justify-center   ">
@@ -109,16 +98,16 @@ export default function RecentNotes() {
             )}
 
             {/* EMPTY STATE */}
-            {!loading && notes.length === 0 && (
+            {!loading && filteredNotes.length === 0 && (
                 <p className="capitalize text-white/90 text-center relative bottom-10 text-[1.2rem] py-10 ">
                     Notes not found.
                 </p>
             )}
 
             {/* NOTES GRID */}
-            {!loading && notes.length > 0 && (
+            {!loading && filteredNotes.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-5 overflow-y-scroll h-[25rem] recent-sec-scroller cursor-pointer ">
-                    {notes.map((note) => (
+                    {filteredNotes.map((note) => (
                         <div
                             key={note.$id} // Ensure $id is unique for each note
                             className="relative flex flex-col gap-4 p-5 max-h-[10rem]  transition-all duration-300 bg-white/5 rounded-lg group hover:bg-white/10 "
@@ -126,8 +115,17 @@ export default function RecentNotes() {
                             {/* Conditionally render menu if this note's ID matches openNoteMenuId */}
                             {openNoteMenuId === note.$id && (
                                 <div className="absolute border border-white/30 top-8 left-[8.5rem] w-24 h-fit flex flex-col gap-1 justify-center items-center !bg-[#242424] rounded-md shadow-lg z-10">
-                                    <p className="p-2 text-white/80 hover:bg-white/10 w-full text-center text-sm">Edit</p>
-                                    <p className="p-2 text-white/80 hover:bg-white/10 w-full text-center text-sm">Delete</p>
+                                    <p className="p-2 text-white/80 hover:bg-white/10 w-full text-center text-sm cursor-pointer">Edit</p>
+                                    <p
+                                        className="p-2 text-white/80 hover:bg-white/10 w-full text-center text-sm cursor-pointer"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setNoteToDelete(note.$id);
+                                            setOpenNoteMenuId(null);
+                                        }}
+                                    >
+                                        Delete
+                                    </p>
                                 </div>
                             )}
 
@@ -168,6 +166,30 @@ export default function RecentNotes() {
                             </p>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* CONFIRMATION MODAL */}
+            {noteToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-[#242424] border border-white/10 rounded-xl p-6 shadow-2xl w-[90%] max-w-md flex flex-col gap-4">
+                        <h3 className="text-white text-xl font-semibold">Delete Note</h3>
+                        <p className="text-white/70">Are you sure you want to delete this note? This action cannot be undone.</p>
+                        <div className="flex justify-end gap-3 mt-4">
+                            <button
+                                onClick={() => setNoteToDelete(null)}
+                                className="px-4 py-2 rounded-lg text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 rounded-lg bg-red-600/80 hover:bg-red-600 text-white transition-colors cursor-pointer"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
