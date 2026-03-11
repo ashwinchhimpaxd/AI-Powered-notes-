@@ -1,13 +1,13 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useDispatch } from 'react-redux';
-import { Notetitlesetter, addNote } from '../redux/NotesCreation/NotesCreationSlice.js'
+import { Notetitlesetter, NoteSlugsetter, addNote } from '../redux/NotesCreation/NotesCreationSlice.js'
 
 
 function NotesCreationForm({ setNewNotesClick }) {
 
-    console.log(setNewNotesClick)
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const {
         register,
@@ -15,12 +15,18 @@ function NotesCreationForm({ setNewNotesClick }) {
         reset,
         getValues,
         formState: { isSubmitting, errors },
-    } = useForm({ defaultValues: { title: "Untitled" } });
+    } = useForm({ defaultValues: { title: "" } });
+    
     const onSubmit = async (data) => {
-        console.log(data);
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate an async operation
+        const title = data.title;
+        const newSlug = title.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, "");
+        dispatch(Notetitlesetter(title));
+        dispatch(NoteSlugsetter(newSlug));
+        dispatch(addNote(title));
+        
         setNewNotesClick(false); // Close the modal after submission
         reset(); // Clear the form after submission
+        navigate('/editor');
     };
 
 
@@ -34,26 +40,19 @@ function NotesCreationForm({ setNewNotesClick }) {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col justify-evenly items-center ">
                         {/* register your input into the hook by invoking the "register" function */}
-                        <input {...register("title", { required: "title is required" })} placeholder="enter title" className="border w-full text-start md:text-2xl p-2 pt-3 rounded-xl bg-white/8 border-white/30" style={{ color: "var( --primary-text-color)" }} />
+                        <input {...register("title", { required: "title is required" })} placeholder="enter title" className="border w-full text-start md:text-semibold p-2 pt-3 rounded-xl bg-white/8 border-white/30 " style={{ color: "var( --primary-text-color)" }} />
 
-                        {errors.title && <span className="absolute top-[50%] right-[10%]  ">{errors.title.message}</span>}
+                        {errors.title && <span className="absolute font-semibold text-red-400 top-[30%] left-[33%] -translate-x-1/2">{errors.title.message}</span>}
 
                         <div id="Okay-cancle-BTN" className="flex w-full justify-center items-center gap-15 text-2xl  ">
 
-                            <Link to="/editor" className="">
-                                <button type="submit" className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
+                            <button type="submit" className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
                                 border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 " style={{ color: "var( --primary-text-color)" }} disabled={isSubmitting}
-                                    onClick={() => {
-                                        const title = getValues("title");
-                                        dispatch(Notetitlesetter(title));
-                                        dispatch(addNote(title));
-                                    }}
-                                >
-                                    {isSubmitting ? "Creating..." : "Create"}
-                                </button>
-                            </Link>
+                            >
+                                {isSubmitting ? "Creating..." : "Create"}
+                            </button>
 
-                            <button className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
+                            <button type="button" className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
                                 border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 "
                                 onClick={() => {
                                     console.log("Cancel button clicked");

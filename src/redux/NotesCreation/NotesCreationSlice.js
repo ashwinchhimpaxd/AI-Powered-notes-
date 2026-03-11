@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit'
 const NotesCreation = createSlice({
     name: 'NotesCreation',
     initialState: {
-        NoteTitle: false,
+        NoteTitle: null,
+        NoteSlug: null,
         notes: [
             {
                 $id: "temp1",
@@ -41,6 +42,12 @@ const NotesCreation = createSlice({
         Notetitlesetter: (state, action) => {
             state.NoteTitle = action.payload
         },
+        NoteSlugsetter: (state, action) => {
+            // Only strictly generate the slug once, or allow resetting back to empty
+            if (!state.NoteSlug || action.payload === "") {
+                state.NoteSlug = action.payload
+            }
+        },
         addNote: (state, action) => {
             const newNote = {
                 $id: `temp_${Date.now()}`,
@@ -60,6 +67,6 @@ const NotesCreation = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { Notetitlesetter, addNote, deleteNote, setNotes } = NotesCreation.actions
+export const { Notetitlesetter, NoteSlugsetter, addNote, deleteNote, setNotes } = NotesCreation.actions
 
 export default NotesCreation.reducer

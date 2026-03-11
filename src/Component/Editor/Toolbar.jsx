@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   TextB,
   TextItalic,
@@ -21,20 +21,126 @@ import {
   Palette,
   FileText,
   CaretDown,
-  Sparkle
+  Sparkle,
+  CircleNotch
 } from "@phosphor-icons/react";
+import SaveData from "./DataSetterMethodonappwrite/SaveData";
+import { useSelector, useDispatch } from "react-redux";
+import { Notetitlesetter, NoteSlugsetter } from "../../redux/NotesCreation/NotesCreationSlice";
 
-function EditorToolbar({ editor, Usertype, isAiChatOpen, toggleAiChat }) {
+function EditorToolbar({ editor, isAiChatOpen, toggleAiChat }) {
   if (!editor) return null;
-
   const [highlightactive, sethighlightactive] = useState(false);
   const [coloractive, setcoloractive] = useState(false);
   const [fontSizeactive, setFontSizeactive] = useState(false);
   const [linkInputActive, setLinkInputActive] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
-
   const [editing, setEditing] = useState(false);
-  const [title, setTitle] = useState("My Note");
+  const [slug, setslug] = useState("");
+  const [title, setTitle] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isNoteSaved, setIsNoteSaved] = useState(true);
+  const lastSavedContent = useRef("");
+  const timeoutRef = useRef(null);
+  const isSavingRef = useRef(false);
+  const NoteTitle = useSelector((state) => state.NotesCreation.NoteTitle);
+  const NoteSlug = useSelector((state) => state.NotesCreation.NoteSlug);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Run CheckTitle logic on mount and when NoteTitle explicitly changes from Redux
+    const currentTitle = NoteTitle || title;
+    let newTitle = currentTitle.trim().replace(/\s+/g, ' ');
+
+    setTitle(newTitle);
+
+    if (newTitle.length > 0) {
+      dispatch(Notetitlesetter(newTitle));
+      
+      // Only generate and dispatch slug if none exists in Redux yet
+      if (!NoteSlug) {
+        const newSlug = newTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, "");
+        setslug(newSlug);
+        dispatch(NoteSlugsetter(newSlug));
+      } else {
+        console.log(NoteSlug,"NoteSlug")
+        setslug(NoteSlug);
+      }
+    }
+  }, [NoteTitle]);
+
+
+  const handleSave = async (currentEditor) => {
+    if (!currentEditor) return;
+    if (isSavingRef.current) {
+      console.log("Request ignored: A save is already in progress.");
+      return;
+    }
+
+    // Cancel any pending autosave so it doesn't trigger unexpectedly
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    const currentContent = currentEditor.getHTML();
+    const textContent = currentEditor.getText().trim();
+
+    // Ignore if note is empty or contains only whitespace (and has no images)
+    if (textContent === "" && !currentContent.includes('<img')) {
+      console.log("Request ignored: Note is empty or only whitespace.");
+      return;
+    }
+
+    // Prevent duplicate requests if there are no new changes
+    if (currentContent === lastSavedContent.current) {
+      console.log("Request ignored: Note is already saved and has no new changes.");
+      return;
+    }
+
+    setIsSaving(true);
+    isSavingRef.current = true;
+    try {
+      await SaveData(currentEditor, slug);
+      // Update the reference and set flag to true after successful save
+      lastSavedContent.current = currentContent;
+      setIsNoteSaved(true);
+    } catch (error) {
+      console.error("Error saving data:", error);
+    } finally {
+      setIsSaving(false);
+      isSavingRef.current = false;
+    }
+  };
+
+  // ✅ Autosave functionality (Debounce)
+  useEffect(() => {
+    if (!editor) return;
+
+    // We listen to the transaction event which fires whenever document changes
+    const handleUpdate = () => {
+      if (editor.getHTML() !== lastSavedContent.current) {
+        setIsNoteSaved(false);
+      }
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        console.log("save notes automatically");
+        handleSave(editor);
+      }, 3000);
+    };
+
+    editor.on('update', handleUpdate);
+
+    return () => {
+      editor.off('update', handleUpdate);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [editor, slug]);
 
   const formattingIcons = [
     { label: "Bold", icon: <TextB /> },
@@ -88,36 +194,49 @@ function EditorToolbar({ editor, Usertype, isAiChatOpen, toggleAiChat }) {
   const fontSizes = ["12px", "14px", "16px", "18px", "20px", "24px", "30px", "36px"];
 
   const CheckTitle = () => {
-    if (title.trim().length === 0) {
-      setTitle("Untitled");
-      return;
-    }
-    setTitle(title.replace(/\s+/g, ' ').trim());
-  }
+    let newTitle = title.trim();
+    newTitle = newTitle.replace(/\s+/g, ' ');
 
-  const isActive = (label) => {
-    if (!editor) return false;
-    switch (label) {
-      case "Bold": return editor.isActive("bold");
-      case "Italic": return editor.isActive("italic");
-      case "Underline": return editor.isActive("underline");
-      case "Strike": return editor.isActive("strike");
-      case "Code": return editor.isActive("code");
-      case "Highlight": return editor.isActive("highlight");
-      case "H1": return editor.isActive("heading", { level: 1 });
-      case "H2": return editor.isActive("heading", { level: 2 });
-      case "Paragraph": return editor.isActive("paragraph");
-      case "Blockquote": return editor.isActive("blockquote");
-      case "Bullet": return editor.isActive("bulletList");
-      case "Number": return editor.isActive("orderedList");
-      case "Center": return editor.isActive({ textAlign: "center" });
-      case "Justify": return editor.isActive({ textAlign: "justify" });
-      case "Left": return editor.isActive({ textAlign: "left" });
-      case "Right": return editor.isActive({ textAlign: "right" });
-      case "Link": return editor.isActive("link");
-      default: return false;
+    setTitle(newTitle);
+
+    if (newTitle.length > 0) {
+      // Dispatch title update to Redux
+      dispatch(Notetitlesetter(newTitle));
+      
+      // DO NOT overwrite slug here. Just make sure local state matches the persistent slug
+      if (NoteSlug) {
+        setslug(NoteSlug);
+      }
+    } else {
+      setslug("");
+      dispatch(Notetitlesetter(""));
+      dispatch(NoteSlugsetter(""));
     }
   };
+
+  // const isActive = (label) => {
+  //   if (!editor) return false;
+  //   switch (label) {
+  //     case "Bold": return editor.isActive("bold");
+  //     case "Italic": return editor.isActive("italic");
+  //     case "Underline": return editor.isActive("underline");
+  //     case "Strike": return editor.isActive("strike");
+  //     case "Code": return editor.isActive("code");
+  //     case "Highlight": return editor.isActive("highlight");
+  //     case "H1": return editor.isActive("heading", { level: 1 });
+  //     case "H2": return editor.isActive("heading", { level: 2 });
+  //     case "Paragraph": return editor.isActive("paragraph");
+  //     case "Blockquote": return editor.isActive("blockquote");
+  //     case "Bullet": return editor.isActive("bulletList");
+  //     case "Number": return editor.isActive("orderedList");
+  //     case "Center": return editor.isActive({ textAlign: "center" });
+  //     case "Justify": return editor.isActive({ textAlign: "justify" });
+  //     case "Left": return editor.isActive({ textAlign: "left" });
+  //     case "Right": return editor.isActive({ textAlign: "right" });
+  //     case "Link": return editor.isActive("link");
+  //     default: return false;
+  //   }
+  // };
 
   const onClickfx = (label, value) => {
     switch (label) {
@@ -132,9 +251,9 @@ function EditorToolbar({ editor, Usertype, isAiChatOpen, toggleAiChat }) {
       case "FontSize": return editor.chain().focus().setFontSize(value).run();
 
       // Typography
-      case "H1": return editor.chain().focus().toggleHeading({ level: 1 }).run();
-      case "H2": return editor.chain().focus().toggleHeading({ level: 2 }).run();
-      case "Paragraph": return editor.chain().focus().setParagraph().run();
+      case "H1": return editor.chain().focus().unsetFontSize().toggleHeading({ level: 1 }).run();
+      case "H2": return editor.chain().focus().unsetFontSize().toggleHeading({ level: 2 }).run();
+      case "Paragraph": return editor.chain().focus().unsetFontSize().setParagraph().run();
       case "Blockquote": return editor.chain().focus().toggleBlockquote().run();
 
       // Lists & Alignment
@@ -182,7 +301,7 @@ function EditorToolbar({ editor, Usertype, isAiChatOpen, toggleAiChat }) {
           {icons.map((icone, index) => {
             if (icone.label === "Highlight") {
               return (
-                <div className="cursor-pointer relative" key={icone.label}>
+                <div index={index} className="cursor-pointer relative" key={icone.label}>
                   <button
                     className={`cursor-pointer text-[1.2rem] px-2 py-1.5 rounded-md transition-colors text-white hover:bg-white/10`}
                     onClick={() => { sethighlightactive(!highlightactive); setcoloractive(false); setFontSizeactive(false); setLinkInputActive(false); }}
@@ -288,20 +407,34 @@ function EditorToolbar({ editor, Usertype, isAiChatOpen, toggleAiChat }) {
   return (
     <div className="relative z-50 bg-[#1e1e1e] shadow-md border-b border-black/50">
       <div className='w-full border-b-[1px] border-white/5 min-h-12 justify-between items-center flex px-5 py-2 bg-[#2a2a2a]'>
-        {!editing ? (
+        {(!editing && title.trim().length > 0) ? (
           <h2 onClick={() => setEditing(true)} className='text-xl font-semibold p-1 cursor-text text-white'>
             {title}
           </h2>
         ) : (
           <input
             type="text"
-            className='text-xl font-semibold w-1/2 p-1 border-b border-blue-500 outline-none bg-transparent text-white'
-            autoFocus
+            placeholder="Enter Note Title..."
+            className="text-xl font-semibold p-1 border-b border-blue-500 outline-none bg-transparent text-white placeholder-gray-400 placeholder:text-base placeholder:font-normal"
+            autoFocus={editing}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            onBlur={() => { CheckTitle(); setEditing(false); }}
+            onBlur={() => { 
+              CheckTitle(); 
+              // Only exit editing mode if they actually provided a title
+              if (title.trim().length > 0) {
+                setEditing(false); 
+              }
+            }}
             onKeyDown={(e) => {
-              if (e.key === "Enter") { CheckTitle(); setEditing(false); }
+              if (e.key === "Enter") {
+                CheckTitle();
+                if (title.length > 0) {
+                  setEditing(false);
+                  return;
+                }
+                setEditing(true);
+              }
             }}
           />
         )}
@@ -315,10 +448,25 @@ function EditorToolbar({ editor, Usertype, isAiChatOpen, toggleAiChat }) {
             <Sparkle className='size-5' weight={isAiChatOpen ? "fill" : "regular"} />
           </button>
 
-          <button className="group active:scale-95 transition-all duration-150 cursor-pointer relative inline-flex h-9 items-center justify-center overflow-hidden bg-blue-700 px-4 font-medium text-neutral-50 rounded-full">
+          <button
+            onClick={() => handleSave(editor)}
+            disabled={isSaving || isNoteSaved}
+            className={`group active:scale-95 transition-all duration-150 cursor-pointer relative inline-flex h-9 items-center justify-center overflow-hidden bg-blue-700 px-4 font-medium text-neutral-50 rounded-full ${(isSaving || isNoteSaved) ? 'opacity-80 cursor-default' : ''}`}>
             <span className="absolute h-0 w-0 rounded-full bg-blue-800 transition-all duration-600 group-hover:h-54 group-hover:w-40"></span>
-            <span className="relative flex justify-center items-center leading-[20px] gap-2 text-sm">
-              <FileText className='size-5' weight="fill" />Save
+            <span className="relative flex justify-center items-center leading-[20px] gap-2 text-sm z-10">
+              {isSaving ? (
+                <>
+                  <CircleNotch className='size-5 animate-spin' weight="bold" />Saving...
+                </>
+              ) : isNoteSaved ? (
+                <>
+                  <FileText className='size-5' weight="fill" />Saved
+                </>
+              ) : (
+                <>
+                  <FileText className='size-5' weight="fill" />Save
+                </>
+              )}
             </span>
           </button>
         </div>

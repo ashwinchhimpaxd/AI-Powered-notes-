@@ -111,7 +111,7 @@ export class UserAuthentication {
             throw error;
         }
     }
-    // 5. Get Current User Data
+    // 5. Get Current User auth Data
     async getCurrentUser() {
         try {
             return await this.account.get();

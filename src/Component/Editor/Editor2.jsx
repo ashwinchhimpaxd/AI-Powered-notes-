@@ -15,7 +15,7 @@ import FontSize from "./FontSize";
 import { useEffect, useState } from "react";
 import EditorToolbar from "../Editor/Toolbar"; // ✅ IMPORT TOOLBAR
 import AIAssistantChat from "../AIAssistantChat";
-
+import ImageDeleteButton from "./ImageDeleteButton"; // ✅ IMPORT IMAGE DELETE BUTTON
 
 function Editor2({ onEditorReady }) {
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
@@ -55,7 +55,7 @@ function Editor2({ onEditorReady }) {
   ];
   const editor = useEditor({
     extensions,
-    content: "start typing here",
+    content: "",
     immediatelyRender: true,
     editorProps: {
       attributes: {
@@ -80,6 +80,8 @@ function Editor2({ onEditorReady }) {
     },
   });
 
+
+
   // ✅ Jaise hi editor ready ho, parent ko bhej diya
   useEffect(() => {
     if (editor && onEditorReady) {
@@ -95,7 +97,6 @@ function Editor2({ onEditorReady }) {
       <div className="w-full relative z-[100] shadow-sm border-b border-gray-300 dark:border-white/10 bg-[#1e1e1e]">
         <EditorToolbar
           editor={editor}
-          Usertype={" "}
           isAiChatOpen={isAiChatOpen}
           toggleAiChat={() => setIsAiChatOpen(!isAiChatOpen)}
         />
@@ -103,7 +104,8 @@ function Editor2({ onEditorReady }) {
 
       <div className="flex-1 overflow-hidden w-full flex">
         {/* ✅ EDITOR CANVAS (A4 Page Style) */}
-        <div className="flex-1 overflow-y-auto w-full flex justify-center py-10 px-4 transition-all duration-300 ease-in-out">
+        <div className="flex-1 overflow-y-auto w-full flex justify-center py-10 px-4 transition-all duration-300 ease-in-out relative">
+          <ImageDeleteButton editor={editor} />
           <EditorContent
             editor={editor}
             className="w-full max-w-[816px] min-h-[1056px] bg-white shadow-xl px-[4rem] py-[5rem] text-[1.1rem] leading-relaxed text-black rounded-sm border border-gray-200 outline-none focus:outline-none"
