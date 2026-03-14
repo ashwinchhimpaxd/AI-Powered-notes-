@@ -1,6 +1,5 @@
 // src/AppWrite/config.js
-import { Client, Databases, Query } from "appwrite"; // Yaha pe aapka keys ka path
-import { ID } from "appwrite";
+import { Client, Databases, Query, ID, Permission, Role } from "appwrite"; // Yaha pe aapka keys ka path
 import AppwriteConf from "@/appwriteConfigrationKeys/ConfigrationofAppwrite";
 export class Service {
     client = new Client();
@@ -18,16 +17,22 @@ export class Service {
     async createNote({ Notes_title, slug, Notes_contents, Notes_Images_urls, Is_note_important, User_Unique_ID }) {
         try {
             return await this.databases.createDocument(
-                AppwriteConf.appwriteDatabaseId,
+                AppwriteConf.appwriteDataBaseId,
                 AppwriteConf.appwriteCollectionId,
-                slug, // Document ID (Unique identifier for the note)
+                ID.unique(), // Document ID (Unique identifier for the note)
                 {
-                    Notes_title,
-                    Notes_contents,
-                    Notes_Images_urls,
-                    Is_note_important,
-                    User_Unique_ID,
-                }
+                    notes_title: Notes_title,
+                    notes_contents: Notes_contents,
+                    notes_images_urls: Notes_Images_urls,
+                    is_note_important: Is_note_important,
+                    user_unique_id: User_Unique_ID,
+                    slug: slug,
+                },
+                [
+                    Permission.read(Role.user(User_Unique_ID)),
+                    Permission.update(Role.user(User_Unique_ID)),
+                    Permission.delete(Role.user(User_Unique_ID)),
+                ]
             )
         } catch (error) {
             console.log("Appwrite service :: createNote :: error", error);
@@ -35,18 +40,18 @@ export class Service {
     }
 
     // UPDATE DOCUMENT
-    async updateNote(slug, { Notes_title, Notes_contents, Notes_Images_urls, Is_note_important }) {
-        let documentId = slug + ID.unique();
+    async updateNote(noteuniqueid, { slug, Notes_title, Notes_contents, Notes_Images_urls, Is_note_important }) {
         try {
             return await this.databases.updateDocument(
                 AppwriteConf.appwriteDataBaseId,
                 AppwriteConf.appwriteCollectionId,
-                documentId, // Document ID
+                noteuniqueid,
                 {
-                    Notes_title,
-                    Notes_contents,
-                    Notes_Images_urls,
-                    Is_note_important,
+                    notes_title: Notes_title,
+                    notes_contents: Notes_contents,
+                    notes_images_urls: Notes_Images_urls,
+                    is_note_important: Is_note_important,
+                    slug: slug,
                 }
             )
         } catch (error) {
@@ -55,12 +60,12 @@ export class Service {
     }
 
     // DELETE DOCUMENT
-    async deleteNote(slug) {
+    async deleteNote(noteuniqueid) {
         try {
             await this.databases.deleteDocument(
                 AppwriteConf.appwriteDataBaseId,
                 AppwriteConf.appwriteCollectionId,
-                slug
+                noteuniqueid
             )
             return true;
         } catch (error) {
@@ -70,12 +75,12 @@ export class Service {
     }
 
     // GET SINGLE DOCUMENT
-    async getNote(slug) {
+    async getNote(noteuniqueid) {
         try {
             return await this.databases.getDocument(
                 AppwriteConf.appwriteDataBaseId,
                 AppwriteConf.appwriteCollectionId,
-                slug
+                noteuniqueid
             )
         } catch (error) {
             console.log("Appwrite service :: getNote :: error", error);

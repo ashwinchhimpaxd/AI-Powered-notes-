@@ -68,7 +68,6 @@ export class UserAuthentication {
 
     // 4. PHASE 2: Verify OTP and Login
     async verifyOtp(otp, userName) {
-        console.log(otp, userName)
         try {
             // secret hi woh 6-digit OTP hai jo user enter karega
             const usersession = await this.account.createSession(this.userid, otp);

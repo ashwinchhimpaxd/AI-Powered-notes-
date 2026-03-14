@@ -3,7 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import TogglesStatesReducer from "./QuickChatAI/QuickChatAiSlice.js";
 import NotesCreationReducer from "./NotesCreation/NotesCreationSlice.js";
 import userauthanticationReducer from "./Authantication/UserAuthanticationSlice.js";
-
+import currentnoteinfosliceReducer from "./currentnoteinfoslice/currentnoteinfoslice.js";
 import storage from "redux-persist/lib/storage";
 import {
     persistReducer,
@@ -22,13 +22,14 @@ const rootReducer = combineReducers({
     ToggleStates: TogglesStatesReducer,
     NotesCreation: NotesCreationReducer,
     UserAuthantication: userauthanticationReducer,
+    currentnoteinfoslice: currentnoteinfosliceReducer,
 });
 
 // persist config
 const persistConfig = {
     key: "root",
     storage,
-    whitelist: ["UserAuthantication"],
+    whitelist: ["currentnoteinfoslice"],//"UserAuthantication",
     // sirf auth persist karna hai (recommended)
 };
 

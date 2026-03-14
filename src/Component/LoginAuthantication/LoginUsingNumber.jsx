@@ -42,18 +42,15 @@ const LoginUsingNumber = () => {
                 console.log("User already logged in.");
                 return;
             }
-            const Userlogin = await userAuthService.verifyOtp({ otp: String(data.OTP), userName: data.User });
+            const Userlogin = await userAuthService.verifyOtp(String(data.OTP), data.User);
             if (Userlogin) {
                 dispatch(login({
-                    Islogin: true,
                     UserData: {
-                        userId: Userlogin.userId,
-                        UserName: data.User
+                        userdetaild: Userlogin
                     }
                 }));
-                // 3. SUCCESS: Yaha redirect karo
-                // "/dashboard" ko apne route ke hisab se change kar lena
-                navigate("/dashboard");
+                // SUCCESS: Redirect to Dashboard (Match App.jsx case)
+                navigate("/Dashboard");
             }
             // Redirect to dashboard or appropriate page after successful login
         } catch (error) {
@@ -78,7 +75,7 @@ const LoginUsingNumber = () => {
 
                 {/* FORM */}
                 <Forminputs IsOTPDisable={false} IsEmailDisable={false} IsNameDisable={true} ButtonText={'Login'}
-                    formMethods={formMethods}
+                    ReactHookformMethods={formMethods}
                     ALLFX={
                         {
                             onSubmitFX: onSubmit,

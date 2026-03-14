@@ -13,7 +13,6 @@ export default function Dashboard2() {
 
     const settingState = useSelector(state => state.ToggleStates.settingState);
     const [NewNotesClick, setNewNotesClick] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
@@ -27,15 +26,6 @@ export default function Dashboard2() {
         };
     }, [NewNotesClick]);
 
-    useEffect(() => {
-        console.log("useEffect called");
-        // Simulate content loading
-        const timer = setTimeout(() => {
-            setLoading(!loading);
-        }, 0); // Adjust time as needed
-
-        return () => clearTimeout(timer);
-    }, []);
 
     return (
         <>

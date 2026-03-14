@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useDispatch } from 'react-redux';
-import { Notetitlesetter, NoteSlugsetter, addNote } from '../redux/NotesCreation/NotesCreationSlice.js'
+import { setcurrentnoteinfo, resetcurrentnoteinfo } from '../redux/currentnoteinfoslice/currentnoteinfoslice';
 
 
 function NotesCreationForm({ setNewNotesClick }) {
@@ -16,14 +16,13 @@ function NotesCreationForm({ setNewNotesClick }) {
         getValues,
         formState: { isSubmitting, errors },
     } = useForm({ defaultValues: { title: "" } });
-    
+
     const onSubmit = async (data) => {
+        dispatch(resetcurrentnoteinfo());
+        console.log('reset the current note info slice')
         const title = data.title;
-        const newSlug = title.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, "");
-        dispatch(Notetitlesetter(title));
-        dispatch(NoteSlugsetter(newSlug));
-        dispatch(addNote(title));
-        
+        dispatch(setcurrentnoteinfo({ title: title }));
+
         setNewNotesClick(false); // Close the modal after submission
         reset(); // Clear the form after submission
         navigate('/editor');

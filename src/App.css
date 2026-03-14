@@ -61,19 +61,18 @@ html {
     background-position: center;
 }
 
-::-webkit-scrollbar {
-    /* display: none; */
-    /* Chrome, Safari */
-
+* {
+    scrollbar-width: none;
+    scrollbar-gutter: stable;
 }
 
 
 #Home {
-  background-image: url('../public/landingpagedesign/IPBZLNOFykXPribG9KAtpoMptJs.webp');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  position: relative;
+    background-image: url('../public/landingpagedesign/IPBZLNOFykXPribG9KAtpoMptJs.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
 
 /* #Home::before {

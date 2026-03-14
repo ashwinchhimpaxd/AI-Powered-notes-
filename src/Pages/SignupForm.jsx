@@ -31,8 +31,7 @@ function SignupForm() {
         if (!userdetaild) return;
         dispatch(login({
             UserData: {
-                email: userEnteredDetailes[0],
-                name: userEnteredDetailes[1]
+                userdetaild
             }
         }));
     };

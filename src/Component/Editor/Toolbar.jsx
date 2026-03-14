@@ -26,122 +26,10 @@ import {
 } from "@phosphor-icons/react";
 import SaveData from "./DataSetterMethodonappwrite/SaveData";
 import { useSelector, useDispatch } from "react-redux";
-import { Notetitlesetter, NoteSlugsetter } from "../../redux/NotesCreation/NotesCreationSlice";
-
+import { setcurrentnoteinfo, setnoteid } from "../../redux/currentnoteinfoslice/currentnoteinfoslice";
+import service from "../../AppWrite/Setgetuserdatas/config.js"
 function EditorToolbar({ editor, isAiChatOpen, toggleAiChat }) {
   if (!editor) return null;
-  const [highlightactive, sethighlightactive] = useState(false);
-  const [coloractive, setcoloractive] = useState(false);
-  const [fontSizeactive, setFontSizeactive] = useState(false);
-  const [linkInputActive, setLinkInputActive] = useState(false);
-  const [linkUrl, setLinkUrl] = useState("");
-  const [editing, setEditing] = useState(false);
-  const [slug, setslug] = useState("");
-  const [title, setTitle] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [isNoteSaved, setIsNoteSaved] = useState(true);
-  const lastSavedContent = useRef("");
-  const timeoutRef = useRef(null);
-  const isSavingRef = useRef(false);
-  const NoteTitle = useSelector((state) => state.NotesCreation.NoteTitle);
-  const NoteSlug = useSelector((state) => state.NotesCreation.NoteSlug);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    // Run CheckTitle logic on mount and when NoteTitle explicitly changes from Redux
-    const currentTitle = NoteTitle || title;
-    let newTitle = currentTitle.trim().replace(/\s+/g, ' ');
-
-    setTitle(newTitle);
-
-    if (newTitle.length > 0) {
-      dispatch(Notetitlesetter(newTitle));
-      
-      // Only generate and dispatch slug if none exists in Redux yet
-      if (!NoteSlug) {
-        const newSlug = newTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, "");
-        setslug(newSlug);
-        dispatch(NoteSlugsetter(newSlug));
-      } else {
-        console.log(NoteSlug,"NoteSlug")
-        setslug(NoteSlug);
-      }
-    }
-  }, [NoteTitle]);
-
-
-  const handleSave = async (currentEditor) => {
-    if (!currentEditor) return;
-    if (isSavingRef.current) {
-      console.log("Request ignored: A save is already in progress.");
-      return;
-    }
-
-    // Cancel any pending autosave so it doesn't trigger unexpectedly
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    const currentContent = currentEditor.getHTML();
-    const textContent = currentEditor.getText().trim();
-
-    // Ignore if note is empty or contains only whitespace (and has no images)
-    if (textContent === "" && !currentContent.includes('<img')) {
-      console.log("Request ignored: Note is empty or only whitespace.");
-      return;
-    }
-
-    // Prevent duplicate requests if there are no new changes
-    if (currentContent === lastSavedContent.current) {
-      console.log("Request ignored: Note is already saved and has no new changes.");
-      return;
-    }
-
-    setIsSaving(true);
-    isSavingRef.current = true;
-    try {
-      await SaveData(currentEditor, slug);
-      // Update the reference and set flag to true after successful save
-      lastSavedContent.current = currentContent;
-      setIsNoteSaved(true);
-    } catch (error) {
-      console.error("Error saving data:", error);
-    } finally {
-      setIsSaving(false);
-      isSavingRef.current = false;
-    }
-  };
-
-  // ✅ Autosave functionality (Debounce)
-  useEffect(() => {
-    if (!editor) return;
-
-    // We listen to the transaction event which fires whenever document changes
-    const handleUpdate = () => {
-      if (editor.getHTML() !== lastSavedContent.current) {
-        setIsNoteSaved(false);
-      }
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        console.log("save notes automatically");
-        handleSave(editor);
-      }, 3000);
-    };
-
-    editor.on('update', handleUpdate);
-
-    return () => {
-      editor.off('update', handleUpdate);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [editor, slug]);
-
   const formattingIcons = [
     { label: "Bold", icon: <TextB /> },
     { label: "Italic", icon: <TextItalic /> },
@@ -192,6 +80,166 @@ function EditorToolbar({ editor, isAiChatOpen, toggleAiChat }) {
   ];
 
   const fontSizes = ["12px", "14px", "16px", "18px", "20px", "24px", "30px", "36px"];
+  const [highlightactive, sethighlightactive] = useState(false);
+  const [coloractive, setcoloractive] = useState(false);
+  const [fontSizeactive, setFontSizeactive] = useState(false);
+  const [linkInputActive, setLinkInputActive] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [slug, setslug] = useState("");
+  const [title, setTitle] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isNoteSaved, setIsNoteSaved] = useState(true);
+  const reduxNoteId = useSelector((state) => state.currentnoteinfoslice.noteid);
+  const UserData = useSelector((state) => state.UserAuthantication.UserData);
+  const lastSavedContent = useRef("");
+  const timeoutRef = useRef(null);
+  const isSavingRef = useRef(false);
+  const NoteTitle = useSelector((state) => state.currentnoteinfoslice.currentnoteinfo.title);
+  const dispatch = useDispatch();
+
+  // Refs to avoid stale closures in handleSave (especially during autosave)
+  const userDataRef = useRef(UserData);
+  const reduxNoteIdRef = useRef(reduxNoteId);
+  const titleRef = useRef(title);
+  const slugRef = useRef(slug);
+
+  useEffect(() => { userDataRef.current = UserData; }, [UserData]);
+  useEffect(() => { reduxNoteIdRef.current = reduxNoteId; }, [reduxNoteId]);
+  useEffect(() => { titleRef.current = title; }, [title]);
+  useEffect(() => { slugRef.current = slug; }, [slug]);
+
+  useEffect(() => {
+    // Run CheckTitle logic on mount and when NoteTitle explicitly changes from Redux
+    const currentTitle = NoteTitle || title;
+    let newTitle = currentTitle.trim().replace(/\s+/g, ' ');
+    setTitle(newTitle);
+    if (newTitle.length > 0) {
+      const newSlug = newTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, "");
+      setslug(newSlug);
+      dispatch(setcurrentnoteinfo({ title: newTitle, slug: newSlug }));
+    } else {
+      console.log("title is empty")
+    }
+  }, []);
+
+
+  const handleSave = async (currentEditor) => {
+    const currentSlug = slugRef.current;
+    const currentReduxNoteId = reduxNoteIdRef.current;
+    const currentUserData = userDataRef.current;
+    const currentTitle = titleRef.current;
+
+    console.log(currentSlug, "slug in new slug value in handlesave")
+    console.log(currentReduxNoteId, "i was fetch the noteid from slice of current note ")
+    console.log("Current UserData from Redux (Ref):", currentUserData);
+
+    if (!currentEditor) return;
+    if (isSavingRef.current) {
+      console.log("Request ignored: A save is already in progress.");
+      return;
+    }
+
+    // Cancel any pending autosave so it doesn't trigger unexpectedly
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    const currentContent = currentEditor.getHTML();
+    const textContent = currentEditor.getText().trim();
+
+    // Ignore if note is empty or contains only whitespace (and has no images)
+    if (textContent === "" && !currentContent.includes('<img')) {
+      console.log("Request ignored: Note is empty or only whitespace.");
+      return;
+    }
+
+    // Prevent duplicate requests if there are no new changes
+    if (currentContent === lastSavedContent.current) {
+      console.log("Request ignored: Note is already saved and has no new changes.");
+      return;
+    }
+
+    setIsSaving(true);
+    isSavingRef.current = true;
+
+    try {
+      if (currentReduxNoteId) {
+        // UPDATE existing note
+        const data = await service.updateNote(currentReduxNoteId, {
+          slug: currentSlug,
+          Notes_title: currentTitle,
+          Notes_contents: currentContent,
+          Notes_Images_urls: [],
+          Is_note_important: false,
+        });
+        console.log("Note Updated Successfully:", data);
+      } else {
+        // CREATE new note
+        const userId = currentUserData?.userdetaild?.userId || 
+                       currentUserData?.userdetaild?.$id || 
+                       currentUserData?.userId || 
+                       currentUserData?.$id || 
+                       "anonymous";
+        
+        const rep = await service.createNote({
+          Notes_title: currentTitle,
+          slug: currentSlug,
+          Notes_contents: currentContent,
+          Notes_Images_urls: [],
+          Is_note_important: false,
+          User_Unique_ID: userId,
+        });
+        
+        console.log("Note Created Successfully:", rep);
+        
+        if (rep?.$id) {
+          dispatch(setnoteid(rep.$id));
+        }
+      }
+      
+      // Update the reference and set flag to true after successful save
+      lastSavedContent.current = currentContent;
+      setIsNoteSaved(true);
+    } catch (error) {
+      console.error("Error saving data:", error);
+    } finally {
+      setIsSaving(false);
+      isSavingRef.current = false;
+    }
+  };
+
+  // ✅ Autosave functionality (Debounce)
+  useEffect(() => {
+    if (!editor) return;
+
+    // We listen to the transaction event which fires whenever document changes
+    const handleUpdate = () => {
+      if (editor.getHTML() !== lastSavedContent.current) {
+        setIsNoteSaved(false);
+      }
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        console.log("save notes automatically");
+        handleSave(editor);
+      }, 3000);
+    };
+
+    editor.on('update', handleUpdate);
+
+    return () => {
+      editor.off('update', handleUpdate);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [editor, slug]);
+
+
 
   const CheckTitle = () => {
     let newTitle = title.trim();
@@ -201,16 +249,12 @@ function EditorToolbar({ editor, isAiChatOpen, toggleAiChat }) {
 
     if (newTitle.length > 0) {
       // Dispatch title update to Redux
-      dispatch(Notetitlesetter(newTitle));
-      
-      // DO NOT overwrite slug here. Just make sure local state matches the persistent slug
-      if (NoteSlug) {
-        setslug(NoteSlug);
-      }
+      dispatch(setcurrentnoteinfo({ title: newTitle }));
+      setslug(slug);
     } else {
       setslug("");
-      dispatch(Notetitlesetter(""));
-      dispatch(NoteSlugsetter(""));
+      dispatch(setcurrentnoteinfo({ title: "" }));
+      dispatch(setcurrentnoteinfo({ slug: "" }));
     }
   };
 
@@ -419,14 +463,15 @@ function EditorToolbar({ editor, isAiChatOpen, toggleAiChat }) {
             autoFocus={editing}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            onBlur={() => { 
-              CheckTitle(); 
+            onBlur={() => {
+              CheckTitle();
               // Only exit editing mode if they actually provided a title
               if (title.trim().length > 0) {
-                setEditing(false); 
+                setEditing(false);
               }
             }}
             onKeyDown={(e) => {
+              console.log(title, "title in toolbar")
               if (e.key === "Enter") {
                 CheckTitle();
                 if (title.length > 0) {

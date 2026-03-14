@@ -7,35 +7,11 @@ const NotesCreation = createSlice({
         NoteSlug: null,
         notes: [
             {
-                $id: "temp1",
-                title: "Welcome Note",
-                description: "Your notes will appear here once you start writing!",
+                title: 'ashwin',
+                description: 'ashwin is a good boy and he is very intelligent',
+                $id: 'ashwin',
                 $updatedAt: new Date().toISOString(),
-            },
-            {
-                $id: "temp2",
-                title: "How to Use",
-                description: "Create notes using the editor and they will show up here.",
-                $updatedAt: new Date().toISOString(),
-            },
-            {
-                $id: "temp3",
-                title: "How to Use this AI powered Notes for better workflow",
-                description: "Create notes using the editor and they will show up here.",
-                $updatedAt: new Date().toISOString(),
-            },
-            {
-                $id: "temp4",
-                title: "Another Note Title",
-                description: "This is another description.",
-                $updatedAt: new Date().toISOString(),
-            },
-            {
-                $id: "temp5",
-                title: "Short Title",
-                description: "A short description.",
-                $updatedAt: new Date().toISOString(),
-            },
+            }
         ]
     },
     reducers: {

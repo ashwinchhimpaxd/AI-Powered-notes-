@@ -32,7 +32,9 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
     };
 
     useEffect(() => {
-        scrollToBottom();
+        if (messages.length > 0) {
+            scrollToBottom();
+        }
     }, [messages]);
 
     const [showMenu, setShowMenu] = useState(false);
