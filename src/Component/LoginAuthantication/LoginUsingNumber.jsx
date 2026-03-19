@@ -39,7 +39,13 @@ const LoginUsingNumber = () => {
             const currentUser = await userAuthService.getCurrentUser();
             // console.log(currentUser);
             if (currentUser) {
-                console.log("User already logged in.");
+                console.log("User already logged in. Syncing state...");
+                dispatch(login({
+                    UserData: {
+                        userdetaild: currentUser
+                    }
+                }));
+                navigate("/Dashboard");
                 return;
             }
             const Userlogin = await userAuthService.verifyOtp(String(data.OTP), data.User);

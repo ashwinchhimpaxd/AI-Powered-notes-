@@ -13,10 +13,12 @@ export default function SideNavBar() {
     const handleLogout = async () => {
         try {
             await userAuthService.logoutFromCurrentdevice();
+        } catch (error) {
+            console.error("Server-side logout failed:", error.message);
+        } finally {
+            // Always clear local state and navigate even if server request fails
             dispatch(logout());
             navigate("/Login");
-        } catch (error) {
-            console.error("Logout failed:", error.message);
         }
     }
     return (

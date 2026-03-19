@@ -35,7 +35,35 @@ const ProtectedRoute = ({ children, authentication = true }) => {
   return children;
 };
 
+import { useEffect } from "react";
+import userAuthService from "./AppWrite/auth.js";
+import { login, logout } from "./redux/Authantication/UserAuthanticationSlice.js";
+import { useDispatch } from "react-redux";
+
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const user = await userAuthService.getCurrentUser();
+        if (user) {
+          dispatch(login({
+            UserData: {
+              userdetaild: user
+            }
+          }));
+        } else {
+          dispatch(logout());
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+        dispatch(logout());
+      }
+    };
+    checkSession();
+  }, [dispatch]);
+
   return (
     <div className="h-screen w-full">
       <BrowserRouter>

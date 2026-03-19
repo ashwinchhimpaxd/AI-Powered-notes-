@@ -115,7 +115,10 @@ export class UserAuthentication {
         try {
             return await this.account.get();
         } catch (error) {
-            console.error("Appwrite service :: getCurrentUser :: error", error);
+            // 401 error is expected if no session exists, so we don't log it as an error
+            if (error.code !== 401) {
+                console.error("Appwrite service :: getCurrentUser :: error", error);
+            }
             return null;
         }
     }
@@ -124,8 +127,11 @@ export class UserAuthentication {
     async logoutFromAlldevices() {
         try {
             await this.account.deleteSessions('all');
+            this.userid = null;
+            return true;
         } catch (error) {
-            console.error("Appwrite service :: logout :: error", error);
+            console.error("Appwrite service :: logout From All devices :: error", error);
+            return false;
         }
     }
 
@@ -133,8 +139,11 @@ export class UserAuthentication {
     async logoutFromCurrentdevice() {
         try {
             await this.account.deleteSession('current');
+            this.userid = null;
+            return true;
         } catch (error) {
-            console.error("Appwrite service :: logout :: error", error);
+            console.error("Appwrite service :: logout From Current device :: error", error);
+            return false;
         }
     }
 }

@@ -15,47 +15,52 @@ export class Service {
 
     // CREATE DOCUMENT
     async createNote({ Notes_title, slug, Notes_contents, Notes_Images_urls, Is_note_important, User_Unique_ID }) {
+        console.log(User_Unique_ID)
+        console.log("new note create")
         try {
             return await this.databases.createDocument(
                 AppwriteConf.appwriteDataBaseId,
                 AppwriteConf.appwriteCollectionId,
                 ID.unique(), // Document ID (Unique identifier for the note)
                 {
-                    notes_title: Notes_title,
-                    notes_contents: Notes_contents,
-                    notes_images_urls: Notes_Images_urls,
-                    is_note_important: Is_note_important,
-                    user_unique_id: User_Unique_ID,
-                    slug: slug,
+                    "notes_title": Notes_title,
+                    "notes_contect": Notes_contents,
+                    "notes_images_urls": Notes_Images_urls,
+                    "is_note_important": Is_note_important,
+                    "user_unique_id": User_Unique_ID,
+                    "slug": slug,
                 },
                 [
-                    Permission.read(Role.user(User_Unique_ID)),
-                    Permission.update(Role.user(User_Unique_ID)),
-                    Permission.delete(Role.user(User_Unique_ID)),
+
+                    Permission.write(Role.user(User_Unique_ID))
+
                 ]
             )
         } catch (error) {
             console.log("Appwrite service :: createNote :: error", error);
+            throw error;
         }
     }
 
     // UPDATE DOCUMENT
     async updateNote(noteuniqueid, { slug, Notes_title, Notes_contents, Notes_Images_urls, Is_note_important }) {
+        console.log("note update")
         try {
             return await this.databases.updateDocument(
                 AppwriteConf.appwriteDataBaseId,
                 AppwriteConf.appwriteCollectionId,
                 noteuniqueid,
                 {
-                    notes_title: Notes_title,
-                    notes_contents: Notes_contents,
-                    notes_images_urls: Notes_Images_urls,
-                    is_note_important: Is_note_important,
-                    slug: slug,
+                    "notes_title": Notes_title,
+                    "notes_contect": Notes_contents,
+                    "notes_images_urls": Notes_Images_urls,
+                    "is_note_important": Is_note_important,
+                    "slug": slug,
                 }
             )
         } catch (error) {
             console.log("Appwrite service :: updateNote :: error", error);
+            throw error;
         }
     }
 
@@ -70,7 +75,7 @@ export class Service {
             return true;
         } catch (error) {
             console.log("Appwrite service :: deleteNote :: error", error);
-            return false;
+            throw error;
         }
     }
 
@@ -84,7 +89,7 @@ export class Service {
             )
         } catch (error) {
             console.log("Appwrite service :: getNote :: error", error);
-            return false;
+            throw error;
         }
     }
 
@@ -98,7 +103,7 @@ export class Service {
             )
         } catch (error) {
             console.log("Appwrite service :: getNotes :: error", error);
-            return false;
+            throw error;
         }
     }
 }

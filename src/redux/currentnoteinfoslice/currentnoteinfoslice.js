@@ -4,7 +4,7 @@ const currentnoteinfoslice = createSlice({
     name: "currentnoteinfoslice",
     initialState: {
         noteid: null,
-        curryentnoteinfo: {
+        currentnoteinfo: {
             title: null,
             slug: null,
             content: null,
