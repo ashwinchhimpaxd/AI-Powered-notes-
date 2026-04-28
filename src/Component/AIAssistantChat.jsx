@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { PaperPlaneRight, Plus, ImageIcon, Quotes, MagicWand, FilePdf, Copy, Check } from "@phosphor-icons/react"
 import { useSelector } from 'react-redux';
 import { sendMessageToAI } from '../AiAssistancefiles/AiMehotds/AiassistentLogic.js';
+import AICreateNoteAction from './AICreateNoteAction';
 /**
  * Renders the dedicated AI Assistant chat interface.
  * This component is designed to be placed within a larger dashboard layout.
@@ -171,9 +172,13 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-2">
-                                        <p className={`text-sm whitespace-pre-wrap ${message.type === 'user' ? 'text-white/70' : 'text-white'} `}>
-                                            {message.content}
-                                        </p>
+                                        {message.type === 'ai' ? (
+                                            <AICreateNoteAction content={message.content} isGenerating={isGenerating} />
+                                        ) : (
+                                            <p className={`text-sm whitespace-pre-wrap text-white/70 `}>
+                                                {message.content}
+                                            </p>
+                                        )}
                                         {message.type === 'ai' && message.content && (
                                             <button
                                                 onClick={() => handleCopy(message.id || index, message.content)}
