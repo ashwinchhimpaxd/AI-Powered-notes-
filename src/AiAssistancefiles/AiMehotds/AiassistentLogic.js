@@ -20,7 +20,7 @@ export const sendMessageToAI = async (message, chatHistory = [], onChunk = null)
             for await (const chunk of result.stream) {
                 const chunkText = chunk.text();
                 fullText += chunkText;
-                onChunk(fullText);
+                onChunk(fullText, chunkText);
             }
             return fullText;
         } else {
@@ -31,6 +31,6 @@ export const sendMessageToAI = async (message, chatHistory = [], onChunk = null)
         }
     } catch (error) {
         console.log("AI Error:", error);
-        return "Sorry, I'm having trouble understanding you right now.";
+        throw error;
     }
 }

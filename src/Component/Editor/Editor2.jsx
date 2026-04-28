@@ -215,7 +215,7 @@ function Editor2({ onEditorReady }) {
               AI Assistant
             </h3>
             <div className="h-[calc(100%-3rem)]">
-              <AIAssistantChat isSidebar={true} />
+              <AIAssistantChat isSidebar={true} editor={editor} />
             </div>
           </div>
         </div>

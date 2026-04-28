@@ -3,16 +3,18 @@ import { PaperPlaneRight, Plus, ImageIcon, Quotes, MagicWand, FilePdf, Copy, Che
 import { useSelector } from 'react-redux';
 import { sendMessageToAI } from '../AiAssistancefiles/AiMehotds/AiassistentLogic.js';
 import AICreateNoteAction from './AICreateNoteAction';
+
 /**
  * Renders the dedicated AI Assistant chat interface.
  * This component is designed to be placed within a larger dashboard layout.
  */
-const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
+const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => {
 
     // Chat messages state
     const [messages, setMessages] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [copiedId, setCopiedId] = useState(null);
+    const [pendingAction, setPendingAction] = useState(null);
 
     const handleCopy = (id, text) => {
         navigator.clipboard.writeText(text);
@@ -20,11 +22,10 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
         setTimeout(() => setCopiedId(null), 2000);
     };
 
-
-    // 1. State to hold the current input text (Required for controlled component)
+    // 1. State to hold the current input text
     const [inputText, setInputText] = useState('');
 
-    // 2. Ref to access the textarea DOM element (Required for auto-grow logic)
+    // 2. Ref to access the textarea DOM element
     const textareaRef = useRef(null);
     const messagesEndRef = useRef(null);
 
@@ -41,88 +42,180 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
     const [showMenu, setShowMenu] = useState(false);
 
     const handleActionClick = (action) => {
-        // Placeholder for actions:
-        console.log("Action Triggered: ", action);
-        if (action === "Upload Image") {
+        setShowMenu(false);
+        
+        if (!editor) {
+             console.warn("Editor actions require an active editor instance.");
+             return;
+        }
+
+        let prompt = "";
+        let isEditorAction = false;
+        let actionType = "";
+
+        const editorText = editor.getText().trim();
+
+        if (action === 'Summary Note') {
+            prompt = `Please provide a brief summary of the following note content:\n\n${editorText}`;
+            triggerAI(prompt, `Triggered Action: ${action}`, false, "");
+        } else if (action === 'Write Note') {
+            const userActionMsg = {
+                type: 'user',
+                content: `Triggered Action: ${action}`,
+                avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4"
+            };
+            
+            if (editorText === '') {
+                setPendingAction('write_empty');
+                setMessages(prev => [...prev, userActionMsg, {
+                    type: 'ai',
+                    content: 'The editor is currently empty. What topic would you like me to write a note about?'
+                }]);
+            } else {
+                setPendingAction('write_continue');
+                setMessages(prev => [...prev, userActionMsg, {
+                    type: 'ai',
+                    content: 'Your note already has some content. What else would you like me to write or add to it?'
+                }]);
+            }
+            return; // Stop here, we wait for user input
+        } else if (action === 'Improve Notes') {
+            prompt = `Please rewrite and improve the following note. Output the FULL improved note in HTML format, without any conversational filler or markdown code blocks. Note content:\n\n${editorText}`;
+            triggerAI(prompt, `Triggered Action: ${action}`, true, "improve");
+        } else if (action === "Upload Image") {
             // TODO: Implement actual image upload logic
             const newMessage = { type: 'user', content: 'Uploaded an image', avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4" };
             setMessages(prev => [...prev, newMessage]);
+            return;
         } else {
-            const newMessage = { type: 'user', content: `Triggered Action: ${action}`, avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4" };
-            setMessages(prev => [...prev, newMessage]);
+            prompt = `Triggered Action: ${action}`;
+            triggerAI(prompt, `Triggered Action: ${action}`, false, "");
         }
-        setShowMenu(false);
     };
-
-
 
     // ** 3. useEffect Hook for Auto-Grow Functionality **
     useEffect(() => {
         if (textareaRef.current) {
-            // Step 1: Reset the height to auto (to shrink if text is deleted)
             textareaRef.current.style.height = 'auto';
-
-            // Step 2: Set the height to the scroll height (to fit the content)
             const newHeight = textareaRef.current.scrollHeight;
-
-            // Set a max height (e.g., 5 lines) to prevent it from growing too large.
             const minHeight = 48; // Equivalent to h-12
             const maxHeight = 200;
-
-            // Set height, ensuring it stays between min and max limits
             textareaRef.current.style.height = `${Math.min(Math.max(newHeight, minHeight), maxHeight)}px`;
         }
-    }, [inputText]); // Dependency: Rerun this effect whenever inputText changes
+    }, [inputText]);
 
-    // Handle input change
     const handleChange = (e) => {
         setInputText(e.target.value);
     };
 
-    // Handle button click (for sending message)
-    const handleSend = async () => {
-        if (inputText.trim() !== '') {
-            const userText = inputText.trim();
-            const newMessage = {
-                type: 'user',
-                content: userText,
-                avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4"
-            };
+    const triggerAI = async (actualPrompt, displayUserMessage, isEditorAction = false, actionType = "") => {
+        const newMessage = {
+            type: 'user',
+            content: displayUserMessage,
+            avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4"
+        };
 
-            // Add user message
-            setMessages(prev => [...prev, newMessage]);
-            setInputText(''); // Clear input after sending
+        setMessages(prev => [...prev, newMessage]);
+        setInputText('');
+        setIsGenerating(true);
 
-            setIsGenerating(true);
+        const aiMessageId = Date.now().toString();
 
-            // Generate a unique ID for the AI message
-            const aiMessageId = Date.now().toString();
-
-            // Add a placeholder AI message
+        // Add a placeholder AI message
+        if (isEditorAction) {
+             setMessages(prev => [...prev, {
+                type: 'ai_editor_action',
+                actionType: actionType,
+                status: 'generating',
+                id: aiMessageId
+            }]);
+        } else {
             setMessages(prev => [...prev, {
                 type: 'ai',
                 content: '',
                 id: aiMessageId
             }]);
+        }
 
-            try {
-                // Pass current messages as history, and a callback to handle stream chunks
-                await sendMessageToAI(userText, messages, (currentText) => {
-                    setMessages(prev => prev.map(msg =>
-                        msg.id === aiMessageId ? { ...msg, content: currentText } : msg
-                    ));
+        // Add context rules to the prompt
+        let finalPrompt = actualPrompt;
+        if (isSidebar) {
+            finalPrompt = `[System Context: You are currently assisting the user INSIDE the note editor. DO NOT use the [CREATE_NOTE] tag. Do not suggest creating new notes.]\n\nUser: ${actualPrompt}`;
+        } else {
+            finalPrompt = `[System Context: You are currently on the Dashboard. You CAN use the [CREATE_NOTE] tag if requested.]\n\nUser: ${actualPrompt}`;
+        }
 
-                    // Once we start getting text, we can turn off the "isGenerating" typing indicator
-                    setIsGenerating(false);
-                });
-            } catch (error) {
-                console.error("Failed to get AI response:", error);
-                setMessages(prev => prev.map(msg =>
-                    msg.id === aiMessageId ? { ...msg, content: "Sorry, I'm having trouble understanding you right now." } : msg
-                ));
-            } finally {
-                setIsGenerating(false);
+        try {
+            let originalEditorHtml = "";
+            if (isEditorAction && actionType === 'write' && editor) {
+                originalEditorHtml = editor.getHTML();
             }
+
+            await sendMessageToAI(finalPrompt, messages, (fullText, chunkText) => {
+                if (isEditorAction && editor) {
+                     if (actionType === 'write') {
+                          // For writing, we append the generated text to the original content
+                          editor.commands.setContent(originalEditorHtml + fullText);
+                     } else if (actionType === 'improve') {
+                          // For improving, we replace the entire content
+                          editor.commands.setContent(fullText);
+                     }
+                } else {
+                    setMessages(prev => prev.map(msg =>
+                        msg.id === aiMessageId ? { ...msg, content: fullText } : msg
+                    ));
+                }
+                setIsGenerating(false);
+            });
+
+            if (isEditorAction) {
+                 setMessages(prev => prev.map(msg =>
+                    msg.id === aiMessageId ? { ...msg, status: 'completed' } : msg
+                 ));
+            }
+
+        } catch (error) {
+            console.error("Failed to get AI response:", error);
+            
+            let errorMessage = "Sorry, I'm having trouble understanding you right now.";
+            const errorStr = String(error);
+            
+            if (errorStr.includes("429") || errorStr.toLowerCase().includes("quota") || errorStr.toLowerCase().includes("exhausted")) {
+                errorMessage = "⚠️ API Limit Reached! Gemini API has exhausted its quota. Please try again later.";
+            } else if (error.message) {
+                errorMessage = `⚠️ Error: ${error.message}`;
+            } else {
+                errorMessage = `⚠️ Error: ${errorStr}`;
+            }
+
+            if (isEditorAction) {
+                 setMessages(prev => prev.map(msg =>
+                    msg.id === aiMessageId ? { ...msg, status: 'error', content: errorMessage } : msg
+                 ));
+            } else {
+                setMessages(prev => prev.map(msg =>
+                    msg.id === aiMessageId ? { ...msg, content: errorMessage } : msg
+                ));
+            }
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleSend = () => {
+        const text = inputText.trim();
+        if (text !== '') {
+             if (pendingAction === 'write_empty') {
+                 const prompt = `Please write a new note about the following topic. Output the FULL note in HTML format, without any conversational filler or markdown code blocks. Topic: ${text}`;
+                 triggerAI(prompt, text, true, "write");
+                 setPendingAction(null);
+             } else if (pendingAction === 'write_continue') {
+                 const prompt = `Please continue writing the following note based on the user's instructions. Output ONLY the newly generated continuation text in HTML format, without any conversational filler or markdown code blocks.\n\nCurrent note content:\n${editor.getText()}\n\nUser instructions: ${text}`;
+                 triggerAI(prompt, text, true, "write");
+                 setPendingAction(null);
+             } else {
+                 triggerAI(text, text);
+             }
         }
     };
 
@@ -132,26 +225,25 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
             handleSend();
         }
     };
+    
     const quickchataiState = useSelector(state => state.ToggleStates.quickchataiState);
+    
     return (
-
-
         <div className={`lg:col-span-2 relative overflow-hidden transition-all duration-300 ease-in-out will-change-height ${isSidebar ? 'h-full' : (quickchataiState ? 'h-[400px]' : 'h-[0px]')}`}>
             {/* Main Chat Container */}
             <div className="flex flex-col h-full bg-white/5 border border-white/10 rounded-lg p-4 shadow-2xl shadow-black/20 backdrop-blur-lg">
 
                 {/* Message Display Area */}
-                <div className="flex-1 space-y-4 overflow-y-auto pr-2  " id='AI_ASSISTANT_QUICKCHAT'>
+                <div className="flex-1 space-y-4 overflow-y-auto pr-2" id='AI_ASSISTANT_QUICKCHAT'>
                     {messages.map((message, index) => (
                         <div
                             key={index}
-                            className={` flex items-start gap-3 ${message.type === 'user' ? 'justify-end' : ''}`}
+                            className={`flex items-start gap-3 ${message.type === 'user' ? 'justify-end' : ''}`}
                         >
                             {/* AI Avatar/Icon (only visible for AI messages) */}
-                            {message.type === 'ai' && (
+                            {(message.type === 'ai' || message.type === 'ai_editor_action') && (
                                 <div className="flex-shrink-0 size-8 rounded-full bg-primary/20 flex items-center justify-center border">
-                                    <span className="material-symbols-outlined text-primary text-lg  border border-black/20  rounded-full p-1 bg-black">
-
+                                    <span className="material-symbols-outlined text-primary text-lg border border-black/20 rounded-full p-1 bg-black">
                                         <img src="public\AI Star logo\SparklesAIForChat.svg" alt="" className='w-10 relative' />
                                     </span>
                                 </div>
@@ -159,7 +251,7 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
 
                             {/* Message Bubble */}
                             <div className={
-                                `px-4 py-3 rounded-lg   ${message.type === 'ai'
+                                `px-4 py-3 rounded-lg ${message.type === 'ai' || message.type === 'ai_editor_action'
                                     ? 'bg-white/10 rounded-tl-none'
                                     : 'bg-primary rounded-tr-none text-background-dark'
                                 }`
@@ -169,6 +261,28 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
                                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                    </div>
+                                ) : message.type === 'ai_editor_action' ? (
+                                    <div className="flex items-center gap-2">
+                                         {message.status === 'generating' && (
+                                              <>
+                                                 <div className="w-3 h-3 border-2 border-t-primary rounded-full animate-spin"></div>
+                                                 <p className="text-sm text-white/70">
+                                                    {message.actionType === 'write' ? 'Writing note to editor...' : 'Improving note in editor...'}
+                                                 </p>
+                                              </>
+                                         )}
+                                         {message.status === 'completed' && (
+                                              <>
+                                                 <Check className="size-4 text-green-400" />
+                                                 <p className="text-sm text-green-400">
+                                                    {message.actionType === 'write' ? 'Finished writing note.' : 'Finished improving note.'}
+                                                 </p>
+                                              </>
+                                         )}
+                                         {message.status === 'error' && (
+                                              <p className="text-sm text-red-400">{message.content || 'Failed to update editor.'}</p>
+                                         )}
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-2">
@@ -205,13 +319,10 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
                             )}
                         </div>
                     ))}
-
-
-
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* MODIFIED: Input Field replaced with Auto-Growing Textarea */}
+                {/* Input Field Area */}
                 <div className="mt-4 pt-4 border-t border-white/10 relative">
                     <div className="relative flex items-end gap-2">
                         {/* Action Menu Button */}
@@ -251,12 +362,12 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true }) => {
 
                         <textarea
                             id='Text_Area_SCROLLBAR'
-                            ref={textareaRef} // Attach the ref
+                            ref={textareaRef}
                             value={inputText}
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
-                            rows="1" // Start with 1 row
-                            className="w-full  bg-white/5 border border-white/10 rounded-lg py-3 pl-4 pr-12 text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none overflow-y-scroll"
+                            rows="1"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-4 pr-12 text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none overflow-y-scroll"
                             placeholder="Ask the AI to do something..."
                         />
 
