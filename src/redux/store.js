@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: "root",
     storage,
-    whitelist: ["currentnoteinfoslice"],//"UserAuthantication",
+    whitelist: ["currentnoteinfoslice", "UserAuthantication"],//"UserAuthantication",
     // sirf auth persist karna hai (recommended)
 };
 

@@ -4,7 +4,7 @@ import {
   TextAUnderline, TextHOne, TextHTwo, Paragraph,
   TextAlignCenter, TextAlignJustify, TextAlignLeft, TextAlignRight,
   ListBullets, ListNumbers, TextStrikethrough, Code, Quotes,
-  Palette, FileText, Sparkle, CircleNotch,
+  Palette, FileText, Sparkle, CircleNotch, Star,
 } from "@phosphor-icons/react";
 
 import { useNoteSave } from "./DataSetterMethodonappwrite/Usenotesave.js";
@@ -15,6 +15,7 @@ import {
   LinkInput,
   FontSizeDropdown,
 } from "./Toolbarcomponents.jsx";
+import { useImageUpload } from "./Hooks/useImageUpload.js";
 
 // ─── Toolbar icon group definitions ──────────────────────────────────────
 
@@ -51,7 +52,7 @@ const INSERT_ICONS = [
 
 // ─── Editor command dispatcher ────────────────────────────────────────────
 
-function runEditorCommand(editor, label, value) {
+function runEditorCommand(editor, label, value, handleImageUpload) {
   switch (label) {
     case "Bold":       return editor.chain().focus().toggleBold().run();
     case "Italic":     return editor.chain().focus().toggleItalic().run();
@@ -77,11 +78,9 @@ function runEditorCommand(editor, label, value) {
       input.accept = "image/*";
       input.onchange = () => {
         const file = input.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () =>
-          editor.chain().focus().setImage({ src: reader.result }).run();
-        reader.readAsDataURL(file);
+        if (file && handleImageUpload) {
+          handleImageUpload(editor, file);
+        }
       };
       input.click();
       return;
@@ -102,7 +101,7 @@ function runEditorCommand(editor, label, value) {
 // Renders a labelled group of toolbar icons, with special handling for
 // Highlight, TextColor and Link (which have their own sub-components).
 
-function IconGroup({ icons, groupLabel, editor, activePopover, onTogglePopover }) {
+function IconGroup({ icons, groupLabel, editor, activePopover, onTogglePopover, handleImageUpload }) {
   return (
     <div className="flex flex-col items-center justify-between border-r-[1px] border-white/10 px-4 h-full min-w-max">
       <div className="flex gap-1 items-center justify-center flex-1">
@@ -115,7 +114,7 @@ function IconGroup({ icons, groupLabel, editor, activePopover, onTogglePopover }
                 isOpen={activePopover === "Highlight"}
                 onToggle={() => onTogglePopover("Highlight")}
                 onPick={(color) => {
-                  runEditorCommand(editor, "Highlight", color);
+                  runEditorCommand(editor, "Highlight", color, handleImageUpload);
                   onTogglePopover(null);
                 }}
               />
@@ -130,7 +129,7 @@ function IconGroup({ icons, groupLabel, editor, activePopover, onTogglePopover }
                 isOpen={activePopover === "TextColor"}
                 onToggle={() => onTogglePopover("TextColor")}
                 onPick={(color) => {
-                  runEditorCommand(editor, "TextColor", color);
+                  runEditorCommand(editor, "TextColor", color, handleImageUpload);
                   onTogglePopover(null);
                 }}
               />
@@ -146,7 +145,7 @@ function IconGroup({ icons, groupLabel, editor, activePopover, onTogglePopover }
                 isOpen={activePopover === "Link"}
                 onToggle={() => onTogglePopover("Link")}
                 onSave={(url) => {
-                  runEditorCommand(editor, "SaveLink", url);
+                  runEditorCommand(editor, "SaveLink", url, handleImageUpload);
                   onTogglePopover(null);
                 }}
               />
@@ -158,7 +157,7 @@ function IconGroup({ icons, groupLabel, editor, activePopover, onTogglePopover }
               key={item.label}
               icon={item.icon}
               label={item.label}
-              onClick={() => runEditorCommand(editor, item.label)}
+              onClick={() => runEditorCommand(editor, item.label, null, handleImageUpload)}
             />
           );
         })}
@@ -185,7 +184,11 @@ export default function Toolbar({ editor, isAiChatOpen, toggleAiChat }) {
     isNoteSaved,
     commitTitle,
     handleSave,
+    toggleImportant,
+    isImportant,
   } = useNoteSave(editor);
+
+  const { isUploading, handleImageUpload } = useImageUpload();
 
   const [isEditing, setIsEditing] = useState(false);
   const [activePopover, setActivePopover] = useState(null);
@@ -231,6 +234,19 @@ export default function Toolbar({ editor, isAiChatOpen, toggleAiChat }) {
         )}
 
         <div className="flex items-center gap-3">
+          {/* Important Star Toggle */}
+          <button
+            onClick={() => toggleImportant(editor)}
+            title={isImportant ? "Unmark as Important" : "Mark as Important"}
+            className={`group active:scale-95 transition-all duration-150 cursor-pointer flex items-center justify-center p-2 rounded-full  ${
+              isImportant
+                ? " text-yellow-400"
+                : "bg-transparent border-transparent text-white hover:bg-white/10"
+            }`}
+          >
+            <Star className="size-5" weight={isImportant ? "fill" : "regular"} />
+          </button>
+
           {/* AI chat toggle */}
           <button
             onClick={toggleAiChat}
@@ -247,20 +263,35 @@ export default function Toolbar({ editor, isAiChatOpen, toggleAiChat }) {
           {/* Save button */}
           <button
             onClick={() => handleSave(editor)}
-            disabled={isSaving || isNoteSaved}
-            className={`group active:scale-95 transition-all duration-150 cursor-pointer relative inline-flex h-9 items-center justify-center overflow-hidden bg-blue-700 px-4 font-medium text-neutral-50 rounded-full ${
-              isSaving || isNoteSaved ? "opacity-80 cursor-default" : ""
+            disabled={isSaving || isNoteSaved || isUploading}
+            className={`group flex items-center justify-center font-[1000] text-white outline-none bg-[#212121] hover:bg-black active:scale-95 rounded-[15px] px-[1em] py-[0.7em] pl-[0.9em] cursor-pointer border-none transition-transform duration-150 ${
+              (isSaving || isNoteSaved || isUploading) ? "opacity-80 cursor-default" : ""
             }`}
           >
-            <span className="absolute h-0 w-0 rounded-full bg-blue-800 transition-all duration-600 group-hover:h-54 group-hover:w-40" />
-            <span className="relative flex justify-center items-center leading-[20px] gap-2 text-sm z-10">
-              {isSaving ? (
-                <><CircleNotch className="size-5 animate-spin" weight="bold" /> Saving...</>
-              ) : isNoteSaved ? (
-                <><FileText className="size-5" weight="fill" /> Saved</>
-              ) : (
-                <><FileText className="size-5" weight="fill" /> Save</>
-              )}
+            <div className="svg-wrapper-1 flex items-center justify-center">
+              <div className="svg-wrapper transition-all duration-[0.5s] ease-linear group-hover:scale-[1.25]">
+                {isUploading ? (
+                  <CircleNotch weight="bold" className="w-[30px] h-[30px] animate-spin block origin-center transition-transform duration-300 ease-in-out group-hover:translate-x-[1.2em] group-hover:scale-[1.1] text-[#9b9999] group-hover:text-white" />
+                ) : isSaving ? (
+                  <CircleNotch weight="bold" className="w-[30px] h-[30px] animate-spin block origin-center transition-transform duration-300 ease-in-out group-hover:translate-x-[1.2em] group-hover:scale-[1.1] text-[#9b9999] group-hover:text-white" />
+                ) : isNoteSaved ? (
+                  <FileText weight="fill" className="w-[30px] h-[30px] block origin-center transition-transform duration-300 ease-in-out group-hover:translate-x-[1.2em] group-hover:scale-[1.1] text-[#9b9999] group-hover:text-white" />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-[30px] h-[30px] block origin-center transition-transform duration-300 ease-in-out group-hover:translate-x-[1.2em] group-hover:scale-[1.1] text-[#9b9999] group-hover:text-white"
+                  >
+                    <path
+                      d="M22,15.04C22,17.23 20.24,19 18.07,19H5.93C3.76,19 2,17.23 2,15.04C2,13.07 3.43,11.44 5.31,11.14C5.28,11 5.27,10.86 5.27,10.71C5.27,9.33 6.38,8.2 7.76,8.2C8.37,8.2 8.94,8.43 9.37,8.8C10.14,7.05 11.13,5.44 13.91,5.44C17.28,5.44 18.87,8.06 18.87,10.83C18.87,10.94 18.87,11.06 18.86,11.17C20.65,11.54 22,13.13 22,15.04Z"
+                    ></path>
+                  </svg>
+                )}
+              </div>
+            </div>
+            <span className="block ml-[0.3em] overflow-hidden transition-all duration-300 ease-in-out group-hover:opacity-0 group-hover:duration-[0.5s] group-hover:ease-linear whitespace-nowrap text-base sm:text-[20px]">
+              {isUploading ? "Uploading..." : isSaving ? "Saving..." : isNoteSaved ? "Saved" : "Save"}
             </span>
           </button>
         </div>
@@ -309,6 +340,7 @@ export default function Toolbar({ editor, isAiChatOpen, toggleAiChat }) {
           editor={editor}
           activePopover={activePopover}
           onTogglePopover={togglePopover}
+          handleImageUpload={handleImageUpload}
         />
       </div>
     </div>

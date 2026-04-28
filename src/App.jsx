@@ -1,15 +1,26 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 
-// Components
+// Standard Components (Lightweight)
 import Signup from "./Component/Signup";
 import Login from "./Component/Login";
 import LandingPage from "./Pages/LandingPage";
-import Dashboard2 from "./Pages/Dashboard2.jsx";
-import Editorpage from "./Pages/Editorpage.jsx";
-import EditProfile from "./Component/Appsettings/allappsettingfeatures/EditProfile.jsx";
 import Notfoundpage from "./Pages/Notfoundpage";
+
+// Lazy Loaded Components (Heavy chunks)
+const Dashboard2 = lazy(() => import("./Pages/Dashboard2.jsx"));
+const Editorpage = lazy(() => import("./Pages/Editorpage.jsx"));
+const EditProfile = lazy(() => import("./Component/Appsettings/allappsettingfeatures/EditProfile.jsx"));
+
+const PageLoader = () => (
+  <div className="flex h-screen w-full justify-center items-center bg-[#1e1e1e] text-zinc-400">
+    <div className="animate-pulse text-lg tracking-widest font-semibold flex items-center gap-2">
+        Loading Module...
+    </div>
+  </div>
+);
 
 const ProtectedRoute = ({ children, authentication = true }) => {
 
@@ -35,13 +46,12 @@ const ProtectedRoute = ({ children, authentication = true }) => {
   return children;
 };
 
-import { useEffect } from "react";
 import userAuthService from "./AppWrite/auth.js";
 import { login, logout } from "./redux/Authantication/UserAuthanticationSlice.js";
-import { useDispatch } from "react-redux";
 
 function App() {
   const dispatch = useDispatch();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -59,10 +69,22 @@ function App() {
       } catch (error) {
         console.error("Session check failed:", error);
         dispatch(logout());
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
     checkSession();
   }, [dispatch]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="flex h-screen w-full justify-center items-center bg-[#1e1e1e] text-zinc-400">
+        <div className="animate-pulse text-lg tracking-widest font-semibold flex items-center gap-2">
+            Loading...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full">
@@ -96,7 +118,9 @@ function App() {
             path="/Dashboard"
             element={
               <ProtectedRoute authentication={true}>
-                <Dashboard2 />
+                <Suspense fallback={<PageLoader />}>
+                  <Dashboard2 />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -105,7 +129,9 @@ function App() {
             path="/editor"
             element={
               <ProtectedRoute authentication={true}>
-                <Editorpage />
+                <Suspense fallback={<PageLoader />}>
+                  <Editorpage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -114,7 +140,9 @@ function App() {
             path="/profile/edit"
             element={
               <ProtectedRoute authentication={true}>
-                <EditProfile />
+                <Suspense fallback={<PageLoader />}>
+                  <EditProfile />
+                </Suspense>
               </ProtectedRoute>
             }
           />

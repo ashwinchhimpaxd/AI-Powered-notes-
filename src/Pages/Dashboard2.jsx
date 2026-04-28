@@ -7,13 +7,20 @@ import { useState } from "react";
 import { useEffect } from "react";
 import NotesCreationForm from "../Component/NotesCreationForm";
 import Appsetting from "../Component/Appsettings/Appsetting"
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { resetcurrentnoteinfo } from "../redux/currentnoteinfoslice/currentnoteinfoslice";
+
 export default function Dashboard2() {
 
-
+    const dispatch = useDispatch();
     const settingState = useSelector(state => state.ToggleStates.settingState);
     const [NewNotesClick, setNewNotesClick] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Reset current note info on dashboard load to prevent old data from bleeding over
+    useEffect(() => {
+        dispatch(resetcurrentnoteinfo());
+    }, [dispatch]);
 
     useEffect(() => {
         if (NewNotesClick) {

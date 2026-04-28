@@ -13,12 +13,62 @@ import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import FontSize from "./FontSize";
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import service from "../../AppWrite/Setgetuserdatas/config";
+import { setcurrentnoteinfo } from "../../redux/currentnoteinfoslice/currentnoteinfoslice";
 import EditorToolbar from "../Editor/Toolbar"; // ✅ IMPORT TOOLBAR
 import AIAssistantChat from "../AIAssistantChat";
 import ImageDeleteButton from "./ImageDeleteButton"; // ✅ IMPORT IMAGE DELETE BUTTON
+import StorageService from "../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload";
+
+// ✅ Custom Image Extension to support data-file-id
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      "data-file-id": {
+        default: null,
+        parseHTML: element => element.getAttribute('data-file-id'),
+        renderHTML: attributes => {
+          if (!attributes['data-file-id']) {
+            return {};
+          }
+          return { 'data-file-id': attributes['data-file-id'] };
+        }
+      },
+      loading: {
+        default: "lazy",
+      },
+    };
+  },
+});
 
 function Editor2({ onEditorReady }) {
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+  const dispatch = useDispatch();
+  const reduxNoteId = useSelector((state) => state.currentnoteinfoslice.noteid);
+  const reduxNoteData = useSelector((state) => state.currentnoteinfoslice.currentnoteinfo);
+  const [isNoteLoaded, setIsNoteLoaded] = useState(false);
+
+  // Clean up any pending Appwrite images left over from a previous abandoned session
+  useEffect(() => {
+    const cleanupPendingImages = async () => {
+      const pendingImages = JSON.parse(localStorage.getItem("pending_appwrite_images") || "[]");
+      if (pendingImages.length > 0) {
+        console.log("Cleaning up orphaned pending images...");
+        for (const fileId of pendingImages) {
+          try {
+            await StorageService.deleteImage(fileId);
+          } catch (error) {
+            console.error(`Failed to delete orphaned image ${fileId}:`, error);
+          }
+        }
+        localStorage.removeItem("pending_appwrite_images");
+      }
+    };
+    cleanupPendingImages();
+  }, []);
+
   const extensions = [
     StarterKit.configure({
       blockquote: {
@@ -35,7 +85,7 @@ function Editor2({ onEditorReady }) {
       linkOnPaste: true,
       HTMLAttributes: { class: "text-sky-400 underline cursor-pointer" },
     }),
-    Image.configure({
+    CustomImage.configure({
       inline: true,
       resize: {
         enabled: true,
@@ -79,6 +129,49 @@ function Editor2({ onEditorReady }) {
       localStorage.setItem("editor_content", content);
     },
   });
+
+  // Load content priority: Redux (Instant UX) -> Server (Fallback if Cache Cleared)
+  useEffect(() => {
+    if (!editor || isNoteLoaded) return;
+    let isMounted = true;
+
+    const loadNote = async () => {
+      // 1. If Redux has the content already, load it INSTANTLY. (Fast UX - No API wait)
+      if (reduxNoteData && reduxNoteData.content) {
+          editor.commands.setContent(reduxNoteData.content);
+          if (isMounted) setIsNoteLoaded(true);
+          return;
+      }
+
+      // 2. Fallback: If Redux is empty but we have an ID (e.g. cleared cache), fetch from Server
+      if (reduxNoteId) {
+        try {
+           const serverNote = await service.getNote(reduxNoteId);
+           if (serverNote && serverNote.Notes_contents && isMounted) {
+               // Update Redux with latest server info so it's fresh for next reloads
+               dispatch(setcurrentnoteinfo({
+                   title: serverNote.Notes_title,
+                   slug: serverNote.slug,
+                   content: serverNote.Notes_contents,
+                   images: serverNote.notes_images || [],
+                   isimportant: serverNote.Is_note_important,
+               }));
+               editor.commands.setContent(serverNote.Notes_contents);
+               if (isMounted) setIsNoteLoaded(true);
+               return; // successfully loaded from server
+           }
+        } catch (error) {
+           console.error("Failed to load from server fallback", error);
+        }
+      }
+
+      if (isMounted) setIsNoteLoaded(true);
+    };
+
+    loadNote();
+
+    return () => { isMounted = false; };
+  }, [editor, reduxNoteId, isNoteLoaded]);
 
 
 

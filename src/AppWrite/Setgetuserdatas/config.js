@@ -14,7 +14,7 @@ export class Service {
     }
 
     // CREATE DOCUMENT
-    async createNote({ Notes_title, slug, Notes_contents, Notes_Images_urls, Is_note_important, User_Unique_ID }) {
+    async createNote({ Notes_title, slug, Notes_contents, notes_images, Is_note_important, User_Unique_ID }) {
         console.log(User_Unique_ID)
         console.log("new note create")
         try {
@@ -25,15 +25,16 @@ export class Service {
                 {
                     "notes_title": Notes_title,
                     "notes_contect": Notes_contents,
-                    "notes_images_urls": Notes_Images_urls,
+                    "notes_images": notes_images,
                     "is_note_important": Is_note_important,
                     "user_unique_id": User_Unique_ID,
                     "slug": slug,
                 },
                 [
-
-                    Permission.write(Role.user(User_Unique_ID))
-
+                    Permission.read(Role.user(User_Unique_ID)),
+                    Permission.write(Role.user(User_Unique_ID)),
+                    Permission.update(Role.user(User_Unique_ID)),
+                    Permission.delete(Role.user(User_Unique_ID))
                 ]
             )
         } catch (error) {
@@ -43,7 +44,7 @@ export class Service {
     }
 
     // UPDATE DOCUMENT
-    async updateNote(noteuniqueid, { slug, Notes_title, Notes_contents, Notes_Images_urls, Is_note_important }) {
+    async updateNote(noteuniqueid, { slug, Notes_title, Notes_contents, notes_images, Is_note_important }) {
         console.log("note update")
         try {
             return await this.databases.updateDocument(
@@ -53,7 +54,7 @@ export class Service {
                 {
                     "notes_title": Notes_title,
                     "notes_contect": Notes_contents,
-                    "notes_images_urls": Notes_Images_urls,
+                    "notes_images": notes_images,
                     "is_note_important": Is_note_important,
                     "slug": slug,
                 }
