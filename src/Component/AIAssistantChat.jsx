@@ -3,6 +3,7 @@ import { PaperPlaneRight, Plus, ImageIcon, Quotes, MagicWand, FilePdf, Copy, Che
 import { useSelector } from 'react-redux';
 import { sendMessageToAI } from '../AiAssistancefiles/AiMehotds/AiassistentLogic.js';
 import AICreateNoteAction from './AICreateNoteAction';
+import AIEditorContentParser from './AIEditorContentParser';
 
 /**
  * Renders the dedicated AI Assistant chat interface.
@@ -49,15 +50,11 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
              return;
         }
 
-        let prompt = "";
-        let isEditorAction = false;
-        let actionType = "";
-
         const editorText = editor.getText().trim();
 
         if (action === 'Summary Note') {
-            prompt = `Please provide a brief summary of the following note content:\n\n${editorText}`;
-            triggerAI(prompt, `Triggered Action: ${action}`, false, "");
+            const prompt = `Please provide a brief summary of the following note content:\n\n${editorText}`;
+            triggerAI(prompt, `Triggered Action: ${action}`);
         } else if (action === 'Write Note') {
             const userActionMsg = {
                 type: 'user',
@@ -78,18 +75,17 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
                     content: 'Your note already has some content. What else would you like me to write or add to it?'
                 }]);
             }
-            return; // Stop here, we wait for user input
+            return; // Wait for user input
         } else if (action === 'Improve Notes') {
-            prompt = `Please rewrite and improve the following note. Output the FULL improved note in HTML format, without any conversational filler or markdown code blocks. Note content:\n\n${editorText}`;
-            triggerAI(prompt, `Triggered Action: ${action}`, true, "improve");
+            const prompt = `Please rewrite and improve the following note. YOU MUST wrap the FULL improved note in HTML format inside [REWRITE_NOTE] and [/REWRITE_NOTE] tags. Do not use conversational filler inside the tags. Note content:\n\n${editorText}`;
+            triggerAI(prompt, `Triggered Action: ${action}`);
         } else if (action === "Upload Image") {
             // TODO: Implement actual image upload logic
             const newMessage = { type: 'user', content: 'Uploaded an image', avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4" };
             setMessages(prev => [...prev, newMessage]);
             return;
         } else {
-            prompt = `Triggered Action: ${action}`;
-            triggerAI(prompt, `Triggered Action: ${action}`, false, "");
+            triggerAI(`Triggered Action: ${action}`, `Triggered Action: ${action}`);
         }
     };
 
@@ -108,7 +104,7 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
         setInputText(e.target.value);
     };
 
-    const triggerAI = async (actualPrompt, displayUserMessage, isEditorAction = false, actionType = "") => {
+    const triggerAI = async (actualPrompt, displayUserMessage) => {
         const newMessage = {
             type: 'user',
             content: displayUserMessage,
@@ -121,58 +117,34 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
 
         const aiMessageId = Date.now().toString();
 
-        // Add a placeholder AI message
-        if (isEditorAction) {
-             setMessages(prev => [...prev, {
-                type: 'ai_editor_action',
-                actionType: actionType,
-                status: 'generating',
-                id: aiMessageId
-            }]);
-        } else {
-            setMessages(prev => [...prev, {
-                type: 'ai',
-                content: '',
-                id: aiMessageId
-            }]);
-        }
+        setMessages(prev => [...prev, {
+            type: 'ai',
+            content: '',
+            id: aiMessageId
+        }]);
 
         // Add context rules to the prompt
         let finalPrompt = actualPrompt;
         if (isSidebar) {
-            finalPrompt = `[System Context: You are currently assisting the user INSIDE the note editor. DO NOT use the [CREATE_NOTE] tag. Do not suggest creating new notes.]\n\nUser: ${actualPrompt}`;
+            const currentEditorText = editor ? editor.getText().trim() : "";
+            finalPrompt = `[System Context: You are currently assisting the user INSIDE the note editor. DO NOT use the [CREATE_NOTE] tag. Do not suggest creating new notes. 
+If the user asks you to add, extend, or write new content for the note, YOU MUST wrap the new HTML content in \`[APPEND_TO_NOTE]\` and \`[/APPEND_TO_NOTE]\` tags. 
+If the user asks you to rewrite or improve the entire note, YOU MUST wrap the improved HTML content in \`[REWRITE_NOTE]\` and \`[/REWRITE_NOTE]\` tags.
+For general questions or summaries, just answer normally without these tags.
+Current editor content for your reference:\n"""\n${currentEditorText}\n"""\n]
+
+User: ${actualPrompt}`;
         } else {
             finalPrompt = `[System Context: You are currently on the Dashboard. You CAN use the [CREATE_NOTE] tag if requested.]\n\nUser: ${actualPrompt}`;
         }
 
         try {
-            let originalEditorHtml = "";
-            if (isEditorAction && actionType === 'write' && editor) {
-                originalEditorHtml = editor.getHTML();
-            }
-
             await sendMessageToAI(finalPrompt, messages, (fullText, chunkText) => {
-                if (isEditorAction && editor) {
-                     if (actionType === 'write') {
-                          // For writing, we append the generated text to the original content
-                          editor.commands.setContent(originalEditorHtml + fullText);
-                     } else if (actionType === 'improve') {
-                          // For improving, we replace the entire content
-                          editor.commands.setContent(fullText);
-                     }
-                } else {
-                    setMessages(prev => prev.map(msg =>
-                        msg.id === aiMessageId ? { ...msg, content: fullText } : msg
-                    ));
-                }
+                setMessages(prev => prev.map(msg =>
+                    msg.id === aiMessageId ? { ...msg, content: fullText } : msg
+                ));
                 setIsGenerating(false);
             });
-
-            if (isEditorAction) {
-                 setMessages(prev => prev.map(msg =>
-                    msg.id === aiMessageId ? { ...msg, status: 'completed' } : msg
-                 ));
-            }
 
         } catch (error) {
             console.error("Failed to get AI response:", error);
@@ -188,15 +160,9 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
                 errorMessage = `⚠️ Error: ${errorStr}`;
             }
 
-            if (isEditorAction) {
-                 setMessages(prev => prev.map(msg =>
-                    msg.id === aiMessageId ? { ...msg, status: 'error', content: errorMessage } : msg
-                 ));
-            } else {
-                setMessages(prev => prev.map(msg =>
-                    msg.id === aiMessageId ? { ...msg, content: errorMessage } : msg
-                ));
-            }
+            setMessages(prev => prev.map(msg =>
+                msg.id === aiMessageId ? { ...msg, content: errorMessage } : msg
+            ));
         } finally {
             setIsGenerating(false);
         }
@@ -206,12 +172,12 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
         const text = inputText.trim();
         if (text !== '') {
              if (pendingAction === 'write_empty') {
-                 const prompt = `Please write a new note about the following topic. Output the FULL note in HTML format, without any conversational filler or markdown code blocks. Topic: ${text}`;
-                 triggerAI(prompt, text, true, "write");
+                 const prompt = `Please write a new note about the following topic. YOU MUST wrap the output in [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags in HTML format. Topic: ${text}`;
+                 triggerAI(prompt, text);
                  setPendingAction(null);
              } else if (pendingAction === 'write_continue') {
-                 const prompt = `Please continue writing the following note based on the user's instructions. Output ONLY the newly generated continuation text in HTML format, without any conversational filler or markdown code blocks.\n\nCurrent note content:\n${editor.getText()}\n\nUser instructions: ${text}`;
-                 triggerAI(prompt, text, true, "write");
+                 const prompt = `Please continue writing the note based on the user's instructions. YOU MUST wrap ONLY the new continuation text in [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags in HTML format.\n\nUser instructions: ${text}`;
+                 triggerAI(prompt, text);
                  setPendingAction(null);
              } else {
                  triggerAI(text, text);
@@ -241,7 +207,7 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
                             className={`flex items-start gap-3 ${message.type === 'user' ? 'justify-end' : ''}`}
                         >
                             {/* AI Avatar/Icon (only visible for AI messages) */}
-                            {(message.type === 'ai' || message.type === 'ai_editor_action') && (
+                            {message.type === 'ai' && (
                                 <div className="flex-shrink-0 size-8 rounded-full bg-primary/20 flex items-center justify-center border">
                                     <span className="material-symbols-outlined text-primary text-lg border border-black/20 rounded-full p-1 bg-black">
                                         <img src="public\AI Star logo\SparklesAIForChat.svg" alt="" className='w-10 relative' />
@@ -251,7 +217,7 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
 
                             {/* Message Bubble */}
                             <div className={
-                                `px-4 py-3 rounded-lg ${message.type === 'ai' || message.type === 'ai_editor_action'
+                                `px-4 py-3 rounded-lg ${message.type === 'ai'
                                     ? 'bg-white/10 rounded-tl-none'
                                     : 'bg-primary rounded-tr-none text-background-dark'
                                 }`
@@ -262,32 +228,14 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
                                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                                         <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                                     </div>
-                                ) : message.type === 'ai_editor_action' ? (
-                                    <div className="flex items-center gap-2">
-                                         {message.status === 'generating' && (
-                                              <>
-                                                 <div className="w-3 h-3 border-2 border-t-primary rounded-full animate-spin"></div>
-                                                 <p className="text-sm text-white/70">
-                                                    {message.actionType === 'write' ? 'Writing note to editor...' : 'Improving note in editor...'}
-                                                 </p>
-                                              </>
-                                         )}
-                                         {message.status === 'completed' && (
-                                              <>
-                                                 <Check className="size-4 text-green-400" />
-                                                 <p className="text-sm text-green-400">
-                                                    {message.actionType === 'write' ? 'Finished writing note.' : 'Finished improving note.'}
-                                                 </p>
-                                              </>
-                                         )}
-                                         {message.status === 'error' && (
-                                              <p className="text-sm text-red-400">{message.content || 'Failed to update editor.'}</p>
-                                         )}
-                                    </div>
                                 ) : (
                                     <div className="flex flex-col gap-2">
                                         {message.type === 'ai' ? (
-                                            <AICreateNoteAction content={message.content} isGenerating={isGenerating} />
+                                            isSidebar ? (
+                                                <AIEditorContentParser content={message.content} isGenerating={isGenerating} editor={editor} />
+                                            ) : (
+                                                <AICreateNoteAction content={message.content} isGenerating={isGenerating} />
+                                            )
                                         ) : (
                                             <p className={`text-sm whitespace-pre-wrap text-white/70 `}>
                                                 {message.content}

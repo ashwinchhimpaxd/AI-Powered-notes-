@@ -37,11 +37,17 @@ const NotesCreation = createSlice({
                 state.notes.splice(index, 1);
             }
             state.notes.unshift(action.payload);
+        },
+        updateNoteInPlace: (state, action) => {
+            const index = state.notes.findIndex(note => note.$id === action.payload.$id);
+            if (index !== -1) {
+                state.notes[index] = action.payload;
+            }
         }
     }
 })
 
 // Action creators are generated for each case reducer function
-export const { Notetitlesetter, NoteSlugsetter, addNote, deleteNote, setNotes, appendNotes, addNoteToTop, updateNoteInSlice } = NotesCreation.actions
+export const { Notetitlesetter, NoteSlugsetter, addNote, deleteNote, setNotes, appendNotes, addNoteToTop, updateNoteInSlice, updateNoteInPlace } = NotesCreation.actions
 
 export default NotesCreation.reducer

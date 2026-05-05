@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useDispatch } from 'react-redux';
 import { setcurrentnoteinfo, resetcurrentnoteinfo } from '../redux/currentnoteinfoslice/currentnoteinfoslice';
-
+import { NotePencil, X } from '@phosphor-icons/react';
 
 function NotesCreationForm({ setNewNotesClick }) {
 
@@ -13,54 +13,84 @@ function NotesCreationForm({ setNewNotesClick }) {
         register,
         handleSubmit,
         reset,
-        getValues,
         formState: { isSubmitting, errors },
     } = useForm({ defaultValues: { title: "" } });
 
     const onSubmit = async (data) => {
         dispatch(resetcurrentnoteinfo());
-        console.log('reset the current note info slice')
         const title = data.title;
         dispatch(setcurrentnoteinfo({ title: title }));
 
-        setNewNotesClick(false); // Close the modal after submission
-        reset(); // Clear the form after submission
+        setNewNotesClick(false);
+        reset();
         navigate('/editor');
     };
 
-
     return (
-        <div className=" z-99  bg-white/10 top-0  backdrop-blur-xs absolute  w-full h-full flex justify-center  items-center">
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">
+            
+            {/* Modal Container */}
+            <div className="relative w-full max-w-[400px] bg-[#121212] border border-[#262626] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                
+                {/* Header */}
+                <div className="flex justify-between items-center px-6 py-4 border-b border-[#262626] bg-[#1a1a1a]">
+                    <div className="flex items-center gap-2 text-white">
+                        <NotePencil className="size-5 text-[#8b5cf6]" weight="fill" />
+                        <h2 className="text-lg font-bold">New Note</h2>
+                    </div>
+                    <button 
+                        onClick={() => {
+                            setNewNotesClick(false);
+                            reset();
+                        }}
+                        className="text-[#a1a1aa] hover:text-white transition-colors p-1"
+                    >
+                        <X className="size-5" />
+                    </button>
+                </div>
 
-            <div className="border border-white/30  relative w-1/3 h-1/2 text-center capitalize flex flex-col justify-start items-center p-10 text-white rounded-4xl bg-[#191919]">
-                <p className="text-white text-4xl font-bold capitalize" style={{ color: "var( --primary-text-color)" }}>note name</p>
+                {/* Form Body */}
+                <div className="p-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+                        
+                        {/* Input Group */}
+                        <div className="flex flex-col gap-2 relative">
+                            <label className="text-sm font-medium text-[#a1a1aa] ml-1">Note Title</label>
+                            <input 
+                                {...register("title", { required: "A title is required" })} 
+                                placeholder="E.g., Project Ideas..." 
+                                autoFocus
+                                className="w-full bg-[#0a0a0a] border border-[#262626] focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] text-white rounded-xl px-4 py-3 outline-none transition-all placeholder:text-[#52525b]" 
+                            />
+                            {errors.title && (
+                                <span className="absolute -bottom-5 left-1 text-xs font-semibold text-red-400">
+                                    {errors.title.message}
+                                </span>
+                            )}
+                        </div>
 
-                <div id="take-note-name " className=" h-full w-full flex flex-col justify-center items-center  gap-10" >
-
-                    <form onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col justify-evenly items-center ">
-                        {/* register your input into the hook by invoking the "register" function */}
-                        <input {...register("title", { required: "title is required" })} placeholder="enter title" className="border w-full text-start md:text-semibold p-2 pt-3 rounded-xl bg-white/8 border-white/30 " style={{ color: "var( --primary-text-color)" }} />
-
-                        {errors.title && <span className="absolute font-semibold text-red-400 top-[30%] left-[33%] -translate-x-1/2">{errors.title.message}</span>}
-
-                        <div id="Okay-cancle-BTN" className="flex w-full justify-center items-center gap-15 text-2xl  ">
-
-                            <button type="submit" className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
-                                border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 " style={{ color: "var( --primary-text-color)" }} disabled={isSubmitting}
-                            >
-                                {isSubmitting ? "Creating..." : "Create"}
-                            </button>
-
-                            <button type="button" className="px-5 py-2 pt-3 capitalize  rounded-full  text-2xl font-semibold cursor-pointer bg-white/8 
-                                border-[0.2px] border-white/30 flex justify-center items-center hover:bg-white/10 "
+                        {/* Actions */}
+                        <div className="flex items-center justify-end gap-3 mt-4">
+                            <button 
+                                type="button" 
                                 onClick={() => {
-                                    console.log("Cancel button clicked");
-                                    setNewNotesClick(false)
-                                    reset()
-                                }} style={{ color: "var( --primary-text-color)" }}>Cancel</button>
+                                    setNewNotesClick(false);
+                                    reset();
+                                }}
+                                className="px-5 py-2.5 rounded-lg text-sm font-semibold text-[#a1a1aa] bg-[#1a1a1a] hover:bg-[#262626] hover:text-white transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting}
+                                className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#8b5cf6] hover:bg-[#7c3aed] transition-colors flex items-center justify-center min-w-[100px] shadow-lg shadow-[#8b5cf6]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? "Creating..." : "Create Note"}
+                            </button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

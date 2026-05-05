@@ -1,110 +1,214 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import userAuthService from "@/AppWrite/auth";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/Authantication/UserAuthanticationSlice.js";
-import Forminputs from "@/components/ui/Forminputs.jsx";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { EnvelopeSimple, Key, GithubLogo, GoogleLogo, ArrowRight, CircleNotch } from "@phosphor-icons/react";
+
 const LoginUsingNumber = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // 1. useForm ko Parent me le aaye
-    const formMethods = useForm();
-    const { getValues, trigger } = formMethods;
+    const formMethods = useForm({
+        defaultValues: {
+            Email: '',
+            OTP: ''
+        }
+    });
+    const { register, handleSubmit, getValues, trigger, setError, formState: { errors, isSubmitting } } = formMethods;
+
+    const [cooldown, setCooldown] = useState(0);
+
+    useEffect(() => {
+        if (cooldown <= 0) return;
+        const timer = setInterval(() => {
+            setCooldown((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [cooldown]);
 
     const OnSendOtp = async () => {
-        // Validate Email first
         const isValid = await trigger("Email");
         if (!isValid) return false;
 
-        // Get value directly inside parent
         const Email = getValues("Email");
-
         console.log("Sending OTP to:");
+        
         try {
             await userAuthService.sendOtp(Email);
-            // Success message or state update here
             return true;
         } catch (error) {
-            console.log(error.message)
+            console.log(error.message);
             return false;
         }
     };
 
+    const handleSendOTPClick = async () => {
+        if (cooldown > 0) return;
+        const success = await OnSendOtp();
+        if (success) {
+            setCooldown(60); 
+        }
+    };
 
     const onSubmit = async (data) => {
         try {
             const currentUser = await userAuthService.getCurrentUser();
-            // console.log(currentUser);
             if (currentUser) {
                 console.log("User already logged in. Syncing state...");
-                dispatch(login({
-                    UserData: {
-                        userdetaild: currentUser
-                    }
-                }));
+                dispatch(login({ UserData: { userdetaild: currentUser } }));
                 navigate("/Dashboard");
                 return;
             }
-            const Userlogin = await userAuthService.verifyOtp(String(data.OTP), data.User);
+            
+            const Userlogin = await userAuthService.verifyOtp(String(data.OTP), ""); 
+            console.log(Userlogin)
             if (Userlogin) {
-                dispatch(login({
-                    UserData: {
-                        userdetaild: Userlogin
-                    }
-                }));
-                // SUCCESS: Redirect to Dashboard (Match App.jsx case)
+                dispatch(login({ UserData: { userdetaild: Userlogin } }));
                 navigate("/Dashboard");
             }
-            // Redirect to dashboard or appropriate page after successful login
         } catch (error) {
             console.error(error.message);
+            setError("OTP", {
+                type: "manual",
+                message: "Invalid OTP. Please check and try again."
+            });
         }
     };
 
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display text-[#ffffff] dark:text-white flex flex-col justify-center items-center min-h-screen w-full  mx-auto px-6 py-4  ">
-
-
-            {/* Main */}
-            <div className="flex-1 flex flex-col  justify-center items-center  w-full max-w-120 ">
-
-                {/* Heading */}
-                <div className="text-center  space-y-1 leading-tight  relative top-10">
-                    <h1 className="text-[3.2rem] font-bold " style={{ color: "var(--primary-text-color)" }}>Welcome Back</h1>
-                    <p className="text-slate-300 dark:text-slate-400  w-[85%]  mx-auto md:text-[1.1rem] text-[1.1rem] tracking-tight" >
-                        Focus on your writing. Log in securely with your email address.
-                    </p>
-                </div>
-
-                {/* FORM */}
-                <Forminputs IsOTPDisable={false} IsEmailDisable={false} IsNameDisable={true} ButtonText={'Login'}
-                    ReactHookformMethods={formMethods}
-                    ALLFX={
-                        {
-                            onSubmitFX: onSubmit,
-                            onOTPsendFX: OnSendOtp,
-
-                        }} />
-
-
-
-                {/* Bottom link relative positioning adjustment */}
-
-                <p className="text-[clamp(1rem,2vw,1.1rem)] font-medium text-slate-400 text-center relative bottom-1">
-                    Don't have an account?{' '}
-                    <Link to="/signup">
-                        <span className="text-primary hover:text-primary/80 transition-colors cursor-pointer underline text-blue-700 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300">
-                            Signup
-                        </span>
-                    </Link>
-                </p>
+        <div className="bg-[#0a0a0a] min-h-screen w-full flex flex-col justify-between font-sans text-white selection:bg-purple-500/30">
+            {/* Header / Logo */}
+            <div className="pt-12 md:pt-20 flex flex-col items-center justify-center text-center px-4">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">Deep Focus AI</h1>
+                <p className="text-[#a1a1aa] text-sm md:text-base">Cognitive Workspace for Deep Thought</p>
             </div>
 
+            {/* Main Form Container */}
+            <div className="flex-1 flex flex-col items-center justify-center w-full px-4 py-8">
+                <div className="bg-[#121212] border border-[#262626] rounded-xl w-full max-w-[420px] p-8 shadow-2xl">
+                    <h2 className="text-2xl font-semibold mb-1 text-white">Welcome back</h2>
+                    <p className="text-[#a1a1aa] text-sm mb-8">Enter your details to continue.</p>
 
-        </div >
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                        {/* Email Field */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-[#e5e5e5] block">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <EnvelopeSimple className="h-5 w-5 text-[#a1a1aa]" />
+                                </div>
+                                <input
+                                    type="email"
+                                    placeholder="name@example.com"
+                                    {...register("Email", {
+                                        required: "Email is required",
+                                        pattern: {
+                                            value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                                            message: "Invalid email address"
+                                        }
+                                    })}
+                                    className="w-full h-11 bg-[#0a0a0a] border border-[#262626] text-white rounded-lg pl-10 pr-4 text-sm focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors outline-none placeholder:text-[#52525b]"
+                                />
+                            </div>
+                            {errors.Email && <p className="text-xs text-red-500 mt-1">{errors.Email.message}</p>}
+                        </div>
+
+                        {/* OTP Field */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <label className="text-sm font-medium text-[#e5e5e5] block">
+                                    OTP
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={handleSendOTPClick}
+                                    disabled={cooldown > 0}
+                                    className={`text-sm font-medium transition-colors ${cooldown > 0 ? "text-[#52525b] cursor-not-allowed" : "text-[#c4b5fd] hover:text-[#ddd6fe]"}`}
+                                >
+                                    {cooldown > 0 ? `Resend in ${cooldown}s` : "Send OTP"}
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Key className="h-5 w-5 text-[#a1a1aa]" />
+                                </div>
+                                <input
+                                    type="text"
+                                    maxLength={6}
+                                    placeholder="Enter 6-digit code"
+                                    {...register("OTP", {
+                                        required: "OTP is required",
+                                        minLength: { value: 6, message: "OTP must be 6 digits" }
+                                    })}
+                                    className="w-full h-11 bg-[#0a0a0a] border border-[#262626] text-white rounded-lg pl-10 pr-4 text-sm tracking-widest focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors outline-none placeholder:text-[#52525b] placeholder:tracking-normal"
+                                />
+                            </div>
+                            {errors.OTP && <p className="text-xs text-red-500 mt-1">{errors.OTP.message}</p>}
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full h-11 mt-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <CircleNotch className="animate-spin h-5 w-5" />
+                                    Processing...
+                                </>
+                            ) : (
+                                <>
+                                    Sign In <ArrowRight className="h-4 w-4 font-bold" />
+                                </>
+                            )}
+                        </button>
+                    </form>
+
+                    {/* Divider */}
+                    <div className="relative my-8">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-[#262626]"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                            <span className="bg-[#121212] px-2 text-[#a1a1aa] font-medium">Or continue with</span>
+                        </div>
+                    </div>
+
+                    {/* Social Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <button type="button" className="flex items-center justify-center gap-2 h-10 bg-[#1a1a1a] border border-[#262626] rounded-lg text-sm font-medium text-[#e5e5e5] hover:bg-[#262626] transition-colors">
+                            <GithubLogo className="h-5 w-5" /> GitHub
+                        </button>
+                        <button type="button" className="flex items-center justify-center gap-2 h-10 bg-[#1a1a1a] border border-[#262626] rounded-lg text-sm font-medium text-[#e5e5e5] hover:bg-[#262626] transition-colors">
+                            <GoogleLogo className="h-5 w-5" /> Google
+                        </button>
+                    </div>
+
+                    <p className="text-center text-sm text-[#a1a1aa] mt-8">
+                        Don't have an account?{' '}
+                        <Link to="/signup" className="text-[#c4b5fd] hover:text-[#ddd6fe] font-medium transition-colors">
+                            Sign up
+                        </Link>
+                    </p>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-[#262626] bg-[#0a0a0a] py-6 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-[#52525b] uppercase tracking-wider">
+                <p>© 2024 DEEP FOCUS AI. DESIGNED FOR PEAK COGNITIVE PERFORMANCE.</p>
+                <div className="flex gap-4 md:gap-6">
+                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">PRIVACY</a>
+                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">TERMS</a>
+                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">SUPPORT</a>
+                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">GITHUB</a>
+                </div>
+            </div>
+        </div>
     );
 };
 

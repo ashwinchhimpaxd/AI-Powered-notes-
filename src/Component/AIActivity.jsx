@@ -1,43 +1,33 @@
-import AIAssistantChat from "./AIAssistantChat";
 import { useSelector } from "react-redux";
-
-// AIActivityAndStats.jsx
-export default function AIActivityAndStats() {
-    const notes = useSelector((state) => state.NotesCreation.notes);
+import { ChartLineUp, FileText, Star } from "@phosphor-icons/react";
+export default function NoteStatistics() {
+    const notes = useSelector((state) => state.NotesCreation.notes) || [];
+    
+    const importantCount = notes.filter(n => n.is_note_important).length;
+    const totalCount = notes.length;
 
     return (
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            {/* AI Activity */}
-            <div className="lg:col-span-2">
-                <h3 className="text-white text-[2.5rem] font-bold px-4 pb-2 pt-4" style={{ color: "var( --primary-text-color)" }}>
-                    AI Assistant
-                </h3>
-
-                <div className="p-4 space-y-6">
-
-                    <AIAssistantChat showPlusIcon={false} />
-
-                </div>
+        <div className="fixed bottom-8 right-8 z-20 w-64 bg-[#121212] border border-[#262626] rounded-xl shadow-2xl p-4 flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+                <ChartLineUp className="size-5 text-[#8b5cf6]" />
+                <h3 className="text-white text-sm font-semibold">Note Statistics</h3>
             </div>
-
-            {/* Stats */}
-            <div>
-                <h3 className="text-white text-lg font-bold px-4 pb-2 pt-4">Stats</h3>
-
-                <div className="p-4 space-y-4">
-                    <div className="p-5 bg-white/5 rounded-lg border border-white/10">
-                        <p className="text-sm text-white/60">Total Notes</p>
-                        <p className="text-3xl font-bold text-white mt-1">{notes ? notes.length : 0}</p>
+            
+            <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[#a1a1aa]">
+                        <FileText className="size-4" />
+                        <span className="text-xs font-medium">Total Notes</span>
                     </div>
-                    <div className="p-5 bg-white/5 rounded-lg border border-white/10">
-                        <p className="text-sm text-white/60">Important Notes</p>
-                        <p className="text-3xl font-bold text-white mt-1">16</p>
+                    <span className="text-white font-bold text-sm">{totalCount}</span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-[#a1a1aa]">
+                        <Star className="size-4 text-yellow-400" />
+                        <span className="text-xs font-medium">Important</span>
                     </div>
-                    <div className="p-5 bg-white/5 rounded-lg border border-white/10">
-                        <p className="text-sm text-white/60">AI Actions</p>
-                        <p className="text-3xl font-bold text-white mt-1">241</p>
-                    </div>
+                    <span className="text-white font-bold text-sm">{importantCount}</span>
                 </div>
             </div>
         </div>

@@ -77,7 +77,7 @@ export class UserAuthentication {
             return usersession;
         } catch (error) {
             console.error(error);
-            // throw error;
+            throw error;
         }
     }
 

@@ -1,8 +1,29 @@
 import React from 'react'
 import UserEmailNamechanges from './allappsettingfeatures/UserEmailNamechanges';
 import AiFeatures from './allappsettingfeatures/AllaiFeatures/AiFeatures';
+import userAuthService from '../../AppWrite/auth';
+import { useDispatch } from 'react-redux';
+
+import { useNavigate } from "react-router-dom";
+import { logout } from '../../redux/Authantication/UserAuthanticationSlice';
+import { SignOut } from "@phosphor-icons/react";
 
 function Appsetting() {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await userAuthService.logoutFromCurrentdevice();
+        } catch (error) {
+            console.error("Server-side logout failed:", error.message);
+        } finally {
+            // Always clear local state and navigate even if server request fails
+            dispatch(logout());
+            navigate("/Login");
+        }
+    }
     return (
         <div className='flex-1 w-full relative overflow-y-auto text-foreground flex flex-col items-center pb-20 pt-10 px-4 sm:px-8'>
             {/* Ambient Background Glow Using Root Primary Color */}
@@ -17,6 +38,9 @@ function Appsetting() {
                 <div className="space-y-10">
                     <UserEmailNamechanges />
                     <AiFeatures />
+                    <SignOut
+                        onClick={handleLogout}
+                        className="text-2xl md:text-2xl lg:text-3xl text-red-500 cursor-pointer" title="Logout" />
                 </div>
             </div>
         </div>

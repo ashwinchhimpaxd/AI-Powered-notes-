@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import Button from '../Component/Button';
-import Navbar from '../Component/Navbar'
 import userAuthService from '@/AppWrite/auth';
-import { Sparkle } from "@phosphor-icons/react";
+import { Sparkle, ArrowRight, TreeStructure, MagnifyingGlass, FileText } from "@phosphor-icons/react";
 
 function LandingPage() {
     const navigate = useNavigate();
@@ -22,73 +20,130 @@ function LandingPage() {
         }
     };
 
-    const list = [
-
-        {
-            id: 1,
-            title: "Ai powered Intelligence",
-            subtitle: "Smart suggestions, auto-organization, and content enhancement",
-            imgurl: "public/landingpagedesign/line brain idea.svg",
-        },
-        {
-
-            id: 2,
-            title: "Rich Text Editor",
-            subtitle: "Express your ideas with a powerful editor",
-            imgurl: "public/landingpagedesign/Pen.svg",
-        },
-    ]
     return (
-        <div id='Home' className='relative w-full max-h-auto min-h-screen selection:bg-purple-200 selection:text-black pt-12 px-8 md:px-12 overflow-x-hidden'>
-            {/* navbar */}
-            <nav id="navigation-bar" className="flex justify-between items-center ">
-                <div className="flex justify-center items-center gap-2 ">
-                    <Sparkle className='size-12 text-purple-500' weight={false ? "fill" : "regular"} />
-                    <p className="capitalize relative top-1 text-[1.4rem] md:text-[2.1rem] text-[var(--primary-text-color)] text-nowrap cursor-default font-semibold tracking-wide" style={{ color: "var(--primary-text-color)" }}>noteAi</p>
+        <div id='Home' className="min-h-screen bg-[#0B0B0F] text-[var(--primary-text-color)] selection:bg-[#a855f7]/30 selection:text-white font-sans relative overflow-x-hidden">
+            {/* Background gradient effects */}
+            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[80%] h-[500px] bg-[#7e22ce]/20 blur-[120px] rounded-full pointer-events-none"></div>
+
+            {/* Navbar */}
+            <nav className="flex justify-between items-center px-6 md:px-12 py-6 max-w-7xl mx-auto relative z-10">
+                <div className="font-bold text-xl md:text-2xl tracking-tight flex items-center gap-2 cursor-pointer">
+                    Deep Focus AI
                 </div>
-                <Button text="Get start" type="button" onclick={handleGetStarted} classNameSting="bg-[#A60003] text-[#FFFFFF] text-[1.3rem] md:text-[1.8rem] tracking-wide font-medium text-nowrap  capitalize bottom-1.5 relative flex justify-center items-center px-[1.5rem] py-[0.3rem] md:px-[2.9rem] md:pt-[0.6rem] hover:scale-105 transition-all duration-300 ease-in-out hover:rotate-3 " />
+                <div className="hidden md:flex items-center gap-8 text-sm text-gray-400 font-medium">
+                    <a href="#features" className="hover:text-white transition-colors">Features</a>
+                    <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+                    <button onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                        Start Writing
+                    </button>
+                </div>
+                <div className="md:hidden">
+                     <button onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                        Start
+                    </button>
+                </div>
             </nav>
 
-            {/* maine text of the landing page  */}
-            <div id="main-text-box" className="min-h-full mt-[3.3vw] flex justify-center items-center relative ">
-                <div id="svg-box" className=" absolute left-[15%] top-[0.5rem] ">
-                    <img src="public/landingpagedesign/Star 1.svg" alt="logo"
-                        className="h-[15vw] animate-spin [animation-duration:10s] hover:scale-112 ease-in-out duration-250 max-w-none object-contain" />
+            {/* Hero Section */}
+            <main className="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-24 relative z-10 flex flex-col items-center text-center">
+                
+                {/* Badge */}
+                <div className="flex items-center gap-2 bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 rounded-full px-4 py-1.5 mb-8">
+                    <Sparkle size={14} className="text-[#a855f7]" weight="fill" />
+                    <span className="text-sm font-medium text-[#d8b4fe]">Deep Focus AI v2.0 Live</span>
                 </div>
 
-                <div id="text-box" className="uppercase flex flex-col justify-center items-center text-[5.6vw] tracking-widest" style={{ color: "var(--primary-landing-page-text-color)" }}>
-                    <p>THINK</p>
-                    <p>Create</p>
-                    <p>organize</p>
-                </div>
+                {/* Headline */}
+                <h1 className="text-4xl md:text-5xl lg:text-[4rem] font-bold tracking-tight mb-6 max-w-4xl leading-tight">
+                    AI organizes your notes instantly
+                </h1>
+                
+                {/* Subheadline */}
+                <p className="text-lg md:text-xl text-gray-400 max-w-2xl mb-10 leading-relaxed font-light">
+                    1-click structuring for peak cognitive performance.<br className="hidden md:block" />
+                    Clear the clutter, find your flow state.
+                </p>
 
-                <div id="svg-box" className=" absolute right-2 top-[0.5rem]">
-                    <img src="public/landingpagedesign/A latter grp.svg" alt="logo"
-                        className="h-[20vw] rotate-45 hover:scale-120 ease-in-out duration-450 max-w-none object-contain" />
-                </div>
-            </div>
+                {/* CTA */}
+                <button onClick={handleGetStarted} className="group bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-8 py-4 rounded-xl text-lg font-medium transition-all flex items-center gap-2 shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:shadow-[0_0_60px_rgba(139,92,246,0.6)]">
+                    Start Writing
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </button>
 
-            {/* features line of landing page */}
-            <div id="feature-box-landingpage" className="mt-[4.5vw] flex flex-col justify-center items-center gap-5 tracking-tighter ">
-                <p className=" text-[2.3vw]  text-center tracking-widest font-[100]" style={{ color: "var(--primary-text-color)" }}>The next-generation note-taking experience that adapts to your thinking patterns.</p>
-                <p className="font-bold! text-[3.3vw] text-white tracking-widest">Powered by AI.</p>
-            </div>
+                {/* App Mockup */}
+                <div className="mt-20 w-full max-w-5xl bg-[#121217] border border-white/5 rounded-2xl shadow-2xl overflow-hidden relative">
+                     {/* subtle glow behind mockup */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[#8b5cf6]/5 blur-[100px] pointer-events-none"></div>
 
-            {/* botton  list of landing page that shows the features of the app */}
-
-            <div id="botton-list-box" className="flex flex-col  m-auto justify-center items-center gap-[4vw] mt-[10%] mb-[5%]">
-                {list.map((item) => (
-                    <div key={item.id} className="p-2 bg-[#5F4A8B] m-2 flex flex-row justify-between items-center w-[50vw] h-[10vw] rounded-[164.24px] 
-                    px-[3.5vw] py-[2vw] hover:scale-106  transition-all duration-600 ease-in-out ">
-                        <p className="text-white w-[30%]  text-[1.6rem] font-bold!">{item.title}</p>
-                        <img src={item.imgurl} alt="imgs" className="w-[7vw] " />
-                        <p className="text-[1.4rem]  w-[38%]  h-full flex justify-center items-center text-start font-semibold! " style={{ color: "var(--primary-landing-page-text-color)" }}>{item.subtitle}</p>
+                    <div className="flex items-center gap-2 px-4 py-3 bg-[#18181f] border-b border-white/5 relative z-10">
+                        <div className="w-3 h-3 rounded-full bg-[#404040]"></div>
+                        <div className="w-3 h-3 rounded-full bg-[#404040]"></div>
+                        <div className="w-3 h-3 rounded-full bg-[#404040]"></div>
                     </div>
-                ))}
+                    <div className="p-4 md:p-8 flex flex-col md:flex-row gap-6 h-[300px] md:h-[400px] relative z-10">
+                        {/* Mockup Editor Content */}
+                        <div className="flex-1 flex flex-col gap-4">
+                            <div className="w-3/4 h-8 bg-white/5 rounded-md"></div>
+                            <div className="w-full h-4 bg-white/5 rounded-md mt-4"></div>
+                            <div className="w-5/6 h-4 bg-white/5 rounded-md"></div>
+                            <div className="w-4/6 h-4 bg-white/5 rounded-md"></div>
+                            <div className="mt-auto w-full h-12 bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 rounded-lg flex items-center px-4 gap-3">
+                                <Sparkle className="text-[#a855f7]" weight="fill" />
+                                <div className="w-1/2 h-4 bg-[#8b5cf6]/20 rounded-md"></div>
+                            </div>
+                        </div>
+                        {/* Mockup Sidebar */}
+                        <div className="hidden md:flex w-64 flex-col gap-4">
+                            <div className="w-24 h-6 bg-white/5 rounded-md"></div>
+                            <div className="w-full h-24 bg-white/5 rounded-lg"></div>
+                            <div className="w-full h-24 bg-white/5 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
 
-            </div>
+                {/* Features Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 w-full max-w-5xl text-left">
+                    {/* Feature 1 */}
+                    <div className="bg-[#121217] border border-white/5 p-8 rounded-2xl hover:bg-[#18181f] transition-colors group cursor-default">
+                        <div className="w-12 h-12 bg-[#302844] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <TreeStructure size={24} className="text-[#d8b4fe]" />
+                        </div>
+                        <h3 className="text-xl font-semibold mb-3">Structure messy notes instantly</h3>
+                        <p className="text-gray-400 leading-relaxed text-sm">Transform chaotic brain dumps into organized outlines with a single click.</p>
+                    </div>
+
+                    {/* Feature 2 */}
+                    <div className="bg-[#121217] border border-white/5 p-8 rounded-2xl hover:bg-[#18181f] transition-colors group cursor-default">
+                        <div className="w-12 h-12 bg-[#302844] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <MagnifyingGlass size={24} className="text-[#d8b4fe]" />
+                        </div>
+                        <h3 className="text-xl font-semibold mb-3">Smart AI search across notes</h3>
+                        <p className="text-gray-400 leading-relaxed text-sm">Find concepts, not just keywords. Semantic search understands your intent.</p>
+                    </div>
+
+                    {/* Feature 3 */}
+                    <div className="bg-[#121217] border border-white/5 p-8 rounded-2xl hover:bg-[#18181f] transition-colors group cursor-default">
+                        <div className="w-12 h-12 bg-[#302844] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <FileText size={24} className="text-[#d8b4fe]" />
+                        </div>
+                        <h3 className="text-xl font-semibold mb-3">Summarize key points</h3>
+                        <p className="text-gray-400 leading-relaxed text-sm">Generate executive summaries and action items from long-form content automatically.</p>
+                    </div>
+                </div>
+            </main>
+
+            {/* Footer */}
+            <footer className="max-w-7xl mx-auto px-6 md:px-12 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-medium">
+                <p className="uppercase tracking-widest text-center md:text-left">© 2024 DEEP FOCUS AI. DESIGNED FOR PEAK COGNITIVE PERFORMANCE.</p>
+                <div className="flex flex-wrap justify-center gap-6 uppercase tracking-widest">
+                    <a href="#" className="hover:text-gray-300 transition-colors">Privacy</a>
+                    <a href="#" className="hover:text-gray-300 transition-colors">Terms</a>
+                    <a href="#" className="hover:text-gray-300 transition-colors">Support</a>
+                    <a href="#" className="hover:text-gray-300 transition-colors">Github</a>
+                </div>
+            </footer>
         </div>
-    )
+    );
 }
 
-export default LandingPage
+export default LandingPage;

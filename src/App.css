@@ -67,15 +67,15 @@ html {
 }
 
 
-#Home {
+ /* #Home {
     background-image: url('../public/landingpagedesign/IPBZLNOFykXPribG9KAtpoMptJs.webp');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     position: relative;
-}
+} 
 
-/* #Home::before {
+#Home::before {
   content: "";
   position: absolute;
   inset: 0;

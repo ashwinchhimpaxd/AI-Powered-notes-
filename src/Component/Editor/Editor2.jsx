@@ -6,9 +6,6 @@ import Image from "@tiptap/extension-image";
 import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline"
 import TextAlign from "@tiptap/extension-text-align";
-import Text from "@tiptap/extension-text";
-import { BulletList } from "@tiptap/extension-list";
-import { Dropcursor } from "@tiptap/extensions";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import FontSize from "./FontSize";
@@ -43,6 +40,39 @@ const CustomImage = Image.extend({
   },
 });
 
+// Define extensions outside to prevent duplicate extension warnings on re-renders
+const extensions = [
+  StarterKit.configure({
+    blockquote: {
+      HTMLAttributes: {
+        class: "border-l-4 border-slate-400 bg-slate-100 dark:bg-white/5 dark:border-white/20 text-slate-700 dark:text-slate-300 pl-4 py-3 italic my-4 rounded-r-md",
+      },
+    },
+  }),
+  Highlight.configure({ HTMLAttributes: { class: "editor-text-highlighted" }, multicolor: true }),
+  Underline,
+  Link.extend({ inclusive: false }).configure({
+    openOnClick: false,
+    autolink: true,
+    linkOnPaste: true,
+    HTMLAttributes: { class: "text-sky-400 underline cursor-pointer" },
+  }),
+  CustomImage.configure({
+    inline: true,
+    resize: {
+      enabled: true,
+      directions: ['top', 'bottom', 'left', 'right'],
+      minWidth: 50,
+      minHeight: 50,
+      alwaysPreserveAspectRatio: true,
+    },
+  }),
+  TextStyle,
+  Color,
+  FontSize,
+  TextAlign.configure({ types: ["heading", "paragraph"] }),
+];
+
 function Editor2({ onEditorReady }) {
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const dispatch = useDispatch();
@@ -69,43 +99,10 @@ function Editor2({ onEditorReady }) {
     cleanupPendingImages();
   }, []);
 
-  const extensions = [
-    StarterKit.configure({
-      blockquote: {
-        HTMLAttributes: {
-          class: "border-l-4 border-slate-400 bg-slate-100 dark:bg-white/5 dark:border-white/20 text-slate-700 dark:text-slate-300 pl-4 py-3 italic my-4 rounded-r-md",
-        },
-      },
-    }),
-    Highlight.configure({ HTMLAttributes: { class: "editor-text-highlighted" }, multicolor: true }),
-    Underline,
-    Link.extend({ inclusive: false }).configure({
-      openOnClick: false,
-      autolink: true,
-      linkOnPaste: true,
-      HTMLAttributes: { class: "text-sky-400 underline cursor-pointer" },
-    }),
-    CustomImage.configure({
-      inline: true,
-      resize: {
-        enabled: true,
-        directions: ['top', 'bottom', 'left', 'right'], // can be any direction or diagonal combination
-        minWidth: 50,
-        minHeight: 50,
-        alwaysPreserveAspectRatio: true,
-      },
-    }),
-    Dropcursor,
-    BulletList,
-    Text,
-    TextStyle,
-    Color,
-    FontSize,
-    TextAlign.configure({ types: ["heading", "paragraph"] }),
-  ];
+
   const editor = useEditor({
     extensions,
-    content: "",
+    content: reduxNoteData?.content || "",
     immediatelyRender: true,
     editorProps: {
       attributes: {
@@ -132,14 +129,20 @@ function Editor2({ onEditorReady }) {
 
   // Load content priority: Redux (Instant UX) -> Server (Fallback if Cache Cleared)
   useEffect(() => {
-    if (!editor || isNoteLoaded) return;
+    if (!editor) return;
     let isMounted = true;
 
     const loadNote = async () => {
       // 1. If Redux has the content already, load it INSTANTLY. (Fast UX - No API wait)
-      if (reduxNoteData && reduxNoteData.content) {
-          editor.commands.setContent(reduxNoteData.content);
-          if (isMounted) setIsNoteLoaded(true);
+      if (reduxNoteData && typeof reduxNoteData.content === 'string') {
+          setTimeout(() => {
+             if (isMounted && !editor.isDestroyed) {
+                 if (editor.getHTML() !== reduxNoteData.content) {
+                     editor.commands.setContent(reduxNoteData.content);
+                 }
+                 setIsNoteLoaded(true);
+             }
+          }, 50); // slight delay to ensure editor DOM is fully painted
           return;
       }
 
@@ -147,18 +150,22 @@ function Editor2({ onEditorReady }) {
       if (reduxNoteId) {
         try {
            const serverNote = await service.getNote(reduxNoteId);
-           if (serverNote && serverNote.Notes_contents && isMounted) {
-               // Update Redux with latest server info so it's fresh for next reloads
+           // NOTE: Appwrite stores the content in 'notes_contect' (typo in schema)
+           if (serverNote && typeof serverNote.notes_contect === 'string' && isMounted) {
                dispatch(setcurrentnoteinfo({
-                   title: serverNote.Notes_title,
-                   slug: serverNote.slug,
-                   content: serverNote.Notes_contents,
+                   title: serverNote.Notes_title || "",
+                   slug: serverNote.slug || "",
+                   content: serverNote.notes_contect,
                    images: serverNote.notes_images || [],
-                   isimportant: serverNote.Is_note_important,
+                   isimportant: serverNote.Is_note_important || false,
                }));
-               editor.commands.setContent(serverNote.Notes_contents);
-               if (isMounted) setIsNoteLoaded(true);
-               return; // successfully loaded from server
+               setTimeout(() => {
+                 if (isMounted && !editor.isDestroyed) {
+                    editor.commands.setContent(serverNote.notes_contect);
+                    setIsNoteLoaded(true);
+                 }
+               }, 50);
+               return; 
            }
         } catch (error) {
            console.error("Failed to load from server fallback", error);
@@ -171,7 +178,7 @@ function Editor2({ onEditorReady }) {
     loadNote();
 
     return () => { isMounted = false; };
-  }, [editor, reduxNoteId, isNoteLoaded]);
+  }, [editor, reduxNoteId, reduxNoteData?.content, dispatch]);
 
 
 
