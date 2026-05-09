@@ -27,11 +27,11 @@ export default function SideNavBar({ isOpen, setIsOpen }) {
                     {/* Logo Area & Mobile Close Button */}
                     <div className="p-6 pb-8 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#262626] flex items-center justify-center flex-shrink-0">
-                                <span className="text-[#a1a1aa] text-xs">✨</span>
+                            <div className="size-10 rounded-full bg-[#1a1a1a] border border-[#262626] flex items-center justify-center flex-shrink-0">
+                                <span className="text-[#a1a1aa] text-xl">✨</span>
                             </div>
                             <div>
-                                <h1 className="text-white font-bold text-lg leading-tight tracking-tight">Deep Focus AI</h1>
+                                <h1 className="text-white font-bold text-lg leading-tight tracking-tight"> Focus AI</h1>
                                 <p className="text-[#a1a1aa] text-xs font-medium">Flow State</p>
                             </div>
                         </div>

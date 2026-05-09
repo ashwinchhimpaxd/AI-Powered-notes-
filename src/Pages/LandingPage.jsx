@@ -28,11 +28,9 @@ function LandingPage() {
             {/* Navbar */}
             <nav className="flex justify-between items-center px-6 md:px-12 py-6 max-w-7xl mx-auto relative z-10">
                 <div className="font-bold text-xl md:text-2xl tracking-tight flex items-center gap-2 cursor-pointer">
-                    Deep Focus AI
+                    Focus AI
                 </div>
                 <div className="hidden md:flex items-center gap-8 text-sm text-gray-400 font-medium">
-                    <a href="#features" className="hover:text-white transition-colors">Features</a>
-                    <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
                     <button onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
                         Start Writing
                     </button>
@@ -59,7 +57,7 @@ function LandingPage() {
                 </h1>
                 
                 {/* Subheadline */}
-                <p className="text-lg md:text-xl text-gray-400 max-w-2xl mb-10 leading-relaxed font-light">
+                <p className="text-lg md:text-xl text-gray-300 max-w-2xl mb-10 leading-relaxed font-light">
                     1-click structuring for peak cognitive performance.<br className="hidden md:block" />
                     Clear the clutter, find your flow state.
                 </p>
@@ -133,7 +131,7 @@ function LandingPage() {
             </main>
 
             {/* Footer */}
-            <footer className="max-w-7xl mx-auto px-6 md:px-12 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-medium">
+            {/* <footer className="max-w-7xl mx-auto px-6 md:px-12 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-500 font-medium">
                 <p className="uppercase tracking-widest text-center md:text-left">© 2024 DEEP FOCUS AI. DESIGNED FOR PEAK COGNITIVE PERFORMANCE.</p>
                 <div className="flex flex-wrap justify-center gap-6 uppercase tracking-widest">
                     <a href="#" className="hover:text-gray-300 transition-colors">Privacy</a>
@@ -141,7 +139,7 @@ function LandingPage() {
                     <a href="#" className="hover:text-gray-300 transition-colors">Support</a>
                     <a href="#" className="hover:text-gray-300 transition-colors">Github</a>
                 </div>
-            </footer>
+            </footer> */}
         </div>
     );
 }

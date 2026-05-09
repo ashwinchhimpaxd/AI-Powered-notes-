@@ -1,5 +1,6 @@
 import React from 'react'
-import Editor2 from '../Component/Editor/Editor2'
+// import Editor2 from '../Component/Editor/Editor2'
+import AntigravityEditor from '../Component/Editor/AntigravityEditor'
 import { useEffect, useState } from 'react';
 
 function Editorpage() {
@@ -19,7 +20,7 @@ function Editorpage() {
             <div className='w-full h-full flex flex-col'>
 
 
-                <Editor2 onEditorReady={seteditorInstance} />
+                <AntigravityEditor onEditorReady={seteditorInstance} />
 
             </div>
 

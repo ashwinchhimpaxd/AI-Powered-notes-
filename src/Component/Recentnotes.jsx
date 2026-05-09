@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import service from "@/AppWrite/Setgetuserdatas/config.js";
 import StorageService from "../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
 import { Query } from "appwrite";
+import { executeOptimisticToggle } from "../utils/optimisticToggle.js";
 
 export default function RecentNotes({ searchQuery = "", isCreatingNote = false }) {
     const notes = useSelector((state) => state.NotesCreation.notes) || [];
@@ -98,24 +99,30 @@ export default function RecentNotes({ searchQuery = "", isCreatingNote = false }
         setOpenNoteMenuId(prevId => prevId === noteId ? null : noteId);
     };
 
-    const toggleStar = async (e, note) => {
+    const toggleStar = (e, note) => {
         e.stopPropagation();
-        const newImportance = !note.is_note_important;
-        const updatedNote = { ...note, is_note_important: newImportance };
-        dispatch(updateNoteInPlace(updatedNote));
 
-        try {
-            await service.updateNote(note.$id, {
-                slug: note.slug,
-                Notes_title: note.notes_title,
-                Notes_contents: note.notes_contect,
-                notes_images: note.notes_images || [],
-                Is_note_important: newImportance
-            });
-        } catch (error) {
-            console.error("Failed to toggle important state:", error);
-            dispatch(updateNoteInPlace(note));
-        }
+        executeOptimisticToggle({
+            key: `note-important-${note.$id}`,
+            initialValue: note.is_note_important,
+            originalData: note,
+            onOptimisticUpdate: (newImportance) => {
+                const updatedNote = { ...note, is_note_important: newImportance };
+                dispatch(updateNoteInPlace(updatedNote));
+            },
+            apiCall: async (newImportance) => {
+                await service.updateNote(note.$id, {
+                    slug: note.slug,
+                    Notes_title: note.notes_title,
+                    Notes_contents: note.notes_contect,
+                    notes_images: note.notes_images || [],
+                    Is_note_important: newImportance
+                });
+            },
+            onRollback: (originalNote) => {
+                dispatch(updateNoteInPlace(originalNote));
+            }
+        });
     };
 
     const handleNoteClick = (note) => {

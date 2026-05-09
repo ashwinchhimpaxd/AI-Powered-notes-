@@ -406,3 +406,16 @@ html {
         width: 90vw !important;
     }
 }
+
+/* ── Tiptap Placeholder extension ─────────────────────────────────────────
+   Renders the hint text as a CSS ::before pseudo-element so it is NEVER
+   part of the actual note content. Disappears the moment the editor receives
+   focus or the user starts typing. */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.22);
+  font-style: italic;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

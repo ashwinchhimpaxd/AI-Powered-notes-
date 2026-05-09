@@ -8,6 +8,7 @@ import { resetcurrentnoteinfo } from "../redux/currentnoteinfoslice/currentnotei
 import { MagnifyingGlass, Sparkle, List } from "@phosphor-icons/react";
 import { sendMessageToAI } from "../AiAssistancefiles/AiMehotds/AiassistentLogic.js";
 import service from "@/AppWrite/Setgetuserdatas/config.js";
+import { handleError } from "../utils/errorHandler.js";
 import { addNoteToTop } from "../redux/NotesCreation/NotesCreationSlice.js";
 
 export default function Dashboard2() {
@@ -91,7 +92,7 @@ export default function Dashboard2() {
                     }
                 }
             } catch (error) {
-                console.error("Failed to generate AI note:", error);
+                handleError(error, { action: "generating AI note" });
             } finally {
                 setIsCreatingNote(false);
             }

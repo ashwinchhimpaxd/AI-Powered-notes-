@@ -14,6 +14,120 @@
 </head>
 
 <body class="bg-[#FAFAFB] font-[Inter] text-sm text-[#56565C]">
+  <!-- STARTUP LOADER -->
+  <style>
+    #startup-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99999;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .loader-top, .loader-bottom {
+      width: 100%;
+      height: 50vh;
+      background-color: #0B0B0F;
+      will-change: transform;
+      transform: translateY(0);
+    }
+    .loader-line-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .loader-dot {
+      width: 4px;
+      height: 4px;
+      background-color: #a855f7;
+      border-radius: 50%;
+      will-change: width, height, border-radius, opacity;
+    }
+
+    /* Phase 3: Line Expansion */
+    #startup-loader.phase-3 .loader-dot {
+      width: 100vw;
+      height: 2px;
+      border-radius: 0;
+      transition: 
+        width 1s cubic-bezier(0.4, 0.0, 0.2, 1),
+        height 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
+        border-radius 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    /* Phase 4: Screen Split */
+    #startup-loader.phase-4 .loader-top {
+      transform: translateY(-100%);
+      transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    #startup-loader.phase-4 .loader-bottom {
+      transform: translateY(100%);
+      transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    #startup-loader.phase-4 .loader-dot {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+  </style>
+
+  <div id="startup-loader">
+    <div class="loader-top"></div>
+    <div class="loader-bottom"></div>
+    <div class="loader-line-container">
+      <div class="loader-dot" id="loader-dot"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const loader = document.getElementById('startup-loader');
+      if (!loader) return;
+      
+      let hasStarted = false;
+
+      function startAnimation() {
+        if (hasStarted) return;
+        hasStarted = true;
+
+        // Phase 3: Line Expansion
+        loader.classList.add('phase-3');
+
+        // Phase 4: Screen Split
+        setTimeout(() => {
+          loader.classList.add('phase-4');
+
+          // Phase 5: Cleanup
+          setTimeout(() => {
+            if (loader.parentNode) {
+              loader.parentNode.removeChild(loader);
+            }
+          }, 850);
+        }, 1000);
+      }
+
+      // Trigger on window.load (Phase 2)
+      if (document.readyState === 'complete') {
+        startAnimation();
+      } else {
+        window.addEventListener('load', startAnimation);
+      }
+
+      // Failsafe: if load doesn't fire within 3s
+      setTimeout(startAnimation, 3000);
+    })();
+  </script>
+  <!-- END STARTUP LOADER -->
+
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

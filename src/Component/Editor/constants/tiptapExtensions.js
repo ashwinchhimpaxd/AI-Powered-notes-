@@ -1,0 +1,34 @@
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Highlight from "@tiptap/extension-highlight";
+import TextAlign from "@tiptap/extension-text-align";
+import { Color } from "@tiptap/extension-color";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Placeholder from "@tiptap/extension-placeholder";
+
+/**
+ * Returns a stable array of Tiptap extensions.
+ * Defined outside any component so the array reference never changes between renders,
+ * preventing the editor from being torn down and recreated on every re-render.
+ */
+export const TIPTAP_EXTENSIONS = [
+  StarterKit.configure({
+    blockquote: {
+      HTMLAttributes: { class: "border-l-2 border-white/20 pl-6 py-2 italic my-6 text-white/70" },
+    },
+    heading: { levels: [1, 2, 3] },
+  }),
+  Highlight.configure({
+    HTMLAttributes: { class: "bg-white/10 text-white rounded px-1 py-0.5" },
+  }),
+  Image.configure({
+    inline: true,
+    HTMLAttributes: { class: "rounded-xl border border-white/10 shadow-2xl my-8 max-w-full" },
+  }),
+  TextStyle,
+  Color,
+  TextAlign.configure({ types: ["heading", "paragraph"] }),
+  Placeholder.configure({
+    placeholder: 'Start typing here . . .   Press "/ " to use AI tools',
+  }),
+];

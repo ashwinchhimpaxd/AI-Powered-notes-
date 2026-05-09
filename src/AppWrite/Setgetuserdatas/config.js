@@ -15,8 +15,6 @@ export class Service {
 
     // CREATE DOCUMENT
     async createNote({ Notes_title, slug, Notes_contents, notes_images, Is_note_important, User_Unique_ID }) {
-        console.log(User_Unique_ID)
-        console.log("new note create")
         try {
             return await this.databases.createDocument(
                 AppwriteConf.appwriteDataBaseId,
@@ -45,7 +43,6 @@ export class Service {
 
     // UPDATE DOCUMENT
     async updateNote(noteuniqueid, { slug, Notes_title, Notes_contents, notes_images, Is_note_important }) {
-        console.log("note update")
         try {
             return await this.databases.updateDocument(
                 AppwriteConf.appwriteDataBaseId,

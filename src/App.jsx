@@ -2,12 +2,13 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import React, { Suspense, lazy, useEffect, useState } from "react";
-
+import LoadingScreen from "./Component/LoadingScreen";
 // Standard Components (Lightweight)
 import Signup from "./Component/Signup";
 import Login from "./Component/Login";
 import LandingPage from "./Pages/LandingPage";
 import Notfoundpage from "./Pages/Notfoundpage";
+import ToastContainer from "./Component/Toast/ToastContainer";
 
 // Lazy Loaded Components (Heavy chunks)
 const Dashboard2 = lazy(() => import("./Pages/Dashboard2.jsx"));
@@ -15,11 +16,7 @@ const Editorpage = lazy(() => import("./Pages/Editorpage.jsx"));
 const EditProfile = lazy(() => import("./Component/Appsettings/allappsettingfeatures/EditProfile.jsx"));
 
 const PageLoader = () => (
-  <div className="flex h-screen w-full justify-center items-center bg-[#1e1e1e] text-zinc-400">
-    <div className="animate-pulse text-lg tracking-widest font-semibold flex items-center gap-2">
-        Loading Module...
-    </div>
-  </div>
+  <LoadingScreen />
 );
 
 const ProtectedRoute = ({ children, authentication = true }) => {
@@ -77,17 +74,12 @@ function App() {
   }, [dispatch]);
 
   if (isCheckingAuth) {
-    return (
-      <div className="flex h-screen w-full justify-center items-center bg-[#1e1e1e] text-zinc-400">
-        <div className="animate-pulse text-lg tracking-widest font-semibold flex items-center gap-2">
-            Loading...
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="h-screen w-full">
+      <ToastContainer />
       <BrowserRouter>
         <Routes>
 
