@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 
 import { useNavigate } from "react-router-dom";
 import { logout } from '../../redux/Authantication/UserAuthanticationSlice';
+import { clearNotes } from '../../redux/NotesCreation/NotesCreationSlice';
 import { SignOut } from "@phosphor-icons/react";
 
 function Appsetting() {
@@ -20,14 +21,15 @@ function Appsetting() {
             console.error("Server-side logout failed:", error.message);
         } finally {
             // Always clear local state and navigate even if server request fails
+            dispatch(clearNotes());
             dispatch(logout());
             navigate("/Login");
         }
     }
     return (
-        <div className='flex-1 w-full relative overflow-y-auto text-foreground flex flex-col items-center pb-20 pt-10 px-4 sm:px-8'>
+        <div className='flex-1 w-full relative  text-foreground flex flex-col items-center pb-20 pt-10 px-4 sm:px-8'>
             {/* Ambient Background Glow Using Root Primary Color */}
-            <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10 transition-all duration-1000"></div>
+            <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10 transition-all duration-1000"></div>
 
             <div className='w-full max-w-4xl space-y-12 relative z-10'>
                 <div className="text-center sm:text-left mb-12 animate-fade-in-up">

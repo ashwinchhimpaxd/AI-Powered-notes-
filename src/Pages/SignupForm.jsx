@@ -1,5 +1,5 @@
 import React from 'react';
-import Forminputs from "@/components/ui/Forminputs.jsx";
+import Forminputs from "@/Component/Forminputs.jsx";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import userAuthService from "../AppWrite/auth";
@@ -26,12 +26,15 @@ function SignupForm() {
 
     const onSubmit = async () => {
         const userEnteredDetailes = getValues(["Email", "User", "OTP"]);
-        const userdetaild = await userAuthService.verifyOtp(userEnteredDetailes[2], userEnteredDetailes[1]);
-        console.log(userdetaild)
-        if (!userdetaild) return;
+        const userdetail = await userAuthService.verifyOtp(userEnteredDetailes[2], userEnteredDetailes[1]);
+        console.log(userdetail)
+        if (!userdetail) return;
+        
+        // Fetch actual User object to have correct user details and user $id
+        const currentUser = await userAuthService.getCurrentUser();
         dispatch(login({
             UserData: {
-                userdetaild
+                userdetaild: currentUser || userdetail
             }
         }));
     };

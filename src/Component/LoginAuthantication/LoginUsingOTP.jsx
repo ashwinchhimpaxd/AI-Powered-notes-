@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { EnvelopeSimple, Key, GithubLogo, GoogleLogo, ArrowRight, CircleNotch } from "@phosphor-icons/react";
 
-const LoginUsingNumber = () => {
+const LoginUsingOTP = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -55,6 +55,7 @@ const LoginUsingNumber = () => {
     const onSubmit = async (data) => {
         try {
             const currentUser = await userAuthService.getCurrentUser();
+            console.log(currentUser)
             if (currentUser) {
                 console.log("User already logged in. Syncing state...");
                 dispatch(login({ UserData: { userdetaild: currentUser } }));
@@ -65,7 +66,9 @@ const LoginUsingNumber = () => {
             const Userlogin = await userAuthService.verifyOtp(String(data.OTP), ""); 
             console.log(Userlogin)
             if (Userlogin) {
-                dispatch(login({ UserData: { userdetaild: Userlogin } }));
+                // Fetch actual User object to have correct user details and user $id
+                const currentUser = await userAuthService.getCurrentUser();
+                dispatch(login({ UserData: { userdetaild: currentUser || Userlogin } }));
                 navigate("/Dashboard");
             }
         } catch (error) {
@@ -212,4 +215,4 @@ const LoginUsingNumber = () => {
     );
 };
 
-export default LoginUsingNumber;
+export default LoginUsingOTP;

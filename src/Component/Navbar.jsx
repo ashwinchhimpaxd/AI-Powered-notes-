@@ -4,8 +4,9 @@ import { useDispatch } from "react-redux";
 import { QuickChatAIOpen, SettingsOpen } from "../redux/QuickChatAI/QuickChatAiSlice.js";
 import { useState } from "react";
 import NotesCreationForm from "./NotesCreationForm";
+import { memo } from "react";
 
-export default function SideNavBar({ isOpen, setIsOpen }) {
+function  SideNavBar({ isOpen, setIsOpen }) {
     const dispatch = useDispatch();
     const [NewNotesClick, setNewNotesClick] = useState(false);
 
@@ -85,3 +86,5 @@ export default function SideNavBar({ isOpen, setIsOpen }) {
         </>
     );
 }
+
+export default memo(SideNavBar);

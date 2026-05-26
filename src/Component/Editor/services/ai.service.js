@@ -1,4 +1,4 @@
-import { model } from "../../../AiAssistancefiles/geminiset.js";
+import { generateAIResponse } from "../../../AiAssistancefiles/AiResponse.js";
 import { buildPrompt } from "../utils/buildPrompt.js";
 import { parseAiResponse } from "../utils/parseAiResponse.js";
 
@@ -18,15 +18,14 @@ import { parseAiResponse } from "../utils/parseAiResponse.js";
  * @returns {Promise<string>} HTML string
  */
 export async function runAiCommand(commandId, commandLabel, commandMode, noteText) {
+  console.log(commandId)
+  console.log(commandLabel)
+  console.log(commandMode)
+  console.log(noteText)
   const prompt = buildPrompt(commandId, noteText);
-  const streamResult = await model.generateContentStream(prompt);
+  const resultText = await generateAIResponse(prompt);
 
-  let accumulated = "";
-  for await (const chunk of streamResult.stream) {
-    accumulated += chunk.text();
-  }
-
-  const bodyHtml = parseAiResponse(accumulated);
+  const bodyHtml = parseAiResponse(resultText);
 
   if (commandMode === "replace") {
     // Clean content — no header, replaces the whole note

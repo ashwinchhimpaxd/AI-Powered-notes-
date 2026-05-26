@@ -1,7 +1,10 @@
 // src/AppWrite/config.js
 import { Client, Databases, Query, ID, Permission, Role } from "appwrite"; // Yaha pe aapka keys ka path
 import AppwriteConf from "@/appwriteConfigrationKeys/ConfigrationofAppwrite";
+
+
 export class Service {
+    // for appwrite database "client"
     client = new Client();
     databases;
 
@@ -12,7 +15,6 @@ export class Service {
 
         this.databases = new Databases(this.client);
     }
-
     // CREATE DOCUMENT
     async createNote({ Notes_title, slug, Notes_contents, notes_images, Is_note_important, User_Unique_ID }) {
         try {

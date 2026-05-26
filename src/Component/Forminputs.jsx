@@ -5,7 +5,7 @@ import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from "@/Component/input-otp"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { FloppyDisk, CircleNotch } from "@phosphor-icons/react"
 

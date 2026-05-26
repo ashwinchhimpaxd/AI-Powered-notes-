@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PaperPlaneRight, Plus, ImageIcon, Quotes, MagicWand, FilePdf, Copy, Check } from "@phosphor-icons/react"
 import { useSelector } from 'react-redux';
-import { sendMessageToAI } from '../AiAssistancefiles/AiMehotds/AiassistentLogic.js';
+import { sendMessageToAI } from '../AiAssistancefiles/Aimethods/AiassistentLogic.js';
 import AICreateNoteAction from './AICreateNoteAction';
 import AIEditorContentParser from './AIEditorContentParser';
 
@@ -44,10 +44,10 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
 
     const handleActionClick = (action) => {
         setShowMenu(false);
-        
+
         if (!editor) {
-             console.warn("Editor actions require an active editor instance.");
-             return;
+            console.warn("Editor actions require an active editor instance.");
+            return;
         }
 
         const editorText = editor.getText().trim();
@@ -61,7 +61,7 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
                 content: `Triggered Action: ${action}`,
                 avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuD6wvhfHk7dfGClRX5gOj8Y64BF3YcbRgr6AE2p3K3Kpavtmk9lTNsLgIn0SCRtb2E8oQGaO77rqQjC0V4SBWVMJlmj62hnGQpCDvr3BZmxTM2UhPggsUDmpwQH4Fo4NQ_NSm9wJCEyRKH6gZhxqmZ7DnXdlGs4UR5rPhqaYyD0p16DD_dg0iGIA7HD6O7nUV26i5pIJqm5sH0wJ9ZxCf5r9uzQS1YNxRN6d5dq5ugCzLHuS1rFDvQwmIhx5zJ0ofksySAaZNGskt4"
             };
-            
+
             if (editorText === '') {
                 setPendingAction('write_empty');
                 setMessages(prev => [...prev, userActionMsg, {
@@ -148,10 +148,10 @@ User: ${actualPrompt}`;
 
         } catch (error) {
             console.error("Failed to get AI response:", error);
-            
+
             let errorMessage = "Sorry, I'm having trouble understanding you right now.";
             const errorStr = String(error);
-            
+
             if (errorStr.includes("429") || errorStr.toLowerCase().includes("quota") || errorStr.toLowerCase().includes("exhausted")) {
                 errorMessage = "⚠️ API Limit Reached! Gemini API has exhausted its quota. Please try again later.";
             } else if (error.message) {
@@ -171,17 +171,17 @@ User: ${actualPrompt}`;
     const handleSend = () => {
         const text = inputText.trim();
         if (text !== '') {
-             if (pendingAction === 'write_empty') {
-                 const prompt = `Please write a new note about the following topic. YOU MUST wrap the output in [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags in HTML format. Topic: ${text}`;
-                 triggerAI(prompt, text);
-                 setPendingAction(null);
-             } else if (pendingAction === 'write_continue') {
-                 const prompt = `Please continue writing the note based on the user's instructions. YOU MUST wrap ONLY the new continuation text in [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags in HTML format.\n\nUser instructions: ${text}`;
-                 triggerAI(prompt, text);
-                 setPendingAction(null);
-             } else {
-                 triggerAI(text, text);
-             }
+            if (pendingAction === 'write_empty') {
+                const prompt = `Please write a new note about the following topic. YOU MUST wrap the output in [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags in HTML format. Topic: ${text}`;
+                triggerAI(prompt, text);
+                setPendingAction(null);
+            } else if (pendingAction === 'write_continue') {
+                const prompt = `Please continue writing the note based on the user's instructions. YOU MUST wrap ONLY the new continuation text in [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags in HTML format.\n\nUser instructions: ${text}`;
+                triggerAI(prompt, text);
+                setPendingAction(null);
+            } else {
+                triggerAI(text, text);
+            }
         }
     };
 
@@ -191,9 +191,9 @@ User: ${actualPrompt}`;
             handleSend();
         }
     };
-    
+
     const quickchataiState = useSelector(state => state.ToggleStates.quickchataiState);
-    
+
     return (
         <div className={`lg:col-span-2 relative overflow-hidden transition-all duration-300 ease-in-out will-change-height ${isSidebar ? 'h-full' : (quickchataiState ? 'h-[400px]' : 'h-[0px]')}`}>
             {/* Main Chat Container */}
