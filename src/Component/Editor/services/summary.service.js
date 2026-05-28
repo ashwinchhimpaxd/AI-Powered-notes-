@@ -17,7 +17,7 @@ ${text.slice(0, 4000)}`;
  * @returns {Promise<{overview: string, keyPoints: string[], actionItems: string[], tone: string}>}
  * @throws {Error} if the note is too short or AI fails
  */
-export async function generateSummary(noteText) {
+export async function generateSummary(noteText, signal = null) {
   const text = (noteText || "").trim();
 
   if (text.length < 20) {
@@ -25,7 +25,7 @@ export async function generateSummary(noteText) {
   }
 
   // Use the loosely-coupled AI interface
-  const responseText = await generateAIResponse(SUMMARY_PROMPT(text));
+  const responseText = await generateAIResponse(SUMMARY_PROMPT(text), undefined, undefined, false, signal);
 
   const raw = (responseText || "").trim();
 

@@ -5,12 +5,12 @@ import { showToast } from "../utils/showToast.js";
 
 export function useSlashCommands() {
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
-  const [slashCoords, setSlashCoords]     = useState({ top: 0, left: 0 });
-  const [slashQuery, setSlashQuery]       = useState("");
-  const [aiLoading, setAiLoading]         = useState(false);
-  const [aiStatus, setAiStatus]           = useState("");
+  const [slashCoords, setSlashCoords] = useState({ top: 0, left: 0 });
+  const [slashQuery, setSlashQuery] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiStatus, setAiStatus] = useState("");
 
-  const editorRef    = useRef(null);
+  const editorRef = useRef(null);
   const slashOpenRef = useRef(false);
 
   // Sync mirror of slashQuery — lets updateQuery read the current value
@@ -20,7 +20,7 @@ export function useSlashCommands() {
   const setEditor = useCallback((ed) => { editorRef.current = ed; }, []);
 
   // ── Stable callback refs exposed to useTiptapEditor ──────────────────
-  const onSlashOpenRef  = useRef(null);
+  const onSlashOpenRef = useRef(null);
   const onSlashQueryRef = useRef(null);
   const onSlashCloseRef = useRef(null);
 
@@ -34,7 +34,7 @@ export function useSlashCommands() {
   }, []);
 
   const closeSlash = useCallback(() => {
-    slashOpenRef.current  = false;
+    slashOpenRef.current = false;
     slashQueryRef.current = "";
     setSlashMenuOpen(false);
     setSlashQuery("");
@@ -59,17 +59,17 @@ export function useSlashCommands() {
   }, [closeSlash]);
 
   // Keep callback refs in sync with latest stable functions
-  useEffect(() => { onSlashOpenRef.current  = openSlash;   }, [openSlash]);
-  useEffect(() => { onSlashCloseRef.current = closeSlash;  }, [closeSlash]);
+  useEffect(() => { onSlashOpenRef.current = openSlash; }, [openSlash]);
+  useEffect(() => { onSlashCloseRef.current = closeSlash; }, [closeSlash]);
   useEffect(() => { onSlashQueryRef.current = updateQuery; }, [updateQuery]);
 
   // ── Filtered commands ──────────────────────────────────────────────────
   const filteredCommands = slashQuery
     ? AI_COMMANDS.filter(
-        (cmd) =>
-          cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
-          cmd.description.toLowerCase().includes(slashQuery.toLowerCase())
-      )
+      (cmd) =>
+        cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
+        cmd.description.toLowerCase().includes(slashQuery.toLowerCase())
+    )
     : AI_COMMANDS;
 
   // Close automatically when no commands match (e.g. user typed "/xyzabc")
@@ -108,7 +108,7 @@ export function useSlashCommands() {
       }
     } catch (err) {
       console.error("AI command error:", err);
-      const msg    = err?.message || "";
+      const msg = err?.message || "";
       const status = err?.status ?? err?.statusCode;
 
       if (status === 429 || msg.includes("429") || msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("rate limit")) {

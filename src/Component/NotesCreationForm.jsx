@@ -19,11 +19,22 @@ function NotesCreationForm({ setNewNotesClick }) {
     const onSubmit = async (data) => {
         dispatch(resetcurrentnoteinfo());
         const title = data.title;
-        dispatch(setcurrentnoteinfo({ title: title }));
+        const generatedSlug = title
+            .trim()
+            .replace(/\s+/g, " ")
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]+/g, "");
+
+        dispatch(setcurrentnoteinfo({ title: title, slug: generatedSlug }));
 
         setNewNotesClick(false);
         reset();
-        navigate('/editor');
+        if (generatedSlug) {
+            navigate(`/Dashboard/editor/${generatedSlug}`);
+        } else {
+            navigate('/Dashboard/editor');
+        }
     };
 
     return (

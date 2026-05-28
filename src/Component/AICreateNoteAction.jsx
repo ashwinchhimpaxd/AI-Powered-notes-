@@ -97,7 +97,11 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
         }));
 
         // Navigate to the editor
-        navigate('/editor');
+        if (generatedSlug) {
+            navigate(`/Dashboard/editor/${generatedSlug}`);
+        } else {
+            navigate('/Dashboard/editor');
+        }
     };
 
     return (

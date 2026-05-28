@@ -27,7 +27,7 @@ class AIService {
      * @param {Function|null} onChunk
      */
 
-    async sendMessage(prompt, history = [], onChunk = null, jsonMode = false) {
+    async sendMessage(prompt, history = [], onChunk = null, jsonMode = false, signal = null) {
 
         try {
 
@@ -119,8 +119,8 @@ class AIService {
                             ...this.headers,
                             Accept: "text/event-stream"
                         },
-
-                        responseType: "stream"
+                        responseType: "stream",
+                        signal
                     }
                 );
 
@@ -198,7 +198,8 @@ class AIService {
                         headers: {
                             ...this.headers,
                             Accept: "application/json"
-                        }
+                        },
+                        signal
                     }
                 );
 
@@ -210,6 +211,13 @@ class AIService {
             }
 
         } catch (error) {
+
+            if (axios.isCancel(error)) {
+                const cancelError = new Error("canceled");
+                cancelError.name = "CanceledError";
+                cancelError.code = "ERR_CANCELED";
+                throw cancelError;
+            }
 
             console.error(
                 "AI Service Error:",
@@ -231,12 +239,13 @@ const aiService = new AIService();
  * Entire app uses this function only
  */
 
-export const generateAIResponse = (prompt, history, onChunk, jsonMode = false) => {
+export const generateAIResponse = (prompt, history, onChunk, jsonMode = false, signal = null) => {
 
     return aiService.sendMessage(
         prompt,
         history,
         onChunk,
-        jsonMode
+        jsonMode,
+        signal
     );
 };

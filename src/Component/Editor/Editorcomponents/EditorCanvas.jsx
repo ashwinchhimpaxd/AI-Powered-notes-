@@ -14,7 +14,7 @@ const EditorCanvas = memo(function EditorCanvas({ editor }) {
       <BubbleToolbar editor={editor} />
       <EditorContent
         editor={editor}
-        className="w-full text-[1.05rem] text-white/85 antialiased "
+        className="w-full text-[1.3rem] text-white/85 antialiased "
       />
     </div>
   );

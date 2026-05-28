@@ -1,3 +1,5 @@
+// here we make tiptap editor first phase of making editor initialization of editor 
+
 import { useEffect, useCallback } from "react";
 import { useEditor } from "@tiptap/react";
 import { useSelector } from "react-redux";
@@ -24,7 +26,7 @@ export function useTiptapEditor({
   const handleKeyDown = useCallback((view, event) => {
     if (event.key === "/") {
       const { from } = view.state.selection;
-      const coords   = view.coordsAtPos(from);
+      const coords = view.coordsAtPos(from);
       onSlashOpenRef.current?.({ top: coords.bottom + window.scrollY + 12, left: coords.left + window.scrollX });
     } else if (slashOpenRef.current) {
       if (event.key === "Escape" || event.key === " ") {

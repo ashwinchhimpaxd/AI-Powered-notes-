@@ -24,14 +24,14 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
       options={{ placement: "top" }}
       className="flex items-center gap-0.5 p-1.5 rounded-2xl bg-[#18181b]/90 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/60"
     >
-      <FormatButton editor={editor} command="bold"        icon={<TextB size={16} />} />
-      <FormatButton editor={editor} command="italic"      icon={<TextItalic size={16} />} />
-      <FormatButton editor={editor} command="strike"      icon={<TextUnderline size={16} />} />
+      <FormatButton editor={editor} command="bold" icon={<TextB size={16} />} />
+      <FormatButton editor={editor} command="italic" icon={<TextItalic size={16} />} />
+      <FormatButton editor={editor} command="underline" icon={<TextUnderline size={16} />} />
       <div className="w-px h-4 bg-white/10 mx-1" />
       <FormatButton editor={editor} command="heading" level={1} icon={<TextHOne size={16} />} />
       <FormatButton editor={editor} command="heading" level={2} icon={<TextHTwo size={16} />} />
       <div className="w-px h-4 bg-white/10 mx-1" />
-      <FormatButton editor={editor} command="bulletList"  icon={<ListBullets size={16} />} />
+      <FormatButton editor={editor} command="bulletList" icon={<ListBullets size={16} />} />
       <FormatButton editor={editor} command="orderedList" icon={<ListNumbers size={16} />} />
       <div className="w-px h-4 bg-white/10 mx-1" />
       <FormatButton editor={editor} command="highlight"   icon={<Highlighter size={16} />} />

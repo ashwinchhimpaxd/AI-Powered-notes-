@@ -13,15 +13,11 @@ import { Sparkle, DownloadSimple, FloppyDisk, CircleNotch } from "@phosphor-icon
  * @param {function} props.onSave
  * @param {function} props.onSummary
  */
-const EditorTopbar = memo(function EditorTopbar({
-  title, setTitle, commitTitle,
-  isSaving, isNoteSaved, onSave, onSummary,
-}) {
-  const [isEditing, setIsEditing] = useState(false);
+const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, isSaving, isNoteSaved, onSave, onSummary, }) {
 
+  const [isEditing, setIsEditing] = useState(false);
   return (
     <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4">
-
       {/* Title */}
       <div className="flex items-center gap-3 flex-1 min-w-0 mr-6">
         {!isEditing && title.trim().length > 0 ? (
@@ -77,17 +73,16 @@ const EditorTopbar = memo(function EditorTopbar({
         <button
           onClick={onSave}
           disabled={isSaving || isNoteSaved}
-          className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-            isNoteSaved
-              ? "bg-white/5 border border-white/10 text-white/40 cursor-default"
-              : "bg-white text-black hover:bg-white/90 shadow-lg shadow-white/10"
-          }`}
+          className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${isNoteSaved
+            ? "bg-white/5 border border-white/10 text-white/40 cursor-default"
+            : "bg-white text-black hover:bg-white/90 shadow-lg shadow-white/10"
+            }`}
         >
           {isSaving
             ? <><CircleNotch className="animate-spin" size={14} /> Saving…</>
             : isNoteSaved
-            ? <><FloppyDisk size={17}  /> Saved</>
-            : <><FloppyDisk size={17}  /> save</>
+              ? <><FloppyDisk size={17} /> Saved</>
+              : <><FloppyDisk size={17} /> save</>
           }
         </button>
       </div>

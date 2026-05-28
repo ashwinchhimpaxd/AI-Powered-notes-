@@ -2,16 +2,16 @@ import React, { useEffect } from "react";
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { useSlashCommands } from "./Hooks/useSlashCommands.js";
-import { useAiSummary }     from "./Hooks/useAiSummary.js";
-import { useTiptapEditor }  from "./Hooks/useTiptapEditor.js";
-import { useNoteSave }      from "./DataSetterMethodonappwrite/Usenotesave.js";
+import { useAiSummary } from "./Hooks/useAiSummary.js";
+import { useTiptapEditor } from "./Hooks/useTiptapEditor.js";
+import { useNoteSave } from "./DataSetterMethodonappwrite/Usenotesave.js";
 
 // ── UI Components ──────────────────────────────────────────────────────────
-import EditorTopbar     from "./Editorcomponents/EditorTopbar.jsx";
-import EditorCanvas     from "./Editorcomponents/EditorCanvas.jsx";
+import EditorTopbar from "./Editorcomponents/EditorTopbar.jsx";
+import EditorCanvas from "./Editorcomponents/EditorCanvas.jsx";
 import SlashCommandMenu from "./Editorcomponents/SlashCommandMenu.jsx";
 import AiLoadingOverlay from "./Editorcomponents/AiLoadingOverlay.jsx";
-import SummaryPanel     from "./Editorcomponents/SummaryPanel.jsx";
+import SummaryPanel from "./Editorcomponents/SummaryPanel.jsx";
 
 /**
  * AntigravityEditor — clean orchestrator.
@@ -29,10 +29,10 @@ export default function AntigravityEditor({ onEditorReady }) {
 
   // 3. Editor — receives stable callback refs from slash so it never recreates
   const { editor } = useTiptapEditor({
-    onSlashOpenRef:  slash.onSlashOpenRef,
+    onSlashOpenRef: slash.onSlashOpenRef,
     onSlashQueryRef: slash.onSlashQueryRef,
     onSlashCloseRef: slash.onSlashCloseRef,
-    slashOpenRef:    slash.slashOpenRef,
+    slashOpenRef: slash.slashOpenRef,
     onEditorReady,
   });
 
@@ -44,8 +44,7 @@ export default function AntigravityEditor({ onEditorReady }) {
   }, [editor]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 5. Save (autosave + manual + title)
-  const { title, setTitle, isSaving, isNoteSaved, commitTitle, handleSave } =
-    useNoteSave(editor);
+  const { title, setTitle, isSaving, isNoteSaved, commitTitle, handleSave } = useNoteSave(editor, slash.slashOpenRef);
 
   if (!editor) return null;
 

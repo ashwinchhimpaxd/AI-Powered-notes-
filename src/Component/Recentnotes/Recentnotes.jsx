@@ -155,7 +155,11 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
             images: note.notes_images || [],
             isimportant: note.is_note_important || false
         }));
-        navigate("/editor");
+        if (note.slug) {
+            navigate(`/Dashboard/editor/${note.slug}`);
+        } else {
+            navigate("/Dashboard/editor");
+        }
     }, [dispatch, navigate]);
 
     const confirmDelete = useCallback(async () => {
