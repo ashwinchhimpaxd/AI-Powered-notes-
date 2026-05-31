@@ -37,17 +37,19 @@ const Toast = ({ id, type, message, onRemove, duration = 4500 }) => {
     case 'network':
       Icon = WifiSlash;
       iconColorClass = 'text-orange-400';
-      bgColorClass = 'bg-[#18181b] border-orange-500/20';
+      bgColorClass = 'bg-[#2a1a15] border-orange-500/40';
       break;
+    case 'error':
     case 'server':
       Icon = Warning;
       iconColorClass = 'text-red-500';
-      bgColorClass = 'bg-[#18181b] border-red-500/30';
+      bgColorClass = 'bg-[#2a1515] border-red-500/50';
       break;
+    case 'warning':
     case 'client':
       Icon = WarningCircle;
       iconColorClass = 'text-yellow-400';
-      bgColorClass = 'bg-[#18181b] border-yellow-500/20';
+      bgColorClass = 'bg-[#2a2615] border-yellow-500/50';
       break;
     default:
       Icon = WarningCircle;

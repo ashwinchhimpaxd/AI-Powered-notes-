@@ -4,14 +4,14 @@ import { generateAIResponse } from "../AiResponse";
  * Standard interface for sending messages to AI.
  * This file is now loosely coupled to the AI provider.
  */
-export const sendMessageToAI = async (message, chatHistory = [], onChunk = null, jsonMode = false) => {
+export const sendMessageToAI = async (message, chatHistory = [], onChunk = null, jsonMode = false, systemPrompt = null) => {
     try {
         if (!message) {
             throw new Error("Message is required");
         }
         // Standardized history format: [{ role: 'user'|'assistant', content: '...' }]
         // We pass this directly to the abstraction layer
-        const responseText = await generateAIResponse(message, chatHistory, onChunk, jsonMode);
+        const responseText = await generateAIResponse(message, chatHistory, onChunk, jsonMode, null, systemPrompt);
 
         return responseText;
 

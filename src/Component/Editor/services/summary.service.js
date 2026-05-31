@@ -11,6 +11,14 @@ const SUMMARY_PROMPT = (text) => `Analyze the following note and respond with a 
 NOTE CONTENT:
 ${text.slice(0, 4000)}`;
 
+const SUMMARY_SYSTEM_PROMPT = `You are a helpful AI notes assistant.
+Your job is to analyze the note and return a structured JSON response.
+Rules:
+- Output ONLY a raw JSON object matching the requested schema.
+- Do NOT wrap your response in markdown code blocks (e.g. do NOT use \`\`\`json).
+- Do NOT include any conversational filler.
+- Do NOT use custom tags like [CREATE_NOTE], [APPEND_TO_NOTE], or [REWRITE_NOTE].`;
+
 /**
  * Generates a structured summary for the given note text using the configured AI service.
  * @param {string} noteText - plain text of the note
@@ -25,7 +33,7 @@ export async function generateSummary(noteText, signal = null) {
   }
 
   // Use the loosely-coupled AI interface
-  const responseText = await generateAIResponse(SUMMARY_PROMPT(text), undefined, undefined, false, signal);
+  const responseText = await generateAIResponse(SUMMARY_PROMPT(text), undefined, undefined, false, signal, SUMMARY_SYSTEM_PROMPT);
 
   const raw = (responseText || "").trim();
 

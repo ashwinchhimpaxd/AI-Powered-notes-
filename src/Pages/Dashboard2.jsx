@@ -131,8 +131,16 @@ export default function Dashboard2() {
                                 Topic:
                                 ${topic}`;
 
+                const DASHBOARD_CREATE_SYSTEM_PROMPT = `You are a helpful educational assistant.
+Your job is to generate a comprehensive note in JSON format.
+Rules:
+- Output ONLY a raw, valid JSON object matching the requested schema.
+- Do NOT wrap your response in markdown code blocks (e.g. do NOT use \`\`\`json).
+- Do NOT include any conversational filler.
+- Do NOT use custom tags like [CREATE_NOTE], [APPEND_TO_NOTE], or [REWRITE_NOTE].`;
+
                 // Enforce JSON Mode (fourth parameter set to true)
-                const responseText = await sendMessageToAI(prompt, [], null, true);
+                const responseText = await sendMessageToAI(prompt, [], null, true, DASHBOARD_CREATE_SYSTEM_PROMPT);
 
                 // Extract the JSON object using regex to ignore any surrounding text or tags
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);

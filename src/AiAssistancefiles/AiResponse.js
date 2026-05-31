@@ -27,7 +27,7 @@ class AIService {
      * @param {Function|null} onChunk
      */
 
-    async sendMessage(prompt, history = [], onChunk = null, jsonMode = false, signal = null) {
+    async sendMessage(prompt, history = [], onChunk = null, jsonMode = false, signal = null, systemPrompt = null) {
 
         try {
 
@@ -44,7 +44,7 @@ class AIService {
 
                 {
                     role: "system",
-                    content:
+                    content: systemPrompt ||
                         `You are a helpful AI notes assistant.
 
                             When the user explicitly asks you to create a note,
@@ -107,79 +107,79 @@ class AIService {
              */
 
             if (isStreaming) {
+                const response = await fetch(this.invokeUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...this.headers,
+                        Accept: "text/event-stream"
+                    },
+                    body: JSON.stringify(payload),
+                    signal
+                });
 
-                const response = await axios.post(
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`AI service error: ${response.status} - ${errText}`);
+                }
 
-                    this.invokeUrl,
-
-                    payload,
-
-                    {
-                        headers: {
-                            ...this.headers,
-                            Accept: "text/event-stream"
-                        },
-                        responseType: "stream",
-                        signal
-                    }
-                );
-
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
                 let fullText = "";
+                let buffer = "";
 
-                return await new Promise((resolve, reject) => {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
 
-                    response.data.on("data", chunk => {
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop() || "";
 
-                        const lines =
-                            chunk
-                                .toString()
-                                .split("\n")
-                                .filter(line =>
-                                    line.trim().startsWith("data:")
-                                );
+                    for (const line of lines) {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) continue;
 
-                        for (const line of lines) {
-
-                            const jsonStr =
-                                line.replace("data:", "").trim();
-
+                        if (trimmedLine.startsWith("data:")) {
+                            const jsonStr = trimmedLine.replace("data:", "").trim();
                             if (jsonStr === "[DONE]") {
-                                resolve(fullText);
-                                return;
+                                continue;
                             }
 
                             try {
-
-                                const parsed =
-                                    JSON.parse(jsonStr);
-
-                                const content =
-                                    parsed
-                                        ?.choices?.[0]
-                                        ?.delta?.content || "";
-
+                                const parsed = JSON.parse(jsonStr);
+                                const content = parsed?.choices?.[0]?.delta?.content || "";
                                 if (content) {
-
                                     fullText += content;
-
                                     onChunk(fullText, content);
                                 }
-
                             } catch (err) {
-                                console.error(
-                                    "Stream parse error:",
-                                    err
-                                );
+                                console.error("Stream parse error:", err);
                             }
                         }
-                    });
+                    }
+                }
 
-                    response.data.on("end", () => {
-                        resolve(fullText);
-                    });
+                if (buffer.trim()) {
+                    const trimmedLine = buffer.trim();
+                    if (trimmedLine.startsWith("data:")) {
+                        const jsonStr = trimmedLine.replace("data:", "").trim();
+                        if (jsonStr !== "[DONE]") {
+                            try {
+                                const parsed = JSON.parse(jsonStr);
+                                const content = parsed?.choices?.[0]?.delta?.content || "";
+                                if (content) {
+                                    fullText += content;
+                                    onChunk(fullText, content);
+                                }
+                            } catch (err) {
+                                // Ignore
+                            }
+                        }
+                    }
+                }
 
-                    response.data.on("error", reject);
-                });
+                return fullText;
             }
 
             /**
@@ -239,13 +239,14 @@ const aiService = new AIService();
  * Entire app uses this function only
  */
 
-export const generateAIResponse = (prompt, history, onChunk, jsonMode = false, signal = null) => {
+export const generateAIResponse = (prompt, history, onChunk, jsonMode = false, signal = null, systemPrompt = null) => {
 
     return aiService.sendMessage(
         prompt,
         history,
         onChunk,
         jsonMode,
-        signal
+        signal,
+        systemPrompt
     );
 };

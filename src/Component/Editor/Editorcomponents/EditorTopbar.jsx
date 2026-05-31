@@ -17,7 +17,7 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
 
   const [isEditing, setIsEditing] = useState(false);
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4">
+    <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 bg-black/20 backdrop-blur-2xl border-b-2 border-white/20">
       {/* Title */}
       <div className="flex items-center gap-3 flex-1 min-w-0 mr-6">
         {!isEditing && title.trim().length > 0 ? (

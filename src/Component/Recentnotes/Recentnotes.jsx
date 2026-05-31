@@ -12,6 +12,7 @@ import NoteCard from "./NoteCard";
 import NoteSkeleton from "./NoteSkeleton";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { selectFilteredNoteIds } from "../../redux/NotesCreation/NotesSelector.js";
+import FilterModal from "../../filternote/FilterModal.jsx";
 
 const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
     const dispatch = useDispatch();
@@ -23,6 +24,7 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
     const [isGridView, setIsGridView] = useState(true);
     const [openNoteMenuId, setOpenNoteMenuId] = useState(null);
     const [noteToDelete, setNoteToDelete] = useState(null);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const noteIds = useSelector(selectNoteIds);
     const noteData = useSelector((state) =>
@@ -196,7 +198,10 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
                     <p className="text-[#a1a1aa] text-sm mt-1">Continue where you left off or ask AI to summarize.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-3 py-1.5 bg-[#121212] hover:bg-[#1a1a1a] border border-[#262626] rounded-lg text-sm font-medium text-[#e5e5e5] transition-colors">
+                    <button
+                        onClick={() => setIsFilterOpen(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[#121212] hover:bg-[#1a1a1a] border border-[#262626] rounded-lg text-sm font-medium text-[#e5e5e5] transition-colors cursor-pointer"
+                    >
                         <FadersHorizontal className="size-4" /> Filter
                     </button>
                     {/* Toggle Button */}
@@ -265,6 +270,12 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
                     isOpen={!!noteToDelete}
                     onClose={() => setNoteToDelete(null)}
                     onConfirm={confirmDelete}
+                />
+                
+                {/* FILTER MODAL */}
+                <FilterModal
+                    isOpen={isFilterOpen}
+                    onClose={() => setIsFilterOpen(false)}
                 />
             </div>
         </div>

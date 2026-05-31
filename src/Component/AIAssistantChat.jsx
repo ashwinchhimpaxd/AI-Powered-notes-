@@ -125,6 +125,7 @@ const AIAssistantChat = ({ isSidebar = false, showPlusIcon = true, editor }) => 
 
         // Add context rules to the prompt
         let finalPrompt = actualPrompt;
+        let systemPrompt = null;
         if (isSidebar) {
             const currentEditorText = editor ? editor.getText().trim() : "";
             finalPrompt = `[System Context: You are currently assisting the user INSIDE the note editor. DO NOT use the [CREATE_NOTE] tag. Do not suggest creating new notes. 
@@ -134,8 +135,26 @@ For general questions or summaries, just answer normally without these tags.
 Current editor content for your reference:\n"""\n${currentEditorText}\n"""\n]
 
 User: ${actualPrompt}`;
+            systemPrompt = `You are a helpful AI notes assistant assisting the user INSIDE the note editor.
+Rules:
+- DO NOT suggest or create new notes. Do NOT use the [CREATE_NOTE] tag.
+- If the user asks you to add, extend, or write new content for the note, wrap the new HTML content inside [APPEND_TO_NOTE] and [/APPEND_TO_NOTE] tags.
+- If the user asks you to rewrite or improve the entire note, wrap the improved HTML content inside [REWRITE_NOTE] and [/REWRITE_NOTE] tags.
+- For general questions, summaries, or questions about the note, just answer normally without any tags.
+- Keep responses clean, concise, and structured. Use proper HTML tags.`;
         } else {
             finalPrompt = `[System Context: You are currently on the Dashboard. You CAN use the [CREATE_NOTE] tag if requested.]\n\nUser: ${actualPrompt}`;
+            systemPrompt = `You are a helpful AI notes assistant on the dashboard.
+Rules:
+- When the user explicitly asks you to create a note, output it using this exact syntax:
+  [CREATE_NOTE]
+  {
+    "title": "The Note Title",
+    "content": "HTML formatted note content"
+  }
+  [/CREATE_NOTE]
+- No markdown code blocks.
+- Keep notes clean, structured, and easy to read.`;
         }
 
         try {
@@ -144,7 +163,7 @@ User: ${actualPrompt}`;
                     msg.id === aiMessageId ? { ...msg, content: fullText } : msg
                 ));
                 setIsGenerating(false);
-            });
+            }, false, systemPrompt);
 
         } catch (error) {
             console.error("Failed to get AI response:", error);

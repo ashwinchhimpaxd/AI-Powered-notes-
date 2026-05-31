@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { AI_COMMANDS } from "../constants/aiCommands.jsx";
-import { runAiCommand } from "../services/ai.service.js";
+import { runAiCommand, cleanHtmlResponse } from "../services/ai.service.js";
 import { showToast } from "../utils/showToast.js";
 
 export function useSlashCommands() {
@@ -97,15 +97,25 @@ export function useSlashCommands() {
     setAiLoading(true);
     setAiStatus(`${cmd.label}…`);
 
-    try {
-      const html = await runAiCommand(cmd.id, cmd.label, cmd.mode, editor.getText());
+    const originalHtml = editor.getHTML();
+    const headerHtml = cmd.mode === "append" ? `<p><strong style="color:#a78bfa">✦ ${cmd.label}</strong></p>` : "";
 
-      if (cmd.mode === "replace") {
-        editor.commands.setContent(html);
-        editor.commands.focus("end");
-      } else {
-        editor.chain().focus().insertContent(html).run();
-      }
+    try {
+      await runAiCommand(
+        cmd.id,
+        cmd.label,
+        cmd.mode,
+        originalHtml,
+        (streamedText) => {
+          const parsedHtml = cleanHtmlResponse(streamedText);
+          if (cmd.mode === "replace") {
+            editor.commands.setContent(parsedHtml);
+          } else {
+            editor.commands.setContent(originalHtml + headerHtml + parsedHtml);
+          }
+          editor.commands.focus("end");
+        }
+      );
     } catch (err) {
       console.error("AI command error:", err);
       const msg = err?.message || "";

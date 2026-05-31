@@ -27,7 +27,32 @@ export function useTiptapEditor({
     if (event.key === "/") {
       const { from } = view.state.selection;
       const coords = view.coordsAtPos(from);
-      onSlashOpenRef.current?.({ top: coords.bottom + window.scrollY + 12, left: coords.left + window.scrollX });
+
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - coords.bottom;
+      const menuHeight = 360; // Max height of menu (360px list + header)
+
+      let top;
+      if (spaceBelow < menuHeight) {
+        // Agar niche jagah nahi hai -> Open UPWARDS (cursor ke upar)
+        top = coords.top + window.scrollY - menuHeight - 12;
+        // Clamp to screen top so it doesn't go off-screen
+        top = Math.max(12 + window.scrollY, top);
+      } else {
+        // Agar niche jagah hai -> Open DOWNWARDS (cursor ke niche)
+        top = coords.bottom + window.scrollY + 12;
+      }
+
+      const viewportWidth = window.innerWidth;
+      const menuWidth = 320; // w-80 width
+      let left = coords.left + window.scrollX;
+
+      // Horizontal boundary check (Right overflow protection)
+      if (left + menuWidth > viewportWidth) {
+        left = Math.max(12, viewportWidth - menuWidth - 24);
+      }
+
+      onSlashOpenRef.current?.({ top, left });
     } else if (slashOpenRef.current) {
       if (event.key === "Escape" || event.key === " ") {
         onSlashCloseRef.current?.();
