@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import userAuthService from "../AppWrite/auth";
 import { useDispatch } from 'react-redux';
 import { login } from "../redux/Authantication/UserAuthanticationSlice";
+import { showToast } from "../Component/Editor/utils/showToast.js";
 function SignupForm() {
     const dispatch = useDispatch();
 
@@ -21,6 +22,7 @@ function SignupForm() {
         const Email = getValues("Email");
         const sendOtp = await userAuthService.sendOtp(Email); // i was close the calling of sendOtp function beacuse of rate limit
         if (!sendOtp) return false;
+        showToast("success", "OTP sent successfully");
         return true;
     };
 

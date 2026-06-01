@@ -46,6 +46,15 @@
     --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
     --sidebar-border: oklch(0.923 0.003 48.717);
     --sidebar-ring: oklch(0.709 0.01 56.259);
+
+    /* Toast Design Colors mapped to root */
+    --toast-success-bg: #142f1f;
+    --toast-success-border: rgba(34, 197, 94, 0.4);
+    --toast-success-icon: #4ade80;
+
+    --toast-ai-bg: #22152e;
+    --toast-ai-border: rgba(168, 85, 247, 0.4);
+    --toast-ai-icon: #c084fc;
 }
 
 
@@ -418,4 +427,21 @@ html {
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+/* Toast Custom Styles using Root Variables */
+.toast-success {
+    background-color: var(--toast-success-bg) !important;
+    border-color: var(--toast-success-border) !important;
+}
+.toast-success-icon {
+    color: var(--toast-success-icon) !important;
+}
+
+.toast-ai {
+    background-color: var(--toast-ai-bg) !important;
+    border-color: var(--toast-ai-border) !important;
+}
+.toast-ai-icon {
+    color: var(--toast-ai-icon) !important;
 }

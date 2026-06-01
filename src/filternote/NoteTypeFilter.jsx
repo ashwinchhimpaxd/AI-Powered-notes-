@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
 /**
  * NoteTypeFilter Component
  * Segmented control for choosing All Notes, Important, or Non-Important notes.
  */
-const NoteTypeFilter = () => {
-  const [selectedType, setSelectedType] = useState("all");
-
+const NoteTypeFilter = ({ selectedType, setSelectedType }) => {
   const types = [
     { id: "all", label: "All Notes" },
     { id: "important", label: "Important" },

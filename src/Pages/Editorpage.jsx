@@ -34,11 +34,27 @@ function Editorpage() {
             if (!slug) return;
 
             // 1. If currently loaded note in Redux already matches the URL slug, do nothing!
-            if (currentNoteInfo?.slug === slug && reduxNoteId) {
+            if (currentNoteInfo?.slug === slug) {
                 return;
             }
 
-            // 2. Try to find the note locally in Redux cache (allNotes)
+            // 2. Check if the user is editing the title of the active note
+            // (either a saved note with reduxNoteId or a new unsaved note with reduxNoteId === null)
+            if (reduxNoteId) {
+                const activeNoteInCache = allNotes.find(note => note.$id === reduxNoteId);
+                if (activeNoteInCache && activeNoteInCache.slug === slug && currentNoteInfo?.slug) {
+                    // Update URL slug in address bar to match the new edited slug
+                    navigate(`/Dashboard/editor/${currentNoteInfo.slug}`, { replace: true });
+                    return;
+                }
+            } else if (currentNoteInfo?.title && currentNoteInfo?.slug) {
+                // For newly created unsaved notes, reduxNoteId is null but title/slug are in Redux.
+                // If they don't match the URL slug, it's because the user edited the title.
+                navigate(`/Dashboard/editor/${currentNoteInfo.slug}`, { replace: true });
+                return;
+            }
+
+            // 3. Try to find the note locally in Redux cache (allNotes)
             const localNote = allNotes.find(note => note.slug === slug);
             if (localNote) {
                 console.log("Loading note from Redux cache:", localNote.$id);
@@ -53,7 +69,7 @@ function Editorpage() {
                 return;
             }
 
-            // 3. Fallback: Fetch the note from Appwrite server by slug
+            // 4. Fallback: Fetch the note from Appwrite server by slug
             setIsLoading(true);
             try {
                 console.log("Note not found in Redux cache. Querying Appwrite server for slug:", slug);

@@ -10,6 +10,7 @@ import { sendMessageToAI } from "../AiAssistancefiles/Aimethods/AiassistentLogic
 import service from "@/AppWrite/Setgetuserdatas/config.js";
 import { handleError } from "../utils/errorHandler.js";
 import { addNoteToTop } from "../redux/NotesCreation/NotesCreationSlice.js";
+import { showToast } from "../Component/Editor/utils/showToast.js";
 
 
 /**
@@ -180,6 +181,7 @@ Rules:
 
                     if (newNoteResponse && newNoteResponse.$id) {
                         dispatch(addNoteToTop(newNoteResponse));
+                        showToast("ai_success", "Note created");
                     }
                 }
             } catch (error) {

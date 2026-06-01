@@ -5,6 +5,7 @@ import { login } from "@/redux/Authantication/UserAuthanticationSlice.js";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { EnvelopeSimple, Key, GithubLogo, GoogleLogo, ArrowRight, CircleNotch } from "@phosphor-icons/react";
+import { showToast } from "../Editor/utils/showToast.js";
 
 const LoginUsingOTP = () => {
     const dispatch = useDispatch();
@@ -37,6 +38,7 @@ const LoginUsingOTP = () => {
         
         try {
             await userAuthService.sendOtp(Email);
+            showToast("success", "OTP sent successfully");
             return true;
         } catch (error) {
             console.log(error.message);
@@ -81,10 +83,10 @@ const LoginUsingOTP = () => {
     };
 
     return (
-        <div className="bg-[#0a0a0a] min-h-screen w-full flex flex-col justify-between font-sans text-white selection:bg-purple-500/30">
+        <div className="bg-[#0a0a0a] min-h-screen w-full flex flex-col justify-between font-sans text-foreground selection:bg-purple-500/30">
             {/* Header / Logo */}
             <div className="pt-12 md:pt-20 flex flex-col items-center justify-center text-center px-4">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">Deep Focus AI</h1>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">Deep Focus AI</h1>
                 <p className="text-[#a1a1aa] text-sm md:text-base">Cognitive Workspace for Deep Thought</p>
             </div>
 
@@ -114,7 +116,7 @@ const LoginUsingOTP = () => {
                                             message: "Invalid email address"
                                         }
                                     })}
-                                    className="w-full h-11 bg-[#0a0a0a] border border-[#262626] text-white rounded-lg pl-10 pr-4 text-sm focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors outline-none placeholder:text-[#52525b]"
+                                    className="w-full h-11 bg-background border border-[#262626] text-foreground rounded-lg pl-10 pr-4 text-sm focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors outline-none placeholder:text-[#52525b]"
                                 />
                             </div>
                             {errors.Email && <p className="text-xs text-red-500 mt-1">{errors.Email.message}</p>}
@@ -147,7 +149,7 @@ const LoginUsingOTP = () => {
                                         required: "OTP is required",
                                         minLength: { value: 6, message: "OTP must be 6 digits" }
                                     })}
-                                    className="w-full h-11 bg-[#0a0a0a] border border-[#262626] text-white rounded-lg pl-10 pr-4 text-sm tracking-widest focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors outline-none placeholder:text-[#52525b] placeholder:tracking-normal"
+                                    className="w-full h-11 bg-background border border-[#262626] text-foreground rounded-lg pl-10 pr-4 text-sm tracking-widest focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors outline-none placeholder:text-[#52525b] placeholder:tracking-normal"
                                 />
                             </div>
                             {errors.OTP && <p className="text-xs text-red-500 mt-1">{errors.OTP.message}</p>}

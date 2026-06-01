@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { WarningCircle, WifiSlash, Warning, X } from '@phosphor-icons/react';
+import { WarningCircle, WifiSlash, Warning, X, CheckCircle, Sparkle } from '@phosphor-icons/react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -34,6 +34,16 @@ const Toast = ({ id, type, message, onRemove, duration = 4500 }) => {
   let bgColorClass = 'bg-[#18181b] border-red-500/20'; // Base dark theme
 
   switch (type) {
+    case 'success':
+      Icon = CheckCircle;
+      iconColorClass = 'toast-success-icon';
+      bgColorClass = 'toast-success';
+      break;
+    case 'ai_success':
+      Icon = Sparkle;
+      iconColorClass = 'toast-ai-icon';
+      bgColorClass = 'toast-ai';
+      break;
     case 'network':
       Icon = WifiSlash;
       iconColorClass = 'text-orange-400';

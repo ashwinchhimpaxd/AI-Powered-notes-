@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { User, EnvelopeSimple, Check, ArrowLeft, WarningCircle, PaperPlaneRight, ArrowsClockwise, Key } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../Editor/utils/showToast.js';
 
 function EditProfile() {
     const navigate = useNavigate();
@@ -52,6 +53,7 @@ function EditProfile() {
 
         setOtpSent(true);
         setIsSendingOtp(false);
+        showToast("success", "OTP sent successfully");
     };
 
     const onSubmit = async (data) => {

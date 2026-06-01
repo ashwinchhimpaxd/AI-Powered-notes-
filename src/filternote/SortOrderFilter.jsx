@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { CalendarBlank, ClockCounterClockwise } from "@phosphor-icons/react";
 
 /**
  * SortOrderFilter Component
  * Custom selection button grid for sorting notes: Newest First or Oldest First.
  */
-const SortOrderFilter = () => {
-  const [sortOrder, setSortOrder] = useState("newest");
-
+const SortOrderFilter = ({ sortOrder, setSortOrder }) => {
   return (
     <div className="flex flex-col gap-3">
       <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">

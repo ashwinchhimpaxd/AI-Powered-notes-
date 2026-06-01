@@ -18,9 +18,6 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(false);
-    const [fetchingMore, setFetchingMore] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
     const [isGridView, setIsGridView] = useState(true);
     const [openNoteMenuId, setOpenNoteMenuId] = useState(null);
     const [noteToDelete, setNoteToDelete] = useState(null);
@@ -31,73 +28,29 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
         noteToDelete ? selectNoteById(state, noteToDelete) : null
     );
 
-    const lastNoteId = noteIds.length > 0 ? noteIds[noteIds.length - 1] : null;
-    const lastNote = useSelector((state) =>
-        lastNoteId ? selectNoteById(state, lastNoteId) : null
-    );
-
+    const { loading, hasMore, lastCursor, filter } = useSelector((state) => state.NotesCreation);
     const currentuserID = useSelector((state) => state.UserAuthantication.UserData?.userdetaild?.$id) || "";
 
-    // Initial fetch from Server IF Redux slice is empty
+    // Trigger initial fetch or reload when filters/user changes
     useEffect(() => {
         if (!currentuserID) return;
-        if (noteIds.length > 0) return;
 
-        const fetchNotes = async () => {
-            try {
-                setLoading(true);
-                const response = await service.getNotes([
-                    Query.limit(8),
-                    Query.orderDesc("$updatedAt"),
-                    Query.equal("user_unique_id", currentuserID)
-                ]);
-
-                if (response?.documents) {
-                    dispatch(setNotes(response.documents));
-                    if (response.documents.length < 8) {
-                        setHasMore(false);
-                    }
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchNotes();
-    }, [currentuserID, noteIds.length, dispatch]);
-
-    const fetchingRef = useRef(false);
-    const lastNoteIdForCursor = lastNote?.$id;
+        // Fetch first page if lastCursor is null (initial load or filter changed)
+        if (!lastCursor) {
+            import("../../redux/NotesCreation/NotesCreationSlice.js").then((module) => {
+                dispatch(module.fetchNotesThunk({ userId: currentuserID }));
+            });
+        }
+    }, [currentuserID, filter, lastCursor, dispatch]);
 
     // Load More function for Infinite Scroll
     const loadMoreNotes = useCallback(async () => {
-        if (fetchingRef.current || fetchingMore || !hasMore || !lastNoteIdForCursor) return;
+        if (loading || !hasMore || !lastCursor || !currentuserID) return;
 
-        fetchingRef.current = true;
-        setFetchingMore(true);
-
-        try {
-            const response = await service.getNotes([
-                Query.limit(8),
-                Query.orderDesc("$updatedAt"),
-                Query.cursorAfter(lastNoteIdForCursor)
-            ]);
-
-            if (response && response.documents && response.documents.length > 0) {
-                dispatch(appendNotes(response.documents));
-            }
-            if (!response || !response.documents || response.documents.length < 8) {
-                setHasMore(false);
-            }
-        } catch (error) {
-            console.error("Error fetching more notes:", error);
-        } finally {
-            fetchingRef.current = false;
-            setFetchingMore(false);
-        }
-    }, [fetchingMore, hasMore, lastNoteIdForCursor, dispatch]);
+        import("../../redux/NotesCreation/NotesCreationSlice.js").then((module) => {
+            dispatch(module.fetchNotesThunk({ userId: currentuserID }));
+        });
+    }, [loading, hasMore, lastCursor, currentuserID, dispatch]);
 
     // handle delete notes 
     const handleDeleteMenu = useCallback((id) => {
@@ -107,7 +60,7 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
 
     const handleScroll = useCallback((e) => {
         const { scrollTop, clientHeight, scrollHeight } = e.target;
-        if (scrollHeight - scrollTop <= clientHeight + 50) {
+        if (scrollHeight - scrollTop <= clientHeight + 80) { // 80px boundary
             loadMoreNotes();
         }
     }, [loadMoreNotes]);
@@ -219,8 +172,8 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
 
             {/* Note Grid */}
             <div className="flex-1">
-                {/* LOADING STATE */}
-                {loading && (
+                {/* LOADING STATE (FIRST PAGE) */}
+                {loading && filteredNoteIds.length === 0 && (
                     <div className="flex justify-center items-center py-20">
                         <CircleNotch className="size-8 text-[#8b5cf6] animate-spin" />
                     </div>
@@ -234,7 +187,7 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
                 )}
 
                 {/* NOTES GRID */}
-                {!loading && (
+                {(filteredNoteIds.length > 0 || !loading) && (
                     <div
                         onScroll={handleScroll}
                         // Conditionally apply Grid or List (flex-col) classes here:
@@ -258,7 +211,7 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
                                 onClick={handleNoteClick}
                             />
                         ))}
-                        {fetchingMore && (
+                        {loading && filteredNoteIds.length > 0 && (
                             <div className="col-span-full flex justify-center py-4">
                                 <CircleNotch className="size-6 text-[#52525b] animate-spin" />
                             </div>

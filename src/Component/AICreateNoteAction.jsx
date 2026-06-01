@@ -5,7 +5,7 @@ import { FileText, ArrowSquareOut, CheckCircle, CircleNotch } from "@phosphor-ic
 import service from '../AppWrite/Setgetuserdatas/config.js';
 import { addNoteToTop } from '../redux/NotesCreation/NotesCreationSlice.js';
 import { setnoteid, setcurrentnoteinfo } from '../redux/currentnoteinfoslice/currentnoteinfoslice.js';
-
+import { showToast } from './Editor/utils/showToast.js';
 const AICreateNoteAction = ({ content, isGenerating }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -71,6 +71,7 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
                 // Immediately add to Redux Recent Notes slice
                 dispatch(addNoteToTop(response));
                 setCreationStatus('success');
+                showToast("ai_success", "Note created");
             } else {
                 throw new Error("Invalid response from server");
             }

@@ -8,7 +8,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Kufam:ital,wght@0,400..900;1,400..900&family=Kurale&family=Modak&family=Orbitron&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&family=Wallpoet&display=swap"
     rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="/appwrite.svg" />
+  <link rel="icon" type="image/x-icon" href="/src/assets/public/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Notes</title>
 </head>
@@ -28,13 +28,16 @@
       flex-direction: column;
       overflow: hidden;
     }
-    .loader-top, .loader-bottom {
+
+    .loader-top,
+    .loader-bottom {
       width: 100%;
       height: 50vh;
       background-color: #0B0B0F;
       will-change: transform;
       transform: translateY(0);
     }
+
     .loader-line-container {
       position: absolute;
       top: 50%;
@@ -46,6 +49,7 @@
       justify-content: center;
       align-items: center;
     }
+
     .loader-dot {
       width: 4px;
       height: 4px;
@@ -59,7 +63,7 @@
       width: 100vw;
       height: 2px;
       border-radius: 0;
-      transition: 
+      transition:
         width 1s cubic-bezier(0.4, 0.0, 0.2, 1),
         height 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
         border-radius 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -70,10 +74,12 @@
       transform: translateY(-100%);
       transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
     }
+
     #startup-loader.phase-4 .loader-bottom {
       transform: translateY(100%);
       transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
     }
+
     #startup-loader.phase-4 .loader-dot {
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -89,10 +95,10 @@
   </div>
 
   <script>
-    (function() {
+    (function () {
       const loader = document.getElementById('startup-loader');
       if (!loader) return;
-      
+
       let hasStarted = false;
 
       function startAnimation() {

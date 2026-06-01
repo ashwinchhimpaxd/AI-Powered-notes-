@@ -5,16 +5,13 @@ import { CalendarBlank, X, Plus } from "@phosphor-icons/react";
  * DateRangeFilter Component
  * Input fields for Start and End date, along with toggleable Drafts/Shared status tags.
  */
-const DateRangeFilter = () => {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
   const [draftsActive, setDraftsActive] = useState(false);
   const [sharedActive, setSharedActive] = useState(false);
 
   const handleDateChange = (val, setter, prevValue) => {
     // If user is deleting, just let them delete.
     if (prevValue && val.length < prevValue.length) {
-      // If they deleted a dash (e.g., "2026-0" -> "2026-"), delete the preceding digit too
       if (prevValue.endsWith("-") && val.endsWith("-")) {
         val = val.slice(0, -1);
       }
@@ -57,7 +54,7 @@ const DateRangeFilter = () => {
           <input
             type="text"
             placeholder="YYYY-MM-DD"
-            value={startDate}
+            value={startDate || ""}
             maxLength={10}
             onChange={(e) => handleDateChange(e.target.value, setStartDate, startDate)}
             className="w-full bg-[#0e0e10]/80 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b49cf8]/30 focus:bg-[#0e0e10] transition-colors"
@@ -73,7 +70,7 @@ const DateRangeFilter = () => {
           <input
             type="text"
             placeholder="YYYY-MM-DD"
-            value={endDate}
+            value={endDate || ""}
             maxLength={10}
             onChange={(e) => handleDateChange(e.target.value, setEndDate, endDate)}
             className="w-full bg-[#0e0e10]/80 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b49cf8]/30 focus:bg-[#0e0e10] transition-colors"
@@ -85,7 +82,7 @@ const DateRangeFilter = () => {
       <div className="flex items-center gap-2.5 pt-1">
         {/* Drafts tag */}
         <button
-          onClick={() => setDraftsActive(draftsActive)}
+          onClick={() => setDraftsActive(!draftsActive)}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all ${
             draftsActive
               ? "bg-[#25252b]/40 border-[#b49cf8]/30 text-white"

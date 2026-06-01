@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setFilters, resetFilters } from "../redux/NotesCreation/NotesCreationSlice";
 import FilterHeader from "./FilterHeader";
 import NoteTypeFilter from "./NoteTypeFilter";
 import SortOrderFilter from "./SortOrderFilter";
@@ -7,10 +9,30 @@ import FilterFooter from "./FilterFooter";
 
 /**
  * FilterModal Component
- * Parent modal that wraps all filter sub-components.
- * Displays on top of everything with a rich glass-blur background effect.
+ * Parent modal that wraps all filter sub-components and coordinates local staging states.
  */
 const FilterModal = ({ isOpen, onClose }) => {
+  const dispatch = useDispatch();
+
+  // 1. Get currently active filters from Redux
+  const reduxFilter = useSelector((state) => state.NotesCreation.filter);
+
+  // 2. Local staging states initialized from Redux
+  const [stagedImportance, setStagedImportance] = useState("all");
+  const [stagedSort, setStagedSort] = useState("newest");
+  const [stagedStartDate, setStagedStartDate] = useState("");
+  const [stagedEndDate, setStagedEndDate] = useState("");
+
+  // Synchronize local states with Redux whenever modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      setStagedImportance(reduxFilter?.importance || "all");
+      setStagedSort(reduxFilter?.sort || "newest");
+      setStagedStartDate(reduxFilter?.startDate || "");
+      setStagedEndDate(reduxFilter?.endDate || "");
+    }
+  }, [isOpen, reduxFilter]);
+
   // Prevent background scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -24,6 +46,25 @@ const FilterModal = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  // Apply Action: Dispatch staged state to Redux
+  const handleApply = () => {
+    dispatch(
+      setFilters({
+        importance: stagedImportance,
+        sort: stagedSort,
+        startDate: stagedStartDate ? stagedStartDate : null,
+        endDate: stagedEndDate ? stagedEndDate : null,
+      })
+    );
+    onClose();
+  };
+
+  // Reset Action: Restore Redux defaults
+  const handleReset = () => {
+    dispatch(resetFilters());
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -41,13 +82,18 @@ const FilterModal = ({ isOpen, onClose }) => {
 
         {/* Filters content */}
         <div className="flex flex-col gap-6 overflow-y-auto max-h-[70vh] pr-1.5 scrollbar-none">
-          <NoteTypeFilter />
-          <SortOrderFilter />
-          <DateRangeFilter />
+          <NoteTypeFilter selectedType={stagedImportance} setSelectedType={setStagedImportance} />
+          <SortOrderFilter sortOrder={stagedSort} setSortOrder={setStagedSort} />
+          <DateRangeFilter 
+            startDate={stagedStartDate} 
+            setStartDate={setStagedStartDate} 
+            endDate={stagedEndDate} 
+            setEndDate={setStagedEndDate} 
+          />
         </div>
 
         {/* Footer actions */}
-        <FilterFooter onClose={onClose} />
+        <FilterFooter onClose={onClose} onApply={handleApply} onReset={handleReset} />
       </div>
     </div>
   );
