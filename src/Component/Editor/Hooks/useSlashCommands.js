@@ -40,23 +40,11 @@ export function useSlashCommands() {
     setSlashQuery("");
   }, []);
 
-  // ── Query update — called per keypress from useTiptapEditor ───────────
-  const updateQuery = useCallback((key) => {
-    if (key === "BACKSPACE") {
-      if (slashQueryRef.current === "") {
-        // Query is already empty → user just deleted the "/" itself → close
-        closeSlash();
-      } else {
-        const next = slashQueryRef.current.slice(0, -1);
-        slashQueryRef.current = next;
-        setSlashQuery(next);
-      }
-    } else {
-      const next = slashQueryRef.current + key;
-      slashQueryRef.current = next;
-      setSlashQuery(next);
-    }
-  }, [closeSlash]);
+  // ── Query update — called per keystroke/update from useTiptapEditor ───────────
+  const updateQuery = useCallback((fullQuery) => {
+    slashQueryRef.current = fullQuery;
+    setSlashQuery(fullQuery);
+  }, []);
 
   // Keep callback refs in sync with latest stable functions
   useEffect(() => { onSlashOpenRef.current = openSlash; }, [openSlash]);
@@ -92,6 +80,13 @@ export function useSlashCommands() {
     const deleteFrom = Math.max(0, from - 1 - capturedQuery.length);
     if (deleteFrom < from) {
       editor.chain().focus().deleteRange({ from: deleteFrom, to: from }).run();
+    }
+
+    // After deleting the slash command, check if the editor is actually empty.
+    // If it is empty, we don't want to waste an API call.
+    if (editor.getText().trim() === "") {
+      showToast("warning", "Editor is empty. Please write something first before using AI commands.");
+      return;
     }
 
     setAiLoading(true);

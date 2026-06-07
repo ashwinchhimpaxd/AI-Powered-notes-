@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import userAuthService from "@/AppWrite/auth";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/Authantication/UserAuthanticationSlice.js";
@@ -29,29 +29,31 @@ const LoginUsingOTP = () => {
         return () => clearInterval(timer);
     }, [cooldown]);
 
-    const OnSendOtp = async () => {
+    const OnSendOtp = useCallback(async () => {
         const isValid = await trigger("Email");
         if (!isValid) return false;
 
         const Email = getValues("Email");
-        console.log("Sending OTP to:");
-        
         try {
             await userAuthService.sendOtp(Email);
             showToast("success", "OTP sent successfully");
             return true;
         } catch (error) {
-            console.log(error.message);
+            alert(error?.message);
             return false;
         }
-    };
+    }, [trigger, getValues]); // Dependencies
 
     const handleSendOTPClick = async () => {
         if (cooldown > 0) return;
+        // alert("button clicked")
         const success = await OnSendOtp();
+        // alert(success + " this is success")
         if (success) {
-            setCooldown(60); 
+            // alert("inner if console")
+            setCooldown(60);
         }
+        // alert("complet handlesendotp")
     };
 
     const onSubmit = async (data) => {
@@ -64,8 +66,8 @@ const LoginUsingOTP = () => {
                 navigate("/Dashboard");
                 return;
             }
-            
-            const Userlogin = await userAuthService.verifyOtp(String(data.OTP), ""); 
+
+            const Userlogin = await userAuthService.verifyOtp(String(data.OTP), "");
             console.log(Userlogin)
             if (Userlogin) {
                 // Fetch actual User object to have correct user details and user $id
@@ -86,13 +88,14 @@ const LoginUsingOTP = () => {
         <div className="bg-[#0a0a0a] min-h-screen w-full flex flex-col justify-between font-sans text-foreground selection:bg-purple-500/30">
             {/* Header / Logo */}
             <div className="pt-12 md:pt-20 flex flex-col items-center justify-center text-center px-4">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">Deep Focus AI</h1>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">MindSync</h1>
                 <p className="text-[#a1a1aa] text-sm md:text-base">Cognitive Workspace for Deep Thought</p>
             </div>
 
             {/* Main Form Container */}
-            <div className="flex-1 flex flex-col items-center justify-center w-full px-4 py-8">
-                <div className="bg-[#121212] border border-[#262626] rounded-xl w-full max-w-[420px] p-8 shadow-2xl">
+            <div className="flex-1 flex flex-col items-center justify-center w-full px-4 py-3">
+                <div className="bg-[#121212] border border-[#262626] rounded-xl w-full max-w-[420px] p-8  shadow-2xl">
+
                     <h2 className="text-2xl font-semibold mb-1 text-white">Welcome back</h2>
                     <p className="text-[#a1a1aa] text-sm mb-8">Enter your details to continue.</p>
 
@@ -193,13 +196,6 @@ const LoginUsingOTP = () => {
                             <GoogleLogo className="h-5 w-5" /> Google
                         </button>
                     </div>
-
-                    <p className="text-center text-sm text-[#a1a1aa] mt-8">
-                        Don't have an account?{' '}
-                        <Link to="/signup" className="text-[#c4b5fd] hover:text-[#ddd6fe] font-medium transition-colors">
-                            Sign up
-                        </Link>
-                    </p>
                 </div>
             </div>
 

@@ -48,6 +48,7 @@ export class UserAuthentication {
     async sendOtp(email) {
         // console.log(this.userid);
         try {
+            console.log(email)
             // Appwrite naye user ke liye ID.unique() aur purane ke liye email se handle kar leta hai
             const sessiontoken = await this.account.createEmailToken(
                 ID.unique(),

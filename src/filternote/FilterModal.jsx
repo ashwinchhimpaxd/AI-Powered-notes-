@@ -18,20 +18,27 @@ const FilterModal = ({ isOpen, onClose }) => {
   const reduxFilter = useSelector((state) => state.NotesCreation.filter);
 
   // 2. Local staging states initialized from Redux
-  const [stagedImportance, setStagedImportance] = useState("all");
-  const [stagedSort, setStagedSort] = useState("newest");
-  const [stagedStartDate, setStagedStartDate] = useState("");
-  const [stagedEndDate, setStagedEndDate] = useState("");
+  const [stagedState, setStagedState] = useState({
+    importance: reduxFilter?.importance || "all",
+    sort: reduxFilter?.sort || "newest",
+    startDate: reduxFilter?.startDate || "",
+    endDate: reduxFilter?.endDate || ""
+  });
 
-  // Synchronize local states with Redux whenever modal is opened
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(null);
+
+  // Synchronize local states with Redux whenever modal is opened, inline during render
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
-      setStagedImportance(reduxFilter?.importance || "all");
-      setStagedSort(reduxFilter?.sort || "newest");
-      setStagedStartDate(reduxFilter?.startDate || "");
-      setStagedEndDate(reduxFilter?.endDate || "");
+      setStagedState({
+        importance: reduxFilter?.importance || "all",
+        sort: reduxFilter?.sort || "newest",
+        startDate: reduxFilter?.startDate || "",
+        endDate: reduxFilter?.endDate || ""
+      });
     }
-  }, [isOpen, reduxFilter]);
+  }
 
   // Prevent background scroll when modal is open
   useEffect(() => {
@@ -51,10 +58,10 @@ const FilterModal = ({ isOpen, onClose }) => {
   const handleApply = () => {
     dispatch(
       setFilters({
-        importance: stagedImportance,
-        sort: stagedSort,
-        startDate: stagedStartDate ? stagedStartDate : null,
-        endDate: stagedEndDate ? stagedEndDate : null,
+        importance: stagedState.importance,
+        sort: stagedState.sort,
+        startDate: stagedState.startDate ? stagedState.startDate : null,
+        endDate: stagedState.endDate ? stagedState.endDate : null,
       })
     );
     onClose();
@@ -75,20 +82,20 @@ const FilterModal = ({ isOpen, onClose }) => {
       />
 
       {/* Modal card container */}
-      <div className="relative w-full max-w-[400px] bg-[#121214]/90 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] flex flex-col gap-6 p-6 transition-all duration-300 transform scale-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-[400px] bg-card/90 backdrop-blur-2xl border border-border rounded-[28px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] flex flex-col gap-6 p-6 transition-all duration-300 transform scale-100 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
         <FilterHeader onClose={onClose} />
 
         {/* Filters content */}
         <div className="flex flex-col gap-6 overflow-y-auto max-h-[70vh] pr-1.5 scrollbar-none">
-          <NoteTypeFilter selectedType={stagedImportance} setSelectedType={setStagedImportance} />
-          <SortOrderFilter sortOrder={stagedSort} setSortOrder={setStagedSort} />
+          <NoteTypeFilter selectedType={stagedState.importance} setSelectedType={(val) => setStagedState(s => ({ ...s, importance: val }))} />
+          <SortOrderFilter sortOrder={stagedState.sort} setSortOrder={(val) => setStagedState(s => ({ ...s, sort: val }))} />
           <DateRangeFilter 
-            startDate={stagedStartDate} 
-            setStartDate={setStagedStartDate} 
-            endDate={stagedEndDate} 
-            setEndDate={setStagedEndDate} 
+            startDate={stagedState.startDate} 
+            setStartDate={(val) => setStagedState(s => ({ ...s, startDate: val }))} 
+            endDate={stagedState.endDate} 
+            setEndDate={(val) => setStagedState(s => ({ ...s, endDate: val }))} 
           />
         </div>
 

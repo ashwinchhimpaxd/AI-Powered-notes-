@@ -1,12 +1,11 @@
 import { useEffect, useState, useDeferredValue, memo, useCallback, useRef } from "react";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { SquaresFour, List, CircleNotch, FadersHorizontal } from "@phosphor-icons/react";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteNote, setNotes, appendNotes, updateNoteInPlace, selectNoteIds, selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
 import { setnoteid, setcurrentnoteinfo } from "../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
-import { useNavigate } from "react-router-dom";
 import service from "@/AppWrite/Setgetuserdatas/config.js";
 import StorageService from "../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
-import { Query } from "appwrite";
 import { executeOptimisticToggle } from "../../utils/optimisticToggle.js";
 import NoteCard from "./NoteCard";
 import NoteSkeleton from "./NoteSkeleton";
@@ -14,7 +13,10 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { selectFilteredNoteIds } from "../../redux/NotesCreation/NotesSelector.js";
 import FilterModal from "../../filternote/FilterModal.jsx";
 
-const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
+const RecentNotes = memo((props) => {
+    const context = useOutletContext();
+    const searchQuery = context?.searchQuery ?? props.searchQuery ?? "";
+    const isCreatingNote = context?.isCreatingNote ?? props.isCreatingNote ?? false;
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -35,13 +37,17 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
     useEffect(() => {
         if (!currentuserID) return;
 
-        // Fetch first page if lastCursor is null (initial load or filter changed)
-        if (!lastCursor) {
+        // Fetch notes if:
+        // 1. Redux slice is empty (first load or new login) OR
+        // 2. lastCursor is null and hasMore is true (filters reset or changed)
+        const isSliceEmpty = noteIds.length === 0;
+
+        if (isSliceEmpty || (!lastCursor && hasMore)) {
             import("../../redux/NotesCreation/NotesCreationSlice.js").then((module) => {
                 dispatch(module.fetchNotesThunk({ userId: currentuserID }));
             });
         }
-    }, [currentuserID, filter, lastCursor, dispatch]);
+    }, [currentuserID, filter, lastCursor, hasMore, dispatch, noteIds.length]);
 
     // Load More function for Infinite Scroll
     const loadMoreNotes = useCallback(async () => {
@@ -147,13 +153,13 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
             {/* Header Area */}
             <div className="flex items-end justify-between mb-6 ">
                 <div>
-                    <h2 className="text-white text-3xl font-bold tracking-tight">Recent Notes</h2>
-                    <p className="text-[#a1a1aa] text-sm mt-1">Continue where you left off or ask AI to summarize.</p>
+                    <h2 className="text-foreground text-3xl font-bold tracking-tight">Recent Notes</h2>
+                    <p className="text-muted-foreground text-sm mt-1">Continue where you left off or ask AI to summarize.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setIsFilterOpen(true)}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-[#121212] hover:bg-[#1a1a1a] border border-[#262626] rounded-lg text-sm font-medium text-[#e5e5e5] transition-colors cursor-pointer"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-muted border border-border rounded-lg text-sm font-medium text-foreground transition-colors cursor-pointer "
                     >
                         <FadersHorizontal className="size-4" /> Filter
                     </button>
@@ -161,7 +167,7 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
                     <button
                         id="grid-btn"
                         onClick={() => setIsGridView(!isGridView)}
-                        className="flex items-center cursor-pointer justify-center p-1.5 bg-[#121212] hover:bg-[#1a1a1a] border border-[#262626] rounded-lg text-[#e5e5e5] transition-colors"
+                        className="flex items-center cursor-pointer justify-center p-1.5 bg-card hover:bg-muted border border-border rounded-lg text-foreground transition-colors"
                         title={isGridView ? "Switch to List View" : "Switch to Grid View"}
                     >
                         {/* Swaps the icon based on the current state */}
@@ -181,8 +187,8 @@ const RecentNotes = memo(({ searchQuery = "", isCreatingNote = false }) => {
 
                 {/* EMPTY STATE */}
                 {!loading && filteredNoteIds.length === 0 && !isCreatingNote && (
-                    <div className="flex flex-col items-center justify-center py-20 border border-dashed border-[#262626] rounded-xl bg-[#0a0a0a]">
-                        <p className="text-[#a1a1aa] text-sm font-medium">Notes not found.</p>
+                    <div className="flex flex-col items-center justify-center py-20 border border-dashed border-border rounded-xl bg-card">
+                        <p className="text-muted-foreground text-sm font-medium">Notes not found.</p>
                     </div>
                 )}
 

@@ -17,13 +17,13 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
 
   const [isEditing, setIsEditing] = useState(false);
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 bg-black/20 backdrop-blur-2xl border-b-2 border-white/20">
+    <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 bg-background/10 backdrop-blur-sm border-b border-border">
       {/* Title */}
       <div className="flex items-center gap-3 flex-1 min-w-0 mr-6">
         {!isEditing && title.trim().length > 0 ? (
           <h2
             onClick={() => setIsEditing(true)}
-            className="text-lg font-semibold text-white/90 cursor-text truncate hover:text-white transition-colors"
+            className="text-lg font-semibold text-foreground/90 cursor-text truncate hover:text-foreground transition-colors"
             title="Click to edit title"
           >
             {title}
@@ -45,7 +45,7 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
                 if (title.trim().length > 0) setIsEditing(false);
               }
             }}
-            className="text-lg font-semibold bg-transparent text-white border-b border-purple-500/60 outline-none placeholder-white/30 w-56"
+            className="text-lg font-semibold bg-transparent text-foreground border-b border-purple-500/60 outline-none placeholder-foreground/30 w-56"
           />
         )}
       </div>
@@ -55,34 +55,26 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
         {/* Summary */}
         <button
           onClick={onSummary}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white backdrop-blur-md transition-all text-sm"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-border text-foreground/80 hover:bg-muted hover:text-foreground backdrop-blur-md transition-all text-sm cursor-pointer"
         >
           <Sparkle weight="fill" size={14} className="text-purple-400" />
           Summary
-        </button>
-
-        {/* PDF export (placeholder) */}
-        <button
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white backdrop-blur-md transition-all"
-          title="Export PDF"
-        >
-          <DownloadSimple weight="bold" size={16} />
         </button>
 
         {/* Save */}
         <button
           onClick={onSave}
           disabled={isSaving || isNoteSaved}
-          className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${isNoteSaved
-            ? "bg-white/5 border border-white/10 text-white/40 cursor-default"
-            : "bg-white text-black hover:bg-white/90 shadow-lg shadow-white/10"
+          className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
+            ? "bg-card/55 border-border text-foreground/45 cursor-default"
+            : "bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:border-primary/90 shadow-lg"
             }`}
         >
           {isSaving
             ? <><CircleNotch className="animate-spin" size={14} /> Saving…</>
             : isNoteSaved
               ? <><FloppyDisk size={17} /> Saved</>
-              : <><FloppyDisk size={17} /> save</>
+              : <><FloppyDisk size={17} /> Save</>
           }
         </button>
       </div>

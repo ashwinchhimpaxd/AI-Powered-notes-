@@ -12,9 +12,9 @@ const AiLoadingOverlay = memo(function AiLoadingOverlay({ loading, status }) {
   if (!loading) return null;
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] flex items-center gap-3 px-5 py-3 rounded-full bg-[#18181b]/97 backdrop-blur-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/10">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] flex items-center gap-3 px-5 py-3 rounded-full bg-card/97 backdrop-blur-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/10">
       <CircleNotch size={16} className="animate-spin text-purple-400" />
-      <span className="text-sm text-white/80 font-medium">{status}</span>
+      <span className="text-sm text-foreground/80 font-medium">{status}</span>
     </div>
   );
 });

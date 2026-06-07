@@ -85,10 +85,10 @@ const NotesCreation = createSlice({
         addNoteToTop: (state, action) => {
             const note = action.payload;
             const id = note.$id;
-            
+
             // Remove existing occurrence if any to prevent duplicates and shift to top
             state.ids = state.ids.filter(existingId => existingId !== id);
-            
+
             // Unshift to the beginning of the list
             state.ids.unshift(id);
             state.entities[id] = note;
@@ -127,7 +127,7 @@ const NotesCreation = createSlice({
             .addCase(fetchNotesThunk.fulfilled, (state, action) => {
                 state.loading = false;
                 state.hasMore = action.payload.hasMore;
-                
+
                 // If lastCursor is null, we are loading the FIRST page
                 if (!state.lastCursor) {
                     notesAdapter.setAll(state, action.payload.documents);
@@ -135,9 +135,11 @@ const NotesCreation = createSlice({
                     // Subsequent page load: append notes to end
                     notesAdapter.addMany(state, action.payload.documents);
                 }
-                
-                // Update pagination cursor to the last retrieved note's ID
-                state.lastCursor = action.payload.lastCursor;
+                // Only advance the cursor when new documents were returned,
+                // otherwise keep the existing cursor to avoid re-triggering a first-page load
+                if (action.payload.documents && action.payload.documents.length > 0) {
+                    state.lastCursor = action.payload.lastCursor;
+                }
             })
             .addCase(fetchNotesThunk.rejected, (state, action) => {
                 state.loading = false;

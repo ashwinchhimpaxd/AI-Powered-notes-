@@ -1,12 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@font-face {
-    font-family: "BAHNSCHRIFT";
-    src: url('../public/Fonts/BAHNSCHRIFT.TTF') format('truetype');
+@variant dark (&:where(.dark, .dark *));
 
-    font-style: normal;
-}
+
+
 
 :root {
     --white-font-color: #f6f2f2;
@@ -62,12 +60,15 @@
 
 body,
 html {
-
-    font-family: "Kufam", sans-serif;
-    background: black;
+    font-family: "Nunito", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 200;
+    font-style: normal;
+    background: var(--background);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+
 }
 
 * {
@@ -76,7 +77,7 @@ html {
 }
 
 
- /* #Home {
+/* #Home {
     background-image: url('../public/landingpagedesign/IPBZLNOFykXPribG9KAtpoMptJs.webp');
     background-repeat: no-repeat;
     background-size: cover;
@@ -421,12 +422,12 @@ html {
    part of the actual note content. Disappears the moment the editor receives
    focus or the user starts typing. */
 .tiptap p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  color: rgba(255, 255, 255, 0.22);
-  font-style: italic;
-  float: left;
-  height: 0;
-  pointer-events: none;
+    content: attr(data-placeholder);
+    color: rgba(255, 255, 255, 0.22);
+    font-style: italic;
+    float: left;
+    height: 0;
+    pointer-events: none;
 }
 
 /* Toast Custom Styles using Root Variables */
@@ -434,6 +435,7 @@ html {
     background-color: var(--toast-success-bg) !important;
     border-color: var(--toast-success-border) !important;
 }
+
 .toast-success-icon {
     color: var(--toast-success-icon) !important;
 }
@@ -442,6 +444,23 @@ html {
     background-color: var(--toast-ai-bg) !important;
     border-color: var(--toast-ai-border) !important;
 }
+
 .toast-ai-icon {
     color: var(--toast-ai-icon) !important;
+}
+
+/* appsetting opeing animation*/
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out forwards;
 }

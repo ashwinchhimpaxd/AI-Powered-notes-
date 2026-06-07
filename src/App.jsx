@@ -4,12 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import React, { Suspense, lazy, useEffect, useState } from "react";
 
 // Standard Components (Lightweight)
-import Signup from "./Component/Signup";
 import Login from "./Component/Login";
 import LandingPage from "./Pages/LandingPage";
 import Notfoundpage from "./Pages/Notfoundpage";
 import ToastContainer from "./Component/Toast/ToastContainer";
-
+import Appsetting from "./Component/Appsettings/Appsetting";
+import RecentNotes from "./Component/Recentnotes";
 // Lazy Loaded Components (Heavy chunks)
 const Dashboard2 = lazy(() => import("./Pages/Dashboard2.jsx"));
 const Editorpage = lazy(() => import("./Pages/Editorpage.jsx"));
@@ -32,11 +32,6 @@ const ProtectedRoute = ({ children, authentication = true }) => {
     return <Navigate to="/Login" />;
   }
 
-  // Agar user already login hai aur login/signup open kar raha hai
-  if (!authentication && authStatus) {
-    return <Navigate to="/Dashboard" />;
-  }
-
   return children;
 };
 
@@ -47,18 +42,26 @@ import { clearNotes } from "./redux/NotesCreation/NotesCreationSlice.js";
 function App() {
   const dispatch = useDispatch();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  let GetUser = useSelector((state) => state.UserAuthantication.Islogin);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const user = await userAuthService.getCurrentUser();
-        if (user) {
+        if (GetUser) {
+          console.log("user already online ")
+          return;
+        }
+        console.log("user fetched from the server")
+        GetUser = await userAuthService.getCurrentUser();
+        if (GetUser) {
+          console.log("Login success")
           dispatch(login({
             UserData: {
-              userdetaild: user
+              userdetaild: GetUser
             }
           }));
         } else {
+          console.log("No user found")
           dispatch(clearNotes());
           dispatch(logout());
         }
@@ -96,26 +99,23 @@ function App() {
             }
           />
 
-          <Route
-            path="/Signup"
-            element={
-              <ProtectedRoute authentication={false}>
-                <Signup />
-              </ProtectedRoute>
-            }
-          />
+
 
           {/* PRIVATE */}
           <Route
-            path="/Dashboard"
+            path="/dashboard"
             element={
               <ProtectedRoute authentication={true}>
-                  <Suspense fallback={null}>
+                <Suspense fallback={null}>
                   <Dashboard2 />
                 </Suspense>
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<Navigate to="recent-notes" replace />} />
+            <Route path="setting" element={<Appsetting />} />
+            <Route path="recent-notes" element={<RecentNotes />} />
+          </Route>
 
           <Route
             path="/Dashboard/editor"
@@ -149,6 +149,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* 
+          <Route
+            path="/setting"
+            element={
+              <ProtectedRoute authentication={true}>
+                <Suspense fallback={null}>
+                  <Appsetting />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          /> */}
 
           {/* 404 */}
           <Route path="*" element={<Notfoundpage />} />

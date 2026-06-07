@@ -19,18 +19,18 @@ const SlashCommandMenu = memo(function SlashCommandMenu({
 
   return (
     <div
-      className="fixed z-[200] w-80 bg-[#18181b]/97 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden"
+      className="fixed z-[200] w-80 bg-card/97 backdrop-blur-2xl border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
       style={{ top: coords.top, left: coords.left }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-white/5 flex-shrink-0">
+      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border flex-shrink-0">
         <Sparkle size={12} className="text-purple-400 flex-shrink-0" />
-        <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest flex-1">
+        <span className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest flex-1">
           {query ? `"${query}"` : "AI Commands — type to filter"}
         </span>
         <button
           onMouseDown={(e) => { e.preventDefault(); onClose(); }}
-          className="text-white/20 hover:text-white/60 transition-colors"
+          className="text-muted-foreground/40 hover:text-foreground transition-colors cursor-pointer"
         >
           <X size={12} />
         </button>
@@ -39,7 +39,7 @@ const SlashCommandMenu = memo(function SlashCommandMenu({
       {/* List */}
       <div className="max-h-[360px] overflow-y-auto p-1.5 flex flex-col gap-0.5">
         {commands.length === 0 ? (
-          <div className="px-3 py-8 text-center text-sm text-white/30">
+          <div className="px-3 py-8 text-center text-sm text-muted-foreground/40">
             No commands match &quot;{query}&quot;
           </div>
         ) : (
@@ -47,14 +47,14 @@ const SlashCommandMenu = memo(function SlashCommandMenu({
             <button
               key={cmd.id}
               onMouseDown={(e) => { e.preventDefault(); onSelect(cmd); }}
-              className="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-white/10 text-left transition-all group"
+              className="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-muted text-left transition-all group cursor-pointer"
             >
-              <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-purple-400/80 group-hover:text-purple-300 group-hover:bg-purple-500/10 transition-colors text-sm flex-shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-purple-400/80 group-hover:text-purple-300 group-hover:bg-purple-500/10 transition-colors text-sm flex-shrink-0">
                 {cmd.icon}
               </div>
               <div>
-                <div className="text-sm font-medium text-white/90 group-hover:text-white">{cmd.label}</div>
-                <div className="text-[11px] text-white/35">{cmd.description}</div>
+                <div className="text-sm font-medium text-foreground/90 group-hover:text-foreground">{cmd.label}</div>
+                <div className="text-[11px] text-muted-foreground/60">{cmd.description}</div>
               </div>
             </button>
           ))

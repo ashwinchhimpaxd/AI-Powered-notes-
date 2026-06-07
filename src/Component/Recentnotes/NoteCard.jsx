@@ -70,35 +70,35 @@ const NoteCard = memo(({
     return (
         <div
             onClick={() => onClick(note)}
-            className={`relative  flex flex-row bg-[#0e0e11] hover:bg-[#131316] border border-white/10 hover:border-white/10 rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden group shadow-2xl ${isGridView
+            className={`relative  flex flex-row bg-card hover:bg-muted/40 border border-border rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden group shadow-md ${isGridView
                 ? `h-56 ${spanClass}`
                 : "h-auto min-h-fit"
                 }`}
         >
             {/* 1. Left Sidebar Column */}
-            <div className="flex-shrink-0 w-32 md:w-40 bg-[#09090b] p-4 flex flex-col justify-between  gap-4 border-r border-white/5 relative z-10">
-                <div className="flex flex-col gap-5 ">
+            <div className="flex-shrink-0 w-32 md:w-40 bg-background p-4 flex flex-col justify-between  gap-4 border-r border-border relative z-10">
+                <div className="flex flex-col gap-4 ">
                     {/* ID Indicator */}
-                    <div className="flex items-center gap-1.5 text-white/80 font-bold text-[10px] md:text-xs tracking-wider">
+                    <div className="flex items-center gap-1.5 text-foreground/80 font-bold text-[10px] md:text-xs tracking-wider">
                         <FileText size={16} weight="fill" className="text-[#b49cf8]" />
-                        <span>ID_{note.$id.slice(-4).toUpperCase()}</span>
+                        <span>ID-{note.$id.slice(-4).toUpperCase()}</span>
                     </div>
 
                     {/* Metadata Dates */}
                     <div className="flex flex-col gap-3.5">
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest">
+                        <div className="flex flex-col gap-1">
+                            <span className="text-sm font-bold text-muted-foreground/40 uppercase tracking-widest">
                                 Created
                             </span>
-                            <span className="text-[11px] font-medium text-white/60">
+                            <span className="text-xs font-medium text-muted-foreground">
                                 {formattedCreatedDate}
                             </span>
                         </div>
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest">
+                        <div className="flex flex-col gap-1">
+                            <span className="text-sm font-bold text-muted-foreground/40 uppercase tracking-widest">
                                 Modified
                             </span>
-                            <span className="text-[11px] font-medium text-[#b49cf8]/80 animate-pulse-subtle">
+                            <span className="text-xs font-medium text-[#b49cf8]/80 animate-pulse-subtle">
                                 {relativeModified}
                             </span>
                         </div>
@@ -108,9 +108,9 @@ const NoteCard = memo(({
                 {/* Badge (Bottom Left) */}
                 <span className={`self-start px-2.5 py-1 text-[8px] font-extrabold uppercase tracking-widest rounded-md border ${note.is_note_important
                     ? "bg-yellow-500/5 border-yellow-500/20 text-yellow-400/90 shadow-md shadow-yellow-500/5"
-                    : "bg-[#25252b]/30 border-white/5 text-white/40"
+                    : "bg-muted border-border text-muted-foreground/60"
                     }`}>
-                    {note.is_note_important ? "Important" : "Design"}
+                    {note.is_note_important ? "Important" : (note.category || note.type || "General")}
                 </span>
             </div>
 
@@ -118,41 +118,43 @@ const NoteCard = memo(({
             <div className="flex-1 p-5 flex flex-col justify-between min-w-0 relative z-10">
                 {/* Title and Action Menu */}
                 <div className="flex justify-between items-start gap-4">
-                    <h3 className="text-white text-base md:text-lg font-bold leading-tight line-clamp-1 pr-2 flex-1 group-hover:text-[#b49cf8] transition-colors duration-200">
+                    <h3 className="text-foreground text-base md:text-lg font-bold leading-tight line-clamp-1 pr-2 flex-1 group-hover:text-[#b49cf8] transition-colors duration-200">
                         {note.notes_title || "Untitled Note"}
                     </h3>
 
                     <button
-                        className="p-1 rounded-md bg-[#25252b]/50 text-white/40 hover:text-white transition-colors relative z-20"
+                        className="p-1 rounded-md bg-muted text-muted-foreground/60 hover:text-foreground transition-colors relative z-20 cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleMenu(note.$id);
                         }}
+                        aria-label={`Open menu for note ${note.notes_title || "Untitled"}`}
                     >
                         <DotsThreeVertical size={18} weight="bold" />
                     </button>
                 </div>
 
                 {/* Horizontal Divider */}
-                <div className="w-full h-[1px] bg-white/5 my-3" />
+                <div className="w-full h-[1px] bg-border my-3" />
 
                 {/* Snippet Description */}
-                <p className="text-white/50 text-xs md:text-sm leading-relaxed line-clamp-3 md:line-clamp-4 flex-1">
+                <p className="text-muted-foreground text-xs md:text-sm leading-relaxed line-clamp-3 md:line-clamp-4 flex-1">
                     {cleanContent}
                 </p>
 
                 {/* Toolbar Footer Actions */}
-                <div className="flex items-center gap-4 pt-3 border-t border-white/5 mt-2">
+                <div className="flex items-center gap-4 pt-3 border-t border-border mt-2">
                     {/* Toggle Star/Save Action */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleStar(e, note);
                         }}
-                        className={`flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors relative z-20 ${note.is_note_important
+                        className={`flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors relative z-20 cursor-pointer ${note.is_note_important
                             ? "text-yellow-400 hover:text-yellow-500"
-                            : "text-white/40 hover:text-white/60"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
+                        aria-label={note.is_note_important ? `Unbookmark note ${note.notes_title || "Untitled"}` : `Bookmark note ${note.notes_title || "Untitled"}`}
                     >
                         <Bookmark size={14} weight={note.is_note_important ? "fill" : "regular"} />
                         <span>{note.is_note_important ? "Bookmarked" : "Save"}</span>
@@ -162,18 +164,36 @@ const NoteCard = memo(({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
+                            if (!note.slug) {
+                                import("../Editor/utils/showToast.js").then((module) => {
+                                    module.showToast("warning", "Cannot share a note without a slug!");
+                                });
+                                return;
+                            }
+                            const noteUrl = window.location.origin + `/Dashboard/editor/${note.slug}`;
                             // Trigger smooth native navigator share or copy link
                             if (navigator.share) {
                                 navigator.share({
-                                    title: note.notes_title,
-                                    text: cleanContent
+                                    title: note.notes_title || "Untitled Note",
+                                    text: cleanContent || "",
+                                    url: noteUrl
                                 }).catch(() => { });
                             } else {
-                                navigator.clipboard.writeText(window.location.origin + `/Dashboard/editor/${note.slug}`);
-                                alert("Note link copied to clipboard!");
+                                navigator.clipboard.writeText(noteUrl)
+                                    .then(() => {
+                                        import("../Editor/utils/showToast.js").then((module) => {
+                                            module.showToast("success", "Link copied to clipboard!");
+                                        });
+                                    })
+                                    .catch(() => {
+                                        import("../Editor/utils/showToast.js").then((module) => {
+                                            module.showToast("error", "Failed to copy link.");
+                                        });
+                                    });
                             }
                         }}
-                        className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-white/40 hover:text-white/70 transition-colors relative z-20"
+                        className="flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-muted-foreground hover:text-foreground transition-colors relative z-20 cursor-pointer"
+                        aria-label={`Share note ${note.notes_title || "Untitled"}`}
                     >
                         <ShareNetwork size={14} />
                         <span>Share</span>
@@ -183,15 +203,15 @@ const NoteCard = memo(({
 
             {/* Dropdown Menu (Absolute overlay) */}
             {openMenu && (
-                <div className="absolute top-12 right-4 w-32 bg-[#121214]/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-2xl z-[100] flex flex-col py-1 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute top-12 right-4 w-32 bg-card/95 backdrop-blur-2xl border border-border rounded-xl shadow-2xl z-[100] flex flex-col py-1 animate-in fade-in slide-in-from-top-2 duration-150">
                     <button
                         onClick={() => onClick(note)}
-                        className="px-4 py-2.5 text-xs font-semibold text-[#e5e5e5] hover:bg-[#25252b]/50 hover:text-white text-left transition-colors"
+                        className="px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-foreground text-left transition-colors cursor-pointer"
                     >
                         Open Editor
                     </button>
                     <button
-                        className="px-4 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/10 hover:text-red-300 text-left transition-colors"
+                        className="px-4 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/10 hover:text-red-300 text-left transition-colors cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();
                             onDelete(note.$id);

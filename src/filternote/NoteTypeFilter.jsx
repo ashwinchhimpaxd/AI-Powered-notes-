@@ -13,20 +13,20 @@ const NoteTypeFilter = ({ selectedType, setSelectedType }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">
+      <span className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest">
         Note Type
       </span>
-      <div className="bg-[#0e0e10]/80 p-1 rounded-xl flex gap-1 border border-white/5">
+      <div className="bg-background/80 p-1 rounded-xl flex gap-1 border border-border">
         {types.map((type) => {
           const isSelected = selectedType === type.id;
           return (
             <button
               key={type.id}
               onClick={() => setSelectedType(type.id)}
-              className={`flex-1 text-center py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+              className={`flex-1 text-center py-2 px-3 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                 isSelected
-                  ? "bg-[#25252b] text-[#b49cf8] border border-white/5 shadow-md shadow-black/40"
-                  : "text-white/40 hover:text-white/60"
+                  ? "bg-muted text-[#b49cf8] border border-border shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {type.label}

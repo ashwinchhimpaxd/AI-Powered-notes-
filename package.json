@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@appwrite.io/pink-icons": "^1.0.0",
@@ -39,6 +40,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "input-otp": "^1.4.2",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.562.0",
     "openai": "^6.37.0",
     "react": "^19.0.0",
@@ -58,6 +60,7 @@
     "@types/react-dom": "^19.0.3",
     "@types/three": "^0.178.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "@welldone-software/why-did-you-render": "^10.0.1",
     "autoprefixer": "^10.4.23",
     "eslint": "^9.19.0",
     "eslint-plugin-react": "^7.37.4",

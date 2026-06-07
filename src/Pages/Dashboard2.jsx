@@ -1,6 +1,4 @@
 import SideNavBar from "../Component/Navbar";
-import RecentNotes from "../Component/Recentnotes";
-import Appsetting from "../Component/Appsettings/Appsetting";
 import NoteStatistics from "../Component/AIActivity";
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,7 +9,7 @@ import service from "@/AppWrite/Setgetuserdatas/config.js";
 import { handleError } from "../utils/errorHandler.js";
 import { addNoteToTop } from "../redux/NotesCreation/NotesCreationSlice.js";
 import { showToast } from "../Component/Editor/utils/showToast.js";
-
+import { Outlet } from "react-router-dom";
 
 /**
  * Safely sanitizes a raw JSON string returned by AI,
@@ -45,7 +43,6 @@ const sanitizeJsonString = (rawStr) => {
 
 export default function Dashboard2() {
     const dispatch = useDispatch();
-    const settingState = useSelector(state => state.ToggleStates.settingState);
     const userData = useSelector((state) => state.UserAuthantication.UserData);
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -108,43 +105,143 @@ export default function Dashboard2() {
             setSearchQuery("");
             setIsCreatingNote(true);
 
+            const NOTE_PATTERNS = [
+                "make a note",
+                "make note",
+                "create notes",
+                "create a notes",
+                "generate notes",
+                "generate a notes",
+                "study notes",
+                "study a notes",
+                "revision notes",
+                "revision a notes",
+                "notes on",
+                "notes on a",
+                "prepare notes",
+                "prepare a notes"
+            ];
+
+            const isNoteRequest = NOTE_PATTERNS.some(pattern =>
+                topic.toLowerCase().includes(pattern)
+            );
+
+            const intent = isNoteRequest ? "NOTE" : "ARTICLE";
+
             try {
-                const prompt = `You are an expert educational assistant. Create a highly detailed, comprehensive, and well-structured note on the provided topic.
-                                You must format the note using semantic HTML tags to ensure a clear visual hierarchy. Follow these strict HTML formatting rules for the content:
+                const prompt = `Document Intent: ${intent}
+                
+                You MUST write an EXTREMELY DETAILED, IN-DEPTH, AND COMPREHENSIVE document. Do NOT give brief summaries or short sentences. Write extensively about every aspect of the topic.
+                
+                Adapt the structure dynamically to the subject instead of using a fixed template.
+                Choose section headings that naturally fit the topic.
 
-                                Use <h2> for main section headings (e.g., Introduction, Key Concepts, Advantages/Disadvantages, Summary).
+                Examples:
+                * Events → Background, Timeline, What Happened, Impact, Current Status
+                * People → Overview, Early Life, Career, Achievements, Controversies
+                * Technical Topics → Overview, Core Concepts, Architecture, Examples, Best Practices
+                * Direct Questions → Answer the question first, then provide supporting details
+                * Comparisons → Similarities, Differences, Pros, Cons, Recommendation
 
-                                Use <h3> for any sub-headings.
+                Formatting Requirements (STRICTLY ENFORCED):
+                * You MUST use HTML tags. Plain text will be rejected.
+                * Every main section heading MUST be wrapped in <h2> tags.
+                * Every subsection heading MUST be wrapped in <h3> tags.
+                * Use <p> for long, detailed paragraphs.
+                * Use <ul>, <ol>, and <li> where lists improve readability.
+                * You MUST heavily use <strong> to highlight important concepts, terms, names, or key facts.
+                * Do NOT use Markdown formatting (no ** or #).
+                * Do NOT force unnecessary sections unless they are genuinely useful.
 
-                                Use <ul>, <ol>, and <li> to create bulleted or numbered lists for easy readability.
+                Return ONLY a raw valid JSON object with exactly two keys:
 
-                                Use <strong> to highlight important keywords, terms, or definitions.
+                "title": A concise and accurate title.
 
-                                Use <p> for detailed, descriptive paragraphs.
+                "content": Highly detailed HTML formatted content suitable for long-term storage and reading.
 
-                                Do NOT use any Markdown formatting (no **, #, or backticks).
-                                Return ONLY a raw, valid JSON object with exactly two keys:
+                No markdown code blocks (e.g. no \`\`\`json).
+                No conversational text.
+                No explanations outside JSON.
 
-                                "title" (string): A concise, accurate title for the note.
+                User Query:
+                ${topic}
+                `;
 
-                                "content" (string): The detailed HTML-formatted note body, with all line breaks or quotes properly escaped for JSON.
-                                Absolutely no conversational text, no introductory remarks, and no markdown code blocks (like json) wrapping the output.
-                                Topic:
-                                ${topic}`;
+                const DASHBOARD_CREATE_SYSTEM_PROMPT = `You are an expert research, analysis, and knowledge assistant.
 
-                const DASHBOARD_CREATE_SYSTEM_PROMPT = `You are a helpful educational assistant.
-Your job is to generate a comprehensive note in JSON format.
-Rules:
-- Output ONLY a raw, valid JSON object matching the requested schema.
-- Do NOT wrap your response in markdown code blocks (e.g. do NOT use \`\`\`json).
-- Do NOT include any conversational filler.
-- Do NOT use custom tags like [CREATE_NOTE], [APPEND_TO_NOTE], or [REWRITE_NOTE].`;
+Your goal is to transform the user's query into a highly detailed, comprehensive, long-form knowledge document that can be saved, searched, and referenced in the future.
+
+CONTENT QUALITY REQUIREMENTS:
+
+1. Do NOT provide short answers, brief summaries, or shallow overviews.
+2. Every major section should contain detailed explanations and meaningful depth.
+3. Explain not only WHAT something is, but also WHY it matters, HOW it works, its implications, limitations, and real-world relevance when applicable.
+4. Prioritize the most important keywords, entities, and themes found in the user's query.
+5. Allocate significantly more content to the primary subject than to secondary subjects.
+6. Avoid generic filler content and repetitive statements.
+7. Focus on information density, not word count.
+8. Use concrete examples whenever they improve understanding.
+9. Maintain logical flow between sections.
+
+TOPIC ANALYSIS RULES:
+
+1. First identify the primary subject of the query.
+2. Identify supporting or secondary subjects.
+3. The primary subject should receive approximately 60-80% of the document's attention.
+4. Do not distribute content equally across all mentioned topics.
+5. If the query contains years, forecasts, trends, predictions, markets, companies, industries, jobs, salaries, investments, technology adoption, or future outlooks:
+
+   * Include relevant statistics when available.
+   * Include projections and forecasts.
+   * Include trend analysis.
+   * Include market implications.
+   * Include industry-specific insights.
+   * Include practical examples.
+   * Include future opportunities and risks.
+
+STRUCTURE RULES:
+
+1. Organize information using a logical hierarchy.
+2. Use semantic HTML only.
+3. Use <h2> for major sections.
+4. Use <h3> for subsections.
+5. Use <p> for detailed explanations.
+6. Use <ul>, <ol>, and <li> when lists improve readability.
+7. Use <strong> to highlight important concepts, terminology, names, statistics, facts, and conclusions.
+8. Avoid unnecessary sections that do not contribute meaningful information.
+
+FORMATTING RULES:
+
+1. Never use Markdown.
+2. Never use code fences.
+3. Never include conversational text.
+4. Never explain what you are doing.
+5. Never include text outside the required JSON object.
+
+OUTPUT REQUIREMENTS:
+
+Return ONLY a RAW, VALID JSON object with exactly the following structure:
+
+{
+"title": "A concise and accurate title",
+"content": "The complete HTML formatted document"
+}
+
+The JSON must be valid and parseable.
+
+Do NOT wrap the JSON in markdown blocks.
+
+Return ONLY the JSON object.
+
+
+`;
 
                 // Enforce JSON Mode (fourth parameter set to true)
                 const responseText = await sendMessageToAI(prompt, [], null, true, DASHBOARD_CREATE_SYSTEM_PROMPT);
-
+                console.log(responseText)
                 // Extract the JSON object using regex to ignore any surrounding text or tags
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                console.log(jsonMatch)
                 if (!jsonMatch) {
                     throw new Error("No JSON object found in the AI response.");
                 }
@@ -193,7 +290,7 @@ Rules:
     };
 
     return (
-        <div className="flex w-full h-screen bg-[#0a0a0a] overflow-hidden font-sans text-white relative">
+        <div className="flex w-full h-screen bg-background overflow-hidden font-sans text-foreground relative ashwin">
 
             {/* Sidebar Component */}
             <SideNavBar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
@@ -202,14 +299,14 @@ Rules:
             <div className="flex-1 relative overflow-hidden flex flex-col">
 
                 {/* Dashboard Main View */}
-                <main className={`absolute inset-0 flex flex-col transition-transform duration-[600ms] ease-in-out ${settingState ? '-translate-x-full' : 'translate-x-0'}`}>
+                <main className={`absolute inset-0 flex flex-col`}>
 
                     {/* Header with Search */}
-                    <header className="flex items-center gap-4 sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md z-10 px-4 md:px-8 py-5 border-b border-[#262626]">
+                    <header className="flex items-center gap-4 sticky top-0 bg-background/90 backdrop-blur-md z-10 px-4 md:px-8 py-5 border-b border-border">
 
                         {/* Hamburger Menu for Mobile */}
                         <button
-                            className="md:hidden text-white/80 hover:text-white"
+                            className="md:hidden text-foreground/80 hover:text-foreground"
                             onClick={() => setIsMobileMenuOpen(true)}
                         >
                             <List size={28} />
@@ -220,32 +317,32 @@ Rules:
                             <div
                                 className={`hidden md:block absolute left-full ml-4 whitespace-nowrap text-sm font-semibold transition-all duration-500 ease-out z-0
                                     ${showSlideText ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'}
-                                    ${isAiMode ? 'text-purple-400' : 'text-[#a1a1aa]'}
+                                    ${isAiMode ? 'text-purple-400' : 'text-muted-foreground'}
                                 `}
                             >
                                 {slideText}
                             </div>
 
                             {/* Responsive Search Bar */}
-                            <div className="relative flex items-center h-11 w-full md:w-[28rem] rounded-xl bg-[#121212] border border-[#262626] focus-within:border-[#8b5cf6] transition-colors z-10 shadow-lg">
+                            <div className="relative flex items-center h-11 w-full md:w-[28rem] rounded-xl bg-card border border-border focus-within:border-[#8b5cf6] transition-colors z-10 shadow-lg">
                                 <div className="pl-4 pr-2 flex items-center pointer-events-none">
-                                    <MagnifyingGlass className="h-5 w-5 text-[#a1a1aa]" />
+                                    <MagnifyingGlass className="h-5 w-5 text-muted-foreground" />
                                 </div>
                                 <input
                                     type="text"
-                                    className="w-full h-full bg-transparent text-white text-sm focus:outline-none placeholder:text-[#52525b] placeholder:transition-all"
+                                    className="w-full h-full bg-transparent text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/50 placeholder:transition-all"
                                     placeholder={isAiMode ? "give topic & make note automatically" : "Search or ask your notes..."}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearchKeyDown}
                                 />
                                 <div className="pr-4 pl-2 flex items-center gap-3">
-                                    <Sparkle weight="fill" className={`size-4 transition-colors ${isAiMode ? 'text-[#8b5cf6]' : 'text-[#52525b]'}`} />
+                                    <Sparkle weight="fill" className={`size-4 transition-colors ${isAiMode ? 'text-[#8b5cf6]' : 'text-muted-foreground/50'}`} />
                                     {/* Toggle Switch */}
                                     <button
                                         type="button"
                                         onClick={handleToggleAiMode}
-                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAiMode ? 'bg-[#8b5cf6]' : 'bg-[#262626]'}`}
+                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAiMode ? 'bg-[#8b5cf6]' : 'bg-muted'}`}
                                     >
                                         {/* <span className="sr-only">Toggle AI Mode</span> */}
                                         <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAiMode ? 'translate-x-4' : 'translate-x-0'}`} />
@@ -257,11 +354,10 @@ Rules:
 
                     {/* Content Scrollable Area */}
                     <div className="flex-1 overflow-y-auto p-4 md:p-8">
-                        {/* Pass empty string as searchQuery if isAiMode is true to avoid filtering notes while typing a topic */}
-                        <RecentNotes
-                            searchQuery={isAiMode ? "" : debouncedSearchQuery}
-                            isCreatingNote={isCreatingNote}
-                        />
+                        <Outlet context={{
+                            searchQuery: isAiMode ? "" : debouncedSearchQuery,
+                            isCreatingNote: isCreatingNote
+                        }} />
                     </div>
 
                     {/* Floating Statistics Widget (Hidden on small screens to save space) */}
@@ -271,9 +367,9 @@ Rules:
                 </main>
 
                 {/* Settings View */}
-                <div className={`absolute inset-0 bg-[#0a0a0a] overflow-y-auto transition-transform duration-[600ms] ease-in-out z-20 ${settingState ? 'translate-x-0' : 'translate-x-full'}`}>
-                    <Appsetting />
-                </div>
+                {/* <div className={`absolute inset-0 bg-[#0a0a0a] overflow-y-auto transition-transform duration-[600ms] ease-in-out z-20 ${settingState ? 'translate-x-0' : 'translate-x-full'}`}>
+                  <Appsetting />
+                </div> */}
             </div>
         </div>
     );

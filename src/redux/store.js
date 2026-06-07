@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import TogglesStatesReducer from "./QuickChatAI/QuickChatAiSlice.js";
+
 import NotesCreationReducer from "./NotesCreation/NotesCreationSlice.js";
 import userauthanticationReducer from "./Authantication/UserAuthanticationSlice.js";
 import currentnoteinfosliceReducer from "./currentnoteinfoslice/currentnoteinfoslice.js";
@@ -18,12 +18,20 @@ import {
 import { combineReducers } from "redux";
 
 // reducers combine karo
-const rootReducer = combineReducers({
-    ToggleStates: TogglesStatesReducer,
+const appReducer = combineReducers({
     NotesCreation: NotesCreationReducer,
     UserAuthantication: userauthanticationReducer,
     currentnoteinfoslice: currentnoteinfosliceReducer,
 });
+
+// Intercept logout to completely clear state and persisted store
+const rootReducer = (state, action) => {
+    if (action.type === "UserAuth/logout") {
+        storage.removeItem("persist:root");
+        state = undefined;
+    }
+    return appReducer(state, action);
+};
 
 // persist config
 const persistConfig = {

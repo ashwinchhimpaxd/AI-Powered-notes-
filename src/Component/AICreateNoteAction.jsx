@@ -11,38 +11,37 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
     const navigate = useNavigate();
     const userData = useSelector((state) => state.UserAuthantication.UserData);
 
-    const [cleanText, setCleanText] = useState(content);
+    const createNoteRegex = /\[CREATE_NOTE\]([\s\S]*?)\[\/CREATE_NOTE\]/;
+    const match = content ? content.match(createNoteRegex) : null;
+    const cleanText = match ? content.replace(createNoteRegex, '').trim() : content;
+
     const [noteData, setNoteData] = useState(null);
     const [creationStatus, setCreationStatus] = useState('idle'); // idle, creating, success, error
     const [createdNoteId, setCreatedNoteId] = useState(null);
 
-    useEffect(() => {
-        // Parse the content for the [CREATE_NOTE] tag
-        const createNoteRegex = /\[CREATE_NOTE\]([\s\S]*?)\[\/CREATE_NOTE\]/;
-        const match = content.match(createNoteRegex);
+    let parsedData = null;
+    let parseError = false;
 
-        if (match) {
-            // Remove the tag from the displayed text
-            setCleanText(content.replace(createNoteRegex, '').trim());
-
-            // Only try to create if we haven't started yet and not currently generating (to avoid partial JSON parses)
-            if (creationStatus === 'idle' && !isGenerating) {
-                try {
-                    const jsonString = match[1].trim();
-                    const parsedData = JSON.parse(jsonString);
-                    if (parsedData.title && parsedData.content) {
-                        setNoteData(parsedData);
-                        createNoteInBackend(parsedData);
-                    }
-                } catch (error) {
-                    console.error("Failed to parse AI Note JSON:", error);
-                    setCreationStatus('error');
-                }
-            }
-        } else {
-            setCleanText(content);
+    if (match && creationStatus === 'idle' && !isGenerating) {
+        try {
+            const jsonString = match[1].trim();
+            parsedData = JSON.parse(jsonString);
+        } catch (error) {
+            console.error("Failed to parse AI Note JSON:", error);
+            parseError = true;
         }
-    }, [content, isGenerating]); // Re-run when content or generating state changes
+    }
+
+    if (parseError && creationStatus !== 'error') {
+        setCreationStatus('error');
+    }
+
+    useEffect(() => {
+        if (parsedData && parsedData.title && parsedData.content && creationStatus === 'idle') {
+            setNoteData(parsedData);
+            createNoteInBackend(parsedData);
+        }
+    }, [parsedData, creationStatus]);
 
     const createNoteInBackend = async (data) => {
         setCreationStatus('creating');

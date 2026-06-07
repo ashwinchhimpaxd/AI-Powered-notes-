@@ -12,6 +12,7 @@ import EditorCanvas from "./Editorcomponents/EditorCanvas.jsx";
 import SlashCommandMenu from "./Editorcomponents/SlashCommandMenu.jsx";
 import AiLoadingOverlay from "./Editorcomponents/AiLoadingOverlay.jsx";
 import SummaryPanel from "./Editorcomponents/SummaryPanel.jsx";
+import whyDidYouRender from "@welldone-software/why-did-you-render";
 
 /**
  * AntigravityEditor — clean orchestrator.
@@ -49,7 +50,7 @@ export default function AntigravityEditor({ onEditorReady }) {
   if (!editor) return null;
 
   return (
-    <div className="relative w-full min-h-screen bg-[#0d0d0f] text-white flex justify-center font-sans overflow-x-hidden ">
+    <div className="relative w-full min-h-screen bg-background text-foreground flex justify-center font-sans overflow-x-hidden ">
 
       {/* Ambient background glows */}
       <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/8 blur-[120px] rounded-full pointer-events-none z-0" />

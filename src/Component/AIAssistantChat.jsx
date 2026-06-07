@@ -216,7 +216,7 @@ Rules:
     return (
         <div className={`lg:col-span-2 relative overflow-hidden transition-all duration-300 ease-in-out will-change-height ${isSidebar ? 'h-full' : (quickchataiState ? 'h-[400px]' : 'h-[0px]')}`}>
             {/* Main Chat Container */}
-            <div className="flex flex-col h-full bg-white/5 border border-white/10 rounded-lg p-4 shadow-2xl shadow-black/20 backdrop-blur-lg">
+            <div className="flex flex-col h-full bg-card border border-border rounded-lg p-4 shadow-2xl backdrop-blur-lg">
 
                 {/* Message Display Area */}
                 <div className="flex-1 space-y-4 overflow-y-auto pr-2" id='AI_ASSISTANT_QUICKCHAT'>
@@ -227,8 +227,8 @@ Rules:
                         >
                             {/* AI Avatar/Icon (only visible for AI messages) */}
                             {message.type === 'ai' && (
-                                <div className="flex-shrink-0 size-8 rounded-full bg-primary/20 flex items-center justify-center border">
-                                    <span className="material-symbols-outlined text-primary text-lg border border-black/20 rounded-full p-1 bg-black">
+                                <div className="flex-shrink-0 size-8 rounded-full bg-primary/20 flex items-center justify-center border border-border">
+                                    <span className="material-symbols-outlined text-primary text-lg border border-border/20 rounded-full p-1 bg-background">
                                         <img src="public\AI Star logo\SparklesAIForChat.svg" alt="" className='w-10 relative' />
                                     </span>
                                 </div>
@@ -237,15 +237,15 @@ Rules:
                             {/* Message Bubble */}
                             <div className={
                                 `px-4 py-3 rounded-lg ${message.type === 'ai'
-                                    ? 'bg-white/10 rounded-tl-none'
-                                    : 'bg-primary rounded-tr-none text-background-dark'
+                                    ? 'bg-muted rounded-tl-none text-foreground'
+                                    : 'bg-primary rounded-tr-none text-primary-foreground'
                                 }`
                             }>
                                 {message.type === 'ai' && message.content === '' && isGenerating ? (
                                     <div className="flex items-center space-x-1.5 h-5 w-12">
-                                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                        <div className="w-2 h-2 bg-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                        <div className="w-2 h-2 bg-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                        <div className="w-2 h-2 bg-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col gap-2">
@@ -256,14 +256,14 @@ Rules:
                                                 <AICreateNoteAction content={message.content} isGenerating={isGenerating} />
                                             )
                                         ) : (
-                                            <p className={`text-sm whitespace-pre-wrap text-white/70 `}>
+                                            <p className={`text-sm whitespace-pre-wrap text-foreground/80 `}>
                                                 {message.content}
                                             </p>
                                         )}
                                         {message.type === 'ai' && message.content && (
                                             <button
                                                 onClick={() => handleCopy(message.id || index, message.content)}
-                                                className="self-end text-white/40 hover:text-white/100 transition-colors flex items-center gap-1 text-xs mt-1"
+                                                className="self-end text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-xs mt-1 cursor-pointer"
                                                 title="Copy response"
                                             >
                                                 {copiedId === (message.id || index) ? (
@@ -280,7 +280,7 @@ Rules:
                             {/* User Avatar (only visible for User messages) */}
                             {message.type === 'user' && (
                                 <div
-                                    className="flex-shrink-0 size-8 rounded-full bg-center bg-cover"
+                                    className="flex-shrink-0 size-8 rounded-full bg-center bg-cover border border-border"
                                     style={{ backgroundImage: `url("${message.avatarUrl}")` }}
                                 ></div>
                             )}
@@ -290,14 +290,14 @@ Rules:
                 </div>
 
                 {/* Input Field Area */}
-                <div className="mt-4 pt-4 border-t border-white/10 relative">
+                <div className="mt-4 pt-4 border-t border-border relative">
                     <div className="relative flex items-end gap-2">
                         {/* Action Menu Button */}
                         {showPlusIcon && (
                             <div className="relative">
                                 <button
                                     onClick={() => setShowMenu(!showMenu)}
-                                    className="flex items-center justify-center w-10 h-10 mb-1 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/20"
+                                    className="flex items-center justify-center w-10 h-10 mb-1 rounded-full bg-muted hover:bg-muted/80 text-foreground transition-colors border border-border cursor-pointer"
                                     title="Actions"
                                 >
                                     <Plus className={`size-5 transition-transform duration-300 ${showMenu ? 'rotate-45' : ''}`} />
@@ -305,21 +305,21 @@ Rules:
 
                                 {/* Popup Menu */}
                                 {showMenu && (
-                                    <div className="absolute bottom-full left-0 mb-2 w-56 bg-[#2a2a2a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-[100] flex flex-col py-2">
-                                        <button onClick={() => handleActionClick('Upload Image')} className="flex items-center gap-3 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors text-left w-full">
+                                    <div className="absolute bottom-full left-0 mb-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-[100] flex flex-col py-2">
+                                        <button onClick={() => handleActionClick('Upload Image')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <ImageIcon className="size-5 text-blue-400" /> Upload Image
                                         </button>
-                                        <button onClick={() => handleActionClick('Summary Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors text-left w-full">
+                                        <button onClick={() => handleActionClick('Summary Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <Quotes className="size-5 text-green-400" /> Summary Note
                                         </button>
-                                        <button onClick={() => handleActionClick('Write Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors text-left w-full">
+                                        <button onClick={() => handleActionClick('Write Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <PaperPlaneRight className="size-5 text-purple-400" /> Write Note
                                         </button>
-                                        <button onClick={() => handleActionClick('Improve Notes')} className="flex items-center gap-3 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors text-left w-full">
+                                        <button onClick={() => handleActionClick('Improve Notes')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <MagicWand className="size-5 text-yellow-400" /> Improve Notes
                                         </button>
-                                        <div className="h-[1px] bg-white/10 my-1 mx-2"></div>
-                                        <button onClick={() => handleActionClick('Make PDF')} className="flex items-center gap-3 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors text-left w-full">
+                                        <div className="h-[1px] bg-border my-1 mx-2"></div>
+                                        <button onClick={() => handleActionClick('Make PDF')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <FilePdf className="size-5 text-red-400" /> Make PDF
                                         </button>
                                     </div>
@@ -334,15 +334,15 @@ Rules:
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
                             rows="1"
-                            className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-4 pr-12 text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none overflow-y-scroll"
+                            className="w-full bg-card border border-border rounded-lg py-3 pl-4 pr-12 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none overflow-y-scroll"
                             placeholder="Ask the AI to do something..."
                         />
 
                         <button
                             onClick={handleSend}
-                            className="absolute right-2 bottom-0 mb-1 mr-1 flex items-center justify-center w-10 h-10 text-white/60 hover:text-primary transition-colors"
+                            className="absolute right-2 bottom-0 mb-1 mr-1 flex items-center justify-center w-10 h-10 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                         >
-                            <span className="material-symbols-outlined text-[1.3rem] hover:bg-white/30 hover duration-300 ease-in-out size-9 flex justify-center items-center rounded-full"><PaperPlaneRight fill='white' /></span>
+                            <span className="material-symbols-outlined text-[1.3rem] hover:bg-muted/50 hover duration-300 ease-in-out size-9 flex justify-center items-center rounded-full"><PaperPlaneRight className="text-foreground hover:text-primary" /></span>
                         </button>
                     </div>
                 </div>

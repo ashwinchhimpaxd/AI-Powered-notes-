@@ -45,10 +45,9 @@ const ToastContainer = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[99999] flex flex-col-reverse gap-3 pointer-events-none">
-      {/* We use flex-col-reverse so newer toasts appear at the bottom of the stack, 
-          or just flex-col depending on preference. 
-          Usually, newer toasts at the bottom push older ones up. */}
+    <div className="fixed z-[99999] pointer-events-none flex gap-3 
+      top-4 left-1/2 -translate-x-1/2 w-[90vw] max-w-max flex-col items-center
+      md:top-auto md:bottom-6 md:left-auto md:right-6 md:translate-x-0 md:w-auto md:flex-col-reverse md:items-end">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}

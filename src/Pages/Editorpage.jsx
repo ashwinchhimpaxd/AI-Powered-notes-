@@ -6,13 +6,20 @@ import { CircleNotch } from '@phosphor-icons/react';
 
 import AntigravityEditor from '../Component/Editor/AntigravityEditor';
 import service from '../AppWrite/Setgetuserdatas/config.js';
-import { setnoteid, setcurrentnoteinfo } from '../redux/currentnoteinfoslice/currentnoteinfoslice.js';
+import { setnoteid, setcurrentnoteinfo, resetcurrentnoteinfo } from '../redux/currentnoteinfoslice/currentnoteinfoslice.js';
 import { selectAllNotes } from '../redux/NotesCreation/NotesCreationSlice.js';
 
 function Editorpage() {
     const { slug } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    // Cleanup active note state from Redux on unmount
+    useEffect(() => {
+        return () => {
+            dispatch(resetcurrentnoteinfo());
+        };
+    }, [dispatch]);
 
     const [editorInstance, seteditorInstance] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +54,7 @@ function Editorpage() {
                     navigate(`/Dashboard/editor/${currentNoteInfo.slug}`, { replace: true });
                     return;
                 }
-            } else if (currentNoteInfo?.title && currentNoteInfo?.slug) {
+            } else if (currentNoteInfo?.title && currentNoteInfo?.slug &&!allNotes.some(note => note.slug === slug)) {
                 // For newly created unsaved notes, reduxNoteId is null but title/slug are in Redux.
                 // If they don't match the URL slug, it's because the user edited the title.
                 navigate(`/Dashboard/editor/${currentNoteInfo.slug}`, { replace: true });

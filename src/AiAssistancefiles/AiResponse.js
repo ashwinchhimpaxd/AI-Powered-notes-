@@ -30,7 +30,7 @@ class AIService {
     async sendMessage(prompt, history = [], onChunk = null, jsonMode = false, signal = null, systemPrompt = null) {
 
         try {
-
+            console.log("request reach at ai response server", prompt)
             const mappedHistory = history.map(msg => ({
                 role:
                     (msg.role || msg.type) === "user"
@@ -82,12 +82,18 @@ class AIService {
 
                 // model: "google/gemma-3n-e2b-it",
                 // model: "google/gemma-4-31b-it", //i think is model is fast to first model and more advanced also
-                model: "meta/llama-3.1-8b-instruct", //i think is the best model for this project it is fast and advanced
+                // model: "google/gemma-4-31b-it", //i think is the best model for this project it is fast and advanced
+                // model: "meta/llama-3.3-70b-instruct",
+                // model: "google/gemma-4-31b-it",
+                // model: "google/gemma-3-27b-it",
+                // model: "google/gemma-3n-e4b-it",
+                model: "meta/llama-3.1-8b-instruct",
+
                 messages,
 
-                max_tokens: 1024,
+                max_tokens: 2048,
 
-                temperature: 0.2,
+                temperature: 0.3,
 
                 top_p: 0.7,
 

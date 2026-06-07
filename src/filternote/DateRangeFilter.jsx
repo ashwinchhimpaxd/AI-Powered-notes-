@@ -40,14 +40,14 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">
+      <span className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest">
         Date Range
       </span>
 
       <div className="grid grid-cols-2 gap-4">
         {/* Start Date */}
         <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1 text-[10px] font-bold text-white/50 uppercase tracking-wider">
+          <label className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider">
             <CalendarBlank size={12} className="text-purple-400" />
             <span>Start</span>
           </label>
@@ -57,13 +57,13 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
             value={startDate || ""}
             maxLength={10}
             onChange={(e) => handleDateChange(e.target.value, setStartDate, startDate)}
-            className="w-full bg-[#0e0e10]/80 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b49cf8]/30 focus:bg-[#0e0e10] transition-colors"
+            className="w-full bg-background/80 border border-border rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-[#b49cf8]/30 focus:bg-background transition-colors"
           />
         </div>
 
         {/* End Date */}
         <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1 text-[10px] font-bold text-white/50 uppercase tracking-wider">
+          <label className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider">
             <CalendarBlank size={12} className="text-purple-400" />
             <span>End</span>
           </label>
@@ -73,7 +73,7 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
             value={endDate || ""}
             maxLength={10}
             onChange={(e) => handleDateChange(e.target.value, setEndDate, endDate)}
-            className="w-full bg-[#0e0e10]/80 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#b49cf8]/30 focus:bg-[#0e0e10] transition-colors"
+            className="w-full bg-background/80 border border-border rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-[#b49cf8]/30 focus:bg-background transition-colors"
           />
         </div>
       </div>
@@ -83,13 +83,13 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
         {/* Drafts tag */}
         <button
           onClick={() => setDraftsActive(!draftsActive)}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all cursor-pointer ${
             draftsActive
-              ? "bg-[#25252b]/40 border-[#b49cf8]/30 text-white"
-              : "bg-[#121214] border-white/5 text-white/40"
+              ? "bg-muted/40 border-[#b49cf8]/30 text-foreground"
+              : "bg-card border-border text-muted-foreground/60"
           }`}
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${draftsActive ? "bg-[#b49cf8]" : "bg-white/20"}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${draftsActive ? "bg-[#b49cf8]" : "bg-muted-foreground/35"}`} />
           <span>Drafts</span>
           {draftsActive ? <X size={10} weight="bold" /> : <Plus size={10} weight="bold" />}
         </button>
@@ -97,13 +97,13 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
         {/* Shared tag */}
         <button
           onClick={() => setSharedActive(!sharedActive)}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all cursor-pointer ${
             sharedActive
-              ? "bg-[#25252b]/40 border-[#b49cf8]/30 text-white"
-              : "bg-[#121214] border-white/5 text-white/40"
+              ? "bg-muted/40 border-[#b49cf8]/30 text-foreground"
+              : "bg-card border-border text-muted-foreground/60"
           }`}
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${sharedActive ? "bg-[#b49cf8]" : "bg-white/20"}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${sharedActive ? "bg-[#b49cf8]" : "bg-muted-foreground/35"}`} />
           <span>Shared</span>
           {sharedActive ? <X size={10} weight="bold" /> : <Plus size={10} weight="bold" />}
         </button>
