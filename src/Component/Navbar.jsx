@@ -6,14 +6,11 @@ import NotesCreationForm from "./NotesCreationForm";
 import { memo } from "react";
 import { Link, useLocation } from "react-router-dom";
 function SideNavBar({ isOpen, setIsOpen }) {
-    const dispatch = useDispatch();
     const [NewNotesClick, setNewNotesClick] = useState(false);
     const location = useLocation();
 
     let activeIndex = 0;
     if (location.pathname.includes('/setting')) {
-        activeIndex = 2;
-    } else if (location.pathname.includes('/important')) {
         activeIndex = 1;
     } else {
         activeIndex = 0;
@@ -41,11 +38,12 @@ function SideNavBar({ isOpen, setIsOpen }) {
                                 <span className="text-muted-foreground text-xl">✨</span>
                             </div>
                             <div>
-                                <h1 className=" font-[800] text-[1.3rem] leading-tight tracking-tight bg-gradient-to-r from-violet-400 via-purple-400 via-fuchsia-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent ">MindSync</h1>
+                                <h1 className=" font-[800] text-[1.3rem] leading-tight tracking-tight bg-gradient-to-r from-[#8a2be2] via-[#43ADD0] via-[#998EE0] via-[#ffa500] to-[#EF9393] bg-clip-text text-transparent ">MindSync</h1>
                             </div>
                         </div>
                         {/* Mobile Close Button */}
                         <button
+                            type="button"
                             className="md:hidden text-muted-foreground hover:text-foreground"
                             onClick={() => setIsOpen(false)}
                         >
@@ -56,7 +54,7 @@ function SideNavBar({ isOpen, setIsOpen }) {
                     {/* Nav Links */}
                     <nav className="flex flex-col gap-1 px-3 relative">
                         {/* Animated Background */}
-                        <div 
+                        <div
                             className="absolute left-3 right-3 h-[42px] bg-card border border-border rounded-lg transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] pointer-events-none"
                             style={{ transform: `translateY(calc(${activeIndex} * 42px + ${activeIndex} * 4px))` }}
                         />
@@ -67,15 +65,15 @@ function SideNavBar({ isOpen, setIsOpen }) {
                                 <span className="font-medium text-sm">Notes</span>
                             </div>
                         </Link>
-                        
-                        <div className={`flex items-center gap-3 px-3 h-[42px] rounded-lg cursor-pointer z-10 group transition-colors ${activeIndex === 1 ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+
+                        {/* <div className={`flex items-center gap-3 px-3 h-[42px] rounded-lg cursor-pointer z-10 group transition-colors ${activeIndex === 1 ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
                             <Star className={`size-5 transition-colors ${activeIndex === 1 ? 'text-[#8b5cf6]' : 'group-hover:text-foreground'}`} weight={activeIndex === 1 ? "fill" : "regular"} />
                             <span className="font-medium text-sm">Important</span>
-                        </div>
-                        
+                        </div> */}
+
                         <Link to={'/dashboard/setting'} className="z-10">
-                            <div className={`flex items-center gap-3 px-3 h-[42px] rounded-lg cursor-pointer group transition-colors ${activeIndex === 2 ? 'text-foreground' : 'text-muted-foreground  hover:text-foreground'}`}>
-                                <GearSix className={`size-5 transition-colors ${activeIndex === 2 ? 'text-[#8b5cf6]' : 'group-hover:text-foreground'}`} weight={activeIndex === 2 ? "fill" : "regular"} />
+                            <div className={`flex items-center gap-3 px-3 h-[42px] rounded-lg cursor-pointer group transition-colors ${activeIndex === 1 ? 'text-foreground' : 'text-muted-foreground  hover:text-foreground'}`}>
+                                <GearSix className={`size-5 transition-colors ${activeIndex === 1 ? 'text-[#8b5cf6]' : 'group-hover:text-foreground'}`} weight={activeIndex === 1 ? "fill" : "regular"} />
                                 <span className="font-medium text-sm">Settings</span>
                             </div>
                         </Link>
@@ -85,6 +83,7 @@ function SideNavBar({ isOpen, setIsOpen }) {
                 {/* Bottom Section */}
                 <div className="p-4">
                     <button
+                        type="button"
                         onClick={() => {
                             setNewNotesClick(true);
                             if (setIsOpen) setIsOpen(false);

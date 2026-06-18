@@ -11,7 +11,15 @@
  * @returns {string} HTML string ready for editor.insertContent()
  */
 export function parseAiResponse(text) {
-  const lines = (text || "").split("\n");
+  if (!text) return "";
+
+  // If the response already contains HTML tags (e.g. AI returned <ul><li> directly),
+  // return it as-is — no need to re-parse plain-text bullets.
+  if (/<[a-z][\s\S]*>/i.test(text)) {
+    return text;
+  }
+
+  const lines = text.split("\n");
   let html = "";
   let inUl = false;
   let inOl = false;

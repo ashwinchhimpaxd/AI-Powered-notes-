@@ -14,6 +14,7 @@ const SortOrderFilter = ({ sortOrder, setSortOrder }) => {
       <div className="grid grid-cols-2 gap-3">
         {/* Newest First */}
         <button
+          type="button"
           onClick={() => setSortOrder("newest")}
           className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-all cursor-pointer ${
             sortOrder === "newest"
@@ -27,6 +28,7 @@ const SortOrderFilter = ({ sortOrder, setSortOrder }) => {
 
         {/* Oldest First */}
         <button
+          type="button"
           onClick={() => setSortOrder("oldest")}
           className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-medium transition-all cursor-pointer ${
             sortOrder === "oldest"

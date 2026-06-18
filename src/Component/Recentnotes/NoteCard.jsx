@@ -22,7 +22,7 @@ const NoteCard = memo(({
             day: "numeric",
             year: "numeric"
         });
-    }, [note?.$createdAt]);
+    }, [note]);
 
     const [now, setNow] = useState(Date.now());
     useEffect(() => {
@@ -46,7 +46,7 @@ const NoteCard = memo(({
             day: "numeric",
             year: "numeric"
         });
-    }, [note?.$updatedAt, now]);
+    }, [note, now]);
 
     const cleanContent = useMemo(() => {
         return note?.notes_contect
@@ -98,7 +98,7 @@ const NoteCard = memo(({
                             <span className="text-sm font-bold text-muted-foreground/40 uppercase tracking-widest">
                                 Modified
                             </span>
-                            <span className="text-xs font-medium text-[#b49cf8]/80 animate-pulse-subtle">
+                            <span className="text-xs font-medium text-purple-600 dark:text-[#b49cf8] animate-pulse-subtle">
                                 {relativeModified}
                             </span>
                         </div>
@@ -107,7 +107,7 @@ const NoteCard = memo(({
 
                 {/* Badge (Bottom Left) */}
                 <span className={`self-start px-2.5 py-1 text-[8px] font-extrabold uppercase tracking-widest rounded-md border ${note.is_note_important
-                    ? "bg-yellow-500/5 border-yellow-500/20 text-yellow-400/90 shadow-md shadow-yellow-500/5"
+                    ? "bg-amber-500/10 dark:bg-yellow-500/5 border-amber-500/20 dark:border-yellow-500/20 text-amber-700 dark:text-yellow-400/90 shadow-md shadow-yellow-500/5"
                     : "bg-muted border-border text-muted-foreground/60"
                     }`}>
                     {note.is_note_important ? "Important" : (note.category || note.type || "General")}
@@ -123,6 +123,7 @@ const NoteCard = memo(({
                     </h3>
 
                     <button
+                        type="button"
                         className="p-1 rounded-md bg-muted text-muted-foreground/60 hover:text-foreground transition-colors relative z-20 cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();
@@ -146,12 +147,13 @@ const NoteCard = memo(({
                 <div className="flex items-center gap-4 pt-3 border-t border-border mt-2">
                     {/* Toggle Star/Save Action */}
                     <button
+                        type="button"
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleStar(e, note);
                         }}
                         className={`flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase transition-colors relative z-20 cursor-pointer ${note.is_note_important
-                            ? "text-yellow-400 hover:text-yellow-500"
+                            ? "text-amber-600 dark:text-yellow-400 hover:text-amber-700 dark:hover:text-yellow-500"
                             : "text-muted-foreground hover:text-foreground"
                             }`}
                         aria-label={note.is_note_important ? `Unbookmark note ${note.notes_title || "Untitled"}` : `Bookmark note ${note.notes_title || "Untitled"}`}
@@ -162,6 +164,7 @@ const NoteCard = memo(({
 
                     {/* Share Action */}
                     <button
+                        type="button"
                         onClick={(e) => {
                             e.stopPropagation();
                             if (!note.slug) {
@@ -205,12 +208,14 @@ const NoteCard = memo(({
             {openMenu && (
                 <div className="absolute top-12 right-4 w-32 bg-card/95 backdrop-blur-2xl border border-border rounded-xl shadow-2xl z-[100] flex flex-col py-1 animate-in fade-in slide-in-from-top-2 duration-150">
                     <button
+                        type="button"
                         onClick={() => onClick(note)}
                         className="px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-foreground text-left transition-colors cursor-pointer"
                     >
                         Open Editor
                     </button>
                     <button
+                        type="button"
                         className="px-4 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/10 hover:text-red-300 text-left transition-colors cursor-pointer"
                         onClick={(e) => {
                             e.stopPropagation();

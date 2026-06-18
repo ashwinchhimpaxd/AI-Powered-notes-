@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react';
 import UserEmailNamechanges from './allappsettingfeatures/UserEmailNamechanges';
 import AiFeatures from './allappsettingfeatures/AllaiFeatures/AiFeatures';
 import ThemeToggle from '../ThemeToggle';
@@ -15,7 +15,7 @@ function Appsetting() {
     const navigate = useNavigate();
 
 
-    React.useEffect(() => {
+    useEffect(() => {
         console.log("appsetting mounted  ")
     }, [])
     const handleLogout = async () => {
@@ -31,19 +31,19 @@ function Appsetting() {
         }
     }
     return (
-        <div className='flex-1 w-full relative  text-foreground flex flex-col items-center pb-20 pt-10 px-4 sm:px-8 slide-in '>
+        <div className='flex-1 w-full relative  text-foreground flex flex-col items-start pb-20  slide-in '>
             {/* Ambient Background Glow Using Root Primary Color */}
 
 
-            <div className='w-full max-w-4xl space-y-12 relative z-10'>
+            <div className='w-full max-w-4xl space-y-10 relative z-10'>
                 <div className="text-center sm:text-left mb-12 animate-fade-in-up">
-                    <h1 className="text-4xl md:text-5xl font-extrabold  tracking-tight mb-3 drop-shadow-sm text-white">Settings</h1>
-                    <p className="text-muted-foreground text-sm md:text-base max-w-xl leading-relaxed text-gray-500">Customize your profile, manage account preferences, and tune your AI assistant's capabilities for a personalized experience.</p>
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 drop-shadow-sm text-foreground">Settings</h1>
+                    <p className="text-muted-foreground text-sm md:text-base max-w-xl leading-relaxed">Customize your profile, manage account preferences, and tune your AI assistant's capabilities for a personalized experience.</p>
                 </div>
 
                 <div className="space-y-10">
                     <UserEmailNamechanges />
-                    
+
                     {/* Theme Toggle Preference Panel */}
                     <section className="relative overflow-hidden group bg-card/85 backdrop-blur-2xl border border-border rounded-3xl p-6 sm:p-10 transition-all duration-500 hover:border-primary/50 shadow-sm">
                         <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/10 rounded-full blur-[80px] opacity-50 pointer-events-none group-hover:bg-primary/20 group-hover:scale-150 transition-all duration-700"></div>
@@ -55,7 +55,7 @@ function Appsetting() {
                                         Appearance
                                     </div>
                                     <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-wide">Theme Preferences</h2>
-                                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">Customize the look and feel of Focus AI. Toggle between light and dark modes.</p>
+                                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">Customize the look and feel of <span className='text-primary font-medium uppercase'>Mindsync Ai</span>. Toggle between light and dark modes.</p>
                                 </div>
                             </div>
                             <div className="w-full lg:w-2/3">
@@ -65,9 +65,10 @@ function Appsetting() {
                     </section>
 
                     <AiFeatures />
-                    
-                    <div className="flex justify-end pt-4">
+
+                    <div className="flex justify-start pt-4">
                         <button
+                            type="button"
                             onClick={handleLogout}
                             className="flex items-center gap-3 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500 text-red-500 rounded-xl font-bold transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer"
                         >

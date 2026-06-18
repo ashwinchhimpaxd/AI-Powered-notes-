@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 import { useSlashCommands } from "./Hooks/useSlashCommands.js";
@@ -12,8 +12,7 @@ import EditorCanvas from "./Editorcomponents/EditorCanvas.jsx";
 import SlashCommandMenu from "./Editorcomponents/SlashCommandMenu.jsx";
 import AiLoadingOverlay from "./Editorcomponents/AiLoadingOverlay.jsx";
 import SummaryPanel from "./Editorcomponents/SummaryPanel.jsx";
-import whyDidYouRender from "@welldone-software/why-did-you-render";
-
+import Aichatbox from "./Editorcomponents/Aichatbox.jsx";
 /**
  * AntigravityEditor — clean orchestrator.
  *
@@ -22,6 +21,10 @@ import whyDidYouRender from "@welldone-software/why-did-you-render";
  */
 export default function AntigravityEditor({ onEditorReady }) {
 
+
+  const [showChat, setShowChat] = useState(false); // this showchat use to show chatbox on click on the ai icon in the text format toolbar 
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatStatus, setChatStatus] = useState("");
   // 1. Slash commands (initialised first — exposes stable refs for useTiptapEditor)
   const slash = useSlashCommands();
 
@@ -42,10 +45,11 @@ export default function AntigravityEditor({ onEditorReady }) {
     if (!editor) return;
     slash.setEditor(editor);
     summary.setEditor(editor);
-  }, [editor]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [editor, slash.setEditor, summary.setEditor]);
 
   // 5. Save (autosave + manual + title)
-  const { title, setTitle, isSaving, isNoteSaved, commitTitle, handleSave } = useNoteSave(editor, slash.slashOpenRef);
+  const isAiGenerating = slash.aiLoading || chatLoading;
+  const { title, setTitle, isSaving, isNoteSaved, commitTitle, handleSave } = useNoteSave(editor, slash.slashOpenRef, isAiGenerating);
 
   if (!editor) return null;
 
@@ -64,6 +68,7 @@ export default function AntigravityEditor({ onEditorReady }) {
         isNoteSaved={isNoteSaved}
         onSave={() => handleSave(editor)}
         onSummary={summary.handleSummary}
+        onAiChat={setShowChat}
       />
 
       <EditorCanvas editor={editor} />
@@ -78,8 +83,8 @@ export default function AntigravityEditor({ onEditorReady }) {
       />
 
       <AiLoadingOverlay
-        loading={slash.aiLoading}
-        status={slash.aiStatus}
+        loading={slash.aiLoading || chatLoading}
+        status={slash.aiStatus || chatStatus}
       />
 
       <SummaryPanel
@@ -90,6 +95,30 @@ export default function AntigravityEditor({ onEditorReady }) {
         onClose={summary.closeSummary}
         onGenerate={summary.handleSummary}
       />
+
+      {/* this chat box show then user click on the ai icon in the text format toolbar  */}
+      {showChat && (
+        <div
+          className="ai-chat-wrapper relative overflow-hidden z-200 bg-chatbox-bg/40"
+          style={{
+            backdropFilter: "blur(8px)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: `
+      0 10px 40px rgba(0,0,0,0.25),
+      inset 0 1px 0 rgba(255,255,255,0.08)
+    `,
+          }}
+        >
+          <Aichatbox
+            editor={editor}
+            onClose={() => setShowChat(false)}
+            setLoading={setChatLoading}
+            setStatus={setChatStatus}
+            setTitle={setTitle}
+            commitTitle={commitTitle}
+          />
+        </div>
+      )}
     </div>
   );
 }

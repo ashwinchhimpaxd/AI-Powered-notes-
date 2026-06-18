@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { Sparkle, DownloadSimple, FloppyDisk, CircleNotch } from "@phosphor-icons/react";
+import { Sparkle, FloppyDisk, CircleNotch, ChatTeardropText } from "@phosphor-icons/react";
 
 /**
  * Fixed top bar: title (click-to-edit), summary, export, and save buttons.
@@ -13,11 +13,11 @@ import { Sparkle, DownloadSimple, FloppyDisk, CircleNotch } from "@phosphor-icon
  * @param {function} props.onSave
  * @param {function} props.onSummary
  */
-const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, isSaving, isNoteSaved, onSave, onSummary, }) {
+const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, isSaving, isNoteSaved, onSave, onSummary, onAiChat }) {
 
   const [isEditing, setIsEditing] = useState(false);
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 bg-background/10 backdrop-blur-sm border-b border-border">
+    <div className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4">
       {/* Title */}
       <div className="flex items-center gap-3 flex-1 min-w-0 mr-6">
         {!isEditing && title.trim().length > 0 ? (
@@ -51,21 +51,32 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center h-fit gap-2 flex-shrink-0  relative">
+
+        {/* ai chat button  */}
+        <button
+          type="button"
+          onClick={() => onAiChat(pre => !pre)}
+          className="flex items-center gap-1 px-3 py-2 border border-border rounded-xl bg-[#e6b1e9] text-chart-4 hover:bg-purple-500/30 transition-colors text-xs font-semibold cursor-pointer h-full">
+          <ChatTeardropText weight="fill" size={14} />
+          AI
+        </button>
+
         {/* Summary */}
         <button
+          type="button"
           onClick={onSummary}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-border text-foreground/80 hover:bg-muted hover:text-foreground backdrop-blur-md transition-all text-sm cursor-pointer"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-border text-foreground/80 hover:bg-muted hover:text-foreground backdrop-blur-md transition-all text-sm cursor-pointer  h-full"
         >
           <Sparkle weight="fill" size={14} className="text-purple-400" />
           Summary
         </button>
-
         {/* Save */}
         <button
+          type="button"
           onClick={onSave}
           disabled={isSaving || isNoteSaved}
-          className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
+          className={`flex  h-full items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
             ? "bg-card/55 border-border text-foreground/45 cursor-default"
             : "bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:border-primary/90 shadow-lg"
             }`}

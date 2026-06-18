@@ -29,6 +29,7 @@ const SlashCommandMenu = memo(function SlashCommandMenu({
           {query ? `"${query}"` : "AI Commands — type to filter"}
         </span>
         <button
+          type="button"
           onMouseDown={(e) => { e.preventDefault(); onClose(); }}
           className="text-muted-foreground/40 hover:text-foreground transition-colors cursor-pointer"
         >
@@ -45,6 +46,7 @@ const SlashCommandMenu = memo(function SlashCommandMenu({
         ) : (
           commands.map((cmd) => (
             <button
+              type="button"
               key={cmd.id}
               onMouseDown={(e) => { e.preventDefault(); onSelect(cmd); }}
               className="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-muted text-left transition-all group cursor-pointer"

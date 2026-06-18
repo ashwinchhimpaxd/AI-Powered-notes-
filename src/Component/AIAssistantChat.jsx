@@ -262,6 +262,7 @@ Rules:
                                         )}
                                         {message.type === 'ai' && message.content && (
                                             <button
+                                                type="button"
                                                 onClick={() => handleCopy(message.id || index, message.content)}
                                                 className="self-end text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-xs mt-1 cursor-pointer"
                                                 title="Copy response"
@@ -296,6 +297,7 @@ Rules:
                         {showPlusIcon && (
                             <div className="relative">
                                 <button
+                                    type="button"
                                     onClick={() => setShowMenu(!showMenu)}
                                     className="flex items-center justify-center w-10 h-10 mb-1 rounded-full bg-muted hover:bg-muted/80 text-foreground transition-colors border border-border cursor-pointer"
                                     title="Actions"
@@ -306,20 +308,20 @@ Rules:
                                 {/* Popup Menu */}
                                 {showMenu && (
                                     <div className="absolute bottom-full left-0 mb-2 w-56 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-[100] flex flex-col py-2">
-                                        <button onClick={() => handleActionClick('Upload Image')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
+                                        <button type="button" onClick={() => handleActionClick('Upload Image')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <ImageIcon className="size-5 text-blue-400" /> Upload Image
                                         </button>
-                                        <button onClick={() => handleActionClick('Summary Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
+                                        <button type="button" onClick={() => handleActionClick('Summary Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <Quotes className="size-5 text-green-400" /> Summary Note
                                         </button>
-                                        <button onClick={() => handleActionClick('Write Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
+                                        <button type="button" onClick={() => handleActionClick('Write Note')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <PaperPlaneRight className="size-5 text-purple-400" /> Write Note
                                         </button>
-                                        <button onClick={() => handleActionClick('Improve Notes')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
+                                        <button type="button" onClick={() => handleActionClick('Improve Notes')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <MagicWand className="size-5 text-yellow-400" /> Improve Notes
                                         </button>
                                         <div className="h-[1px] bg-border my-1 mx-2"></div>
-                                        <button onClick={() => handleActionClick('Make PDF')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
+                                        <button type="button" onClick={() => handleActionClick('Make PDF')} className="flex items-center gap-3 px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted transition-colors text-left w-full cursor-pointer">
                                             <FilePdf className="size-5 text-red-400" /> Make PDF
                                         </button>
                                     </div>
@@ -339,6 +341,7 @@ Rules:
                         />
 
                         <button
+                            type="button"
                             onClick={handleSend}
                             className="absolute right-2 bottom-0 mb-1 mr-1 flex items-center justify-center w-10 h-10 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                         >

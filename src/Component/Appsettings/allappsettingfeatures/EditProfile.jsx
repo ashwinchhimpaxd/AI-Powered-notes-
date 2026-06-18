@@ -3,17 +3,22 @@ import { useForm } from 'react-hook-form';
 import { User, EnvelopeSimple, Check, ArrowLeft, WarningCircle, PaperPlaneRight, ArrowsClockwise, Key } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../Editor/utils/showToast.js';
+import { useSelector, useDispatch } from 'react-redux';
+import userAuthService from '../../../AppWrite/auth.js';
+import { updateusername } from '@/redux/Authantication/UserAuthanticationSlice.js';
 
 function EditProfile() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
 
-    // OTP states
-    const [otpSent, setOtpSent] = useState(false);
-    const [isSendingOtp, setIsSendingOtp] = useState(false);
-    const [otpError, setOtpError] = useState('');
+    // dispatch methods
+    const dispatch = useDispatch();
 
+    //GET USER EMAIL AND NAME
+    const { name, email } = useSelector((state) => state.UserAuthantication.UserData?.userdetaild || {});
+    // link states
+    const [linkSent, setlinkSent] = useState(false);
+    const [isSendinglink, setIsSendinglink] = useState(false);
     const {
         register,
         handleSubmit,
@@ -22,63 +27,60 @@ function EditProfile() {
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            username: 'ashwin', // In a real app, from auth state
-            email: 'nuni@gmail.com',
-            otp: ''
+            username: name || "",
+            email: email || "",
         }
     });
 
     const emailValue = watch('email');
-    const isEmailChanged = emailValue !== 'nuni@gmail.com';
+    const isEmailChanged = emailValue !== email;
 
-    // Auto-hide OTP section if email changes back to default
+    // Auto-hide link section if email changes back to default
     useEffect(() => {
         if (!isEmailChanged) {
-            setOtpSent(false);
-            setOtpError('');
+            setlinkSent(false);
         }
     }, [isEmailChanged]);
 
-    const handleSendOtp = async (e) => {
-        e.preventDefault();
+    // const handleSendlink = async (e) => {
+    //     e.preventDefault();
 
-        // Don't send if there's an email form error
-        if (errors.email || !emailValue) return;
+    //     // Don't send if there's an email form error
+    //     if (errors.email || !emailValue) return;
 
-        setIsSendingOtp(true);
-        setOtpError('');
 
-        // Simulate API call to send OTP
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    //     try {
+    //         setIsSendinglink(true);
+    //         await userAuthService.sendEmailVerification().then(() => {
+    //             setlinkSent(true);
+    //             showToast("success", "Verification Link Send To You Email Address");
+    //         }).catch((err) => {
+    //             console.error("Appwrite service :: sendEmailVerification :: error", err);
+    //         })
+    //         setIsSendinglink(false);
 
-        setOtpSent(true);
-        setIsSendingOtp(false);
-        showToast("success", "OTP sent successfully");
-    };
+    //     } catch (error) {
+    //         showToast("error", "Something went wrong");
+    //         setIsSendinglink(false);
+    //     }
+
+    // };
 
     const onSubmit = async (data) => {
-        // If email was changed, require OTP verification before saving
-        if (isEmailChanged) {
-            if (!otpSent) {
-                setOtpError('Please request an OTP to verify your new email.');
-                return;
-            }
-            if (!data.otp || data.otp.length < 4) {
-                setOtpError('Please enter a valid OTP to verify your email.');
-                return;
-            }
+
+        if (!data) return;
+
+        try {
+            setIsSubmitting(true);
+            await userAuthService.UpdateUserName(data.username).then((res) => {
+                showToast("success", "Profile Updated Successfully");
+                dispatch(updateusername(res))
+            })
+        } catch (error) {
+            showToast("error", "Something went wrong");
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setIsSubmitting(true);
-        setOtpError('');
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        console.log('Updated Profile Data:', data);
-        setSuccessMessage('Profile updated successfully!');
-        setIsSubmitting(false);
-
         // Return to settings after brief delay
         setTimeout(() => {
             navigate(-1);
@@ -95,6 +97,7 @@ function EditProfile() {
                 <div className="flex items-center justify-between">
                     <div>
                         <button
+                            type="button"
                             onClick={() => navigate(-1)}
                             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-input/10 hover:bg-input/20 border border-border text-muted-foreground hover:text-foreground text-sm font-medium transition-all mb-4 cursor-pointer"
                         >
@@ -102,7 +105,7 @@ function EditProfile() {
                             Back
                         </button>
                         <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-wide">Edit Profile</h2>
-                        <p className="text-sm text-muted-foreground mt-2 leading-relaxed">Update your username and email address.</p>
+                        <p className="text-lg text-muted-foreground mt-2 leading-relaxed">Update your username and email address.</p>
                     </div>
                 </div>
 
@@ -147,12 +150,13 @@ function EditProfile() {
                                 <input
                                     type="email"
                                     className="w-full h-full bg-transparent border-none outline-none text-foreground text-lg placeholder:text-muted-foreground/50 font-medium"
-                                    placeholder="Enter your email"
+                                    placeholder="Enter Your Email"
                                     {...register('email', {
                                         required: 'Email is required',
+                                        disabled: true,
                                         pattern: {
                                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                            message: 'Invalid email address'
+                                            message: 'Invalid Email Address'
                                         }
                                     })}
                                 />
@@ -168,68 +172,33 @@ function EditProfile() {
                                     )}
                                 </div>
 
-                                {/* Send / Resend OTP Button */}
+                                {/* Send / Resend link Button */}
                                 {isEmailChanged && !errors.email && (
                                     <button
                                         type="button"
-                                        onClick={handleSendOtp}
-                                        disabled={isSendingOtp}
-                                        className="text-primary text-sm font-bold flex items-center gap-1.5 hover:text-primary/80 transition-colors disabled:opacity-50 px-2 py-1 rounded-md hover:bg-primary/10 cursor-pointer"
+                                        onClick={handleSendlink}
+                                        disabled={isSendinglink}
+                                        className="text-primary text-sm font-bold flex items-center gap-1.5 hover:text-primary/80 transition-colors disabled:opacity-50 px-2 py-1 mt-2  rounded-md hover:bg-primary/10 cursor-pointer"
                                     >
-                                        {isSendingOtp ? (
-                                            <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                        ) : otpSent ? (
+                                        {isSendinglink ? (
+                                            <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin">
+                                            </div>
+                                        ) : linkSent ? (
                                             <ArrowsClockwise size={14} weight="bold" />
                                         ) : (
                                             <PaperPlaneRight size={14} weight="bold" />
                                         )}
-                                        {otpSent ? 'Resend OTP' : 'Verify Email'}
+                                        {linkSent ? 'Resend Verification Link' : 'Verify Email'}
                                     </button>
                                 )}
                             </div>
                         </div>
 
-                        {/* OTP Input Section (Animated entry) */}
-                        {otpSent && isEmailChanged && (
-                            <div className="group/field animate-in fade-in slide-in-from-top-4 duration-500 overflow-hidden">
-                                <label className="text-sm font-semibold text-primary ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
-                                    <Key size={16} weight="bold" />
-                                    Enter OTP Code
-                                </label>
-                                <div className={`relative w-full h-14 bg-primary/5 border rounded-xl px-4 flex items-center transition-all ${otpError ? 'border-red-500/50 focus-within:border-red-500' : 'border-primary/30 focus-within:border-primary'}`}>
-                                    <input
-                                        type="text"
-                                        maxLength={6}
-                                        className="w-full h-full bg-transparent border-none outline-none text-foreground text-center tracking-[0.5em] text-xl font-bold placeholder:text-muted-foreground/30 placeholder:tracking-normal placeholder:font-medium placeholder:text-lg"
-                                        placeholder="6-Digit OTP"
-                                        {...register('otp')}
-                                    />
-                                </div>
-                                {otpError && (
-                                    <p className="text-red-500 text-xs mt-1.5 ml-1 flex items-center gap-1 font-medium">
-                                        <WarningCircle size={14} weight="fill" />
-                                        {otpError}
-                                    </p>
-                                )}
-                                <p className="text-xs text-muted-foreground ml-1 mt-2">
-                                    We've sent a 6-digit verification code to <span className="font-semibold text-foreground">{emailValue}</span>.
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Success Message */}
-                        {successMessage && (
-                            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
-                                <Check size={20} weight="bold" />
-                                <span className="font-semibold text-sm">{successMessage}</span>
-                            </div>
-                        )}
-
                         {/* Submit Button */}
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                disabled={!isValid || isSubmitting || (isEmailChanged && !otpSent)}
+                                disabled={!isValid || isSubmitting || (isEmailChanged && !linkSent)}
                                 className="w-full sm:w-auto min-w-[200px] relative overflow-hidden rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3.5 text-lg font-bold transition-all duration-300 hover:shadow-md hover:-translate-y-1 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:hover:translate-y-0 flex justify-center items-center gap-3 group ml-auto cursor-pointer"
                             >
                                 {isSubmitting ? (

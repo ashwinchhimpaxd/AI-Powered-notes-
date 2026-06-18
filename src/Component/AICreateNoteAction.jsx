@@ -41,9 +41,9 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
             setNoteData(parsedData);
             createNoteInBackend(parsedData);
         }
-    }, [parsedData, creationStatus]);
+    }, [parsedData, creationStatus, createNoteInBackend]);
 
-    const createNoteInBackend = async (data) => {
+    const createNoteInBackend = useCallback(async (data) => {
         setCreationStatus('creating');
         try {
             const userId = userData?.userdetaild?.userId || 
@@ -78,7 +78,7 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
             console.error("Failed to create note from AI command:", error);
             setCreationStatus('error');
         }
-    };
+    }, [dispatch, userData]);
 
     const handleOpenNote = () => {
         if (!createdNoteId || !noteData) return;
@@ -108,20 +108,20 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
         <div className="flex flex-col gap-3">
             {/* Display the clean text response from AI */}
             {cleanText && (
-                <p className="text-sm whitespace-pre-wrap text-white">
+                <p className="text-sm whitespace-pre-wrap text-foreground/90">
                     {cleanText}
                 </p>
             )}
 
             {/* Display the Interactive Note Creation Card */}
             {noteData && (
-                <div className="mt-2 bg-black/20 border border-white/10 rounded-lg p-4 flex flex-col gap-3">
+                <div className="mt-2 bg-card border border-border rounded-lg p-4 flex flex-col gap-3 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-md">
                             <FileText className="size-6 text-primary" weight="duotone" />
                         </div>
                         <div className="flex-1">
-                            <h4 className="text-white text-sm font-medium line-clamp-1">
+                            <h4 className="text-foreground text-sm font-medium line-clamp-1">
                                 {noteData.title}
                             </h4>
                             <div className="flex items-center gap-2 mt-1">
@@ -146,8 +146,9 @@ const AICreateNoteAction = ({ content, isGenerating }) => {
 
                     {creationStatus === 'success' && (
                         <button
+                            type="button"
                             onClick={handleOpenNote}
-                            className="w-full flex items-center justify-center gap-2 py-2 mt-1 bg-white/10 hover:bg-white/20 text-white rounded-md transition-colors text-sm"
+                            className="w-full flex items-center justify-center gap-2 py-2 mt-1 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm cursor-pointer"
                         >
                             <ArrowSquareOut className="size-4" /> Open Note
                         </button>

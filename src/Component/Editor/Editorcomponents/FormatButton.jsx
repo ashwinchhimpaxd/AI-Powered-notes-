@@ -21,11 +21,12 @@ const FormatButton = memo(function FormatButton({ editor, command, icon, level, 
 
   return (
     <button
+      type="button"
       onMouseDown={(e) => { e.preventDefault(); handleClick(); }}
       className={`p-2 rounded-xl transition-all duration-150 ${
         isActive
-          ? "bg-white/20 text-white"
-          : "text-white/60 hover:text-white hover:bg-white/10"
+          ? "bg-foreground/10 text-foreground"
+          : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
       }`}
     >
       {icon}

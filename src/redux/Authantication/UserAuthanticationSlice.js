@@ -17,10 +17,13 @@ const userauthantication = createSlice({
         logout: (state) => {
             state.Islogin = false;
             state.UserData = null;
+        },
+        updateusername: (state, action) => {
+            state.UserData.userdetaild = action.payload;
         }
     }
 })
 
-export const { login, logout } = userauthantication.actions;
+export const { login, logout, updateusername } = userauthantication.actions;
 
 export default userauthantication.reducer;

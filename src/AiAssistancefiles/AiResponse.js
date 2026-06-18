@@ -30,7 +30,6 @@ class AIService {
     async sendMessage(prompt, history = [], onChunk = null, jsonMode = false, signal = null, systemPrompt = null) {
 
         try {
-            console.log("request reach at ai response server", prompt)
             const mappedHistory = history.map(msg => ({
                 role:
                     (msg.role || msg.type) === "user"
@@ -87,21 +86,26 @@ class AIService {
                 // model: "google/gemma-4-31b-it",
                 // model: "google/gemma-3-27b-it",
                 // model: "google/gemma-3n-e4b-it",
-                model: "meta/llama-3.1-8b-instruct",
+                // model: "meta/llama-3.1-8b-instruct",google/gemma-3n-e4b-it
+                // model: "minimaxai/minimax-m2.7",
+                // model: "minimaxai/minimax-m3",
+                // model: "nvidia/nemotron-3-nano-30b-a3b",
+                model: "deepseek-ai/deepseek-v4-flash",
 
                 messages,
 
-                max_tokens: 2048,
+                max_tokens: 4096,
 
-                temperature: 0.3,
+                temperature: 1,
 
-                top_p: 0.7,
+                top_p: 0.95,
 
                 frequency_penalty: 0,
 
                 presence_penalty: 0,
 
-                stream: isStreaming
+                stream: isStreaming,
+                chat_template_kwargs: { "thinking": true, "reasoning_effort": "high" },
             };
 
             if (jsonMode) {

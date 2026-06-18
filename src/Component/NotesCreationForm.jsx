@@ -50,6 +50,7 @@ function NotesCreationForm({ setNewNotesClick }) {
                         <h2 className="text-lg font-bold">New Note</h2>
                     </div>
                     <button 
+                        type="button"
                         onClick={() => {
                             setNewNotesClick(false);
                             reset();

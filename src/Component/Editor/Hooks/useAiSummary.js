@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { generateSummary } from "../services/summary.service.js";
 import { showToast } from "../utils/showToast.js";
-
+import { handleError } from "@/utils/errorHandler.js";
 /**
  * Manages summary panel state and AI generation.
  * Editor is stored as a ref via setEditor() to avoid hook-count issues.
@@ -13,20 +13,20 @@ export function useAiSummary() {
   const [summaryError, setSummaryError] = useState(null);
 
   const editorRef = useRef(null);
-  const abortControllerRef = useRef(null);
+  const [abortController, setAbortController] = useState(null);
 
   const setEditor = useCallback((ed) => { editorRef.current = ed; }, []);
 
   const openSummary = useCallback(() => setSummaryOpen(true), []);
-  
+
   const closeSummary = useCallback(() => {
     setSummaryOpen(false);
-    // Abort the active request if summary panel is closed
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+    // Cancel the active request if summary panel is closed
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
     }
-  }, []);
+  }, [abortController]);
 
   const handleSummary = useCallback(async () => {
     setSummaryOpen(true);
@@ -35,13 +35,13 @@ export function useAiSummary() {
     setSummaryData(null);
 
     // Cancel any previous summary request that might be running
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    if (abortController) {
+      abortController.abort();
     }
 
     // Create a new AbortController for this request
     const controller = new AbortController();
-    abortControllerRef.current = controller;
+    setAbortController(controller);
 
     try {
       const noteText = editorRef.current?.getText()?.trim() || "";
@@ -69,26 +69,23 @@ export function useAiSummary() {
       } else if (!navigator.onLine) {
         showToast("network", "No internet connection. Summary requires a network.");
       } else {
-        showToast("error", "Failed to generate summary. Please try again.");
+        handleError(err, { action: "Generating summary", silent: false });
       }
       setSummaryError(msg || "Failed to generate summary. Please try again.");
     } finally {
-      // Reset the controller reference if it belongs to this request execution
-      if (abortControllerRef.current === controller) {
-        abortControllerRef.current = null;
-      }
+      setAbortController(null);
       setSummaryLoading(false);
     }
-  }, []);
+  }, [abortController]);
 
   // Cancel any active AI summary request if the component unmounts
   useEffect(() => {
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      if (abortController) {
+        abortController.abort();
       }
     };
-  }, []);
+  }, [abortController]);
 
   return {
     summaryOpen,

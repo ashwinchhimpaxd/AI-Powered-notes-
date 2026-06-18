@@ -82,6 +82,7 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
       <div className="flex items-center gap-2.5 pt-1">
         {/* Drafts tag */}
         <button
+          type="button"
           onClick={() => setDraftsActive(!draftsActive)}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all cursor-pointer ${
             draftsActive
@@ -96,6 +97,7 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
 
         {/* Shared tag */}
         <button
+          type="button"
           onClick={() => setSharedActive(!sharedActive)}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-extrabold uppercase tracking-widest transition-all cursor-pointer ${
             sharedActive

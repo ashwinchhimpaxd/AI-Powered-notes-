@@ -12,7 +12,7 @@ export class UserAuthentication {
         this.account = new Account(this.client);
     }
 
-    // // 1. Password Based Account Creation
+    // // 1. otp Based Account Creation
     // async createUserAccount({ email, password, name }) {
     //     try {
     //         const userAccount = await this.account.create(
@@ -46,9 +46,7 @@ export class UserAuthentication {
 
     // send otp to user email
     async sendOtp(email) {
-        // console.log(this.userid);
         try {
-            console.log(email)
             // Appwrite naye user ke liye ID.unique() aur purane ke liye email se handle kar leta hai
             const sessiontoken = await this.account.createEmailToken(
                 ID.unique(),
@@ -83,27 +81,43 @@ export class UserAuthentication {
     }
 
 
-    // update the user current email by using otp verification
-    async SendOTPforUpdateUserEmail({ newemail }) {
+    // Send verification email to currently logged-in user's email
+    async sendEmailVerification() {
         try {
-            await this.account.createEmailToken(this.userid, newemail, true);
-            return true;
+            return await this.account.createVerification(
+                `${window.location.origin}/verify-email`
+            );
         } catch (error) {
-            console.error("Send email otp failed", error);
+            console.error("Send verification email failed", error);
             throw error;
         }
     }
 
-    async UpdateUserEmail({ newemail, otp }) {
+    // Complete email verification
+    async verifyEmail({ userId, secret }) {
         try {
-            return await this.account.updateEmail(newemail, otp);
+            return await this.account.updateVerification(
+                userId,
+                secret
+            );
         } catch (error) {
-            console.log("Update email otp failed", error);
+            console.error("Email verification failed", error);
             throw error;
         }
     }
 
-    // user Name update in databse
+    // Check verification status
+    async getEmailVerificationStatus() {
+        try {
+            const user = await this.account.get();
+            return user.emailVerification;
+        } catch (error) {
+            console.error("Get verification status failed", error);
+            throw error;
+        }
+    }
+
+    // update the user name
     async UpdateUserName(name) {
         try {
             return await this.account.updateName(name);

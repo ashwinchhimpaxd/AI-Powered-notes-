@@ -31,12 +31,12 @@ function LandingPage() {
                     Mind Sync
                 </div>
                 <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground font-medium">
-                    <button onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                    <button type="button" onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
                         Start Writing
                     </button>
                 </div>
                 <div className="md:hidden">
-                    <button onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                    <button type="button" onClick={handleGetStarted} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
                         Start
                     </button>
                 </div>
@@ -72,7 +72,7 @@ function LandingPage() {
                 </p>
 
                 {/* CTA */}
-                <button onClick={handleGetStarted} className="group bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-8 py-4 rounded-xl text-lg font-medium transition-all flex items-center gap-2 shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:shadow-[0_0_60px_rgba(139,92,246,0.6)]">
+                <button type="button" onClick={handleGetStarted} className="group bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-8 py-4 rounded-xl text-lg font-medium transition-all flex items-center gap-2 shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:shadow-[0_0_60px_rgba(139,92,246,0.6)]">
                     Start Writing
                     <ArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </button>

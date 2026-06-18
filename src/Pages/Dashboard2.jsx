@@ -10,36 +10,28 @@ import { handleError } from "../utils/errorHandler.js";
 import { addNoteToTop } from "../redux/NotesCreation/NotesCreationSlice.js";
 import { showToast } from "../Component/Editor/utils/showToast.js";
 import { Outlet } from "react-router-dom";
+const extractStreamedTitle = (streamedText) => {
+    const match = streamedText.match(/"title"\s*:\s*"([^"]*)"?/);
+    return match ? match[1] : "";
+};
+
+const extractStreamedContent = (streamedText) => {
+    const match = streamedText.match(/"content"\s*:\s*"([\s\S]*)/);
+    if (!match) return "";
+    let contentVal = match[1];
+    contentVal = contentVal.replace(/"\s*\}?\s*$/, "");
+    return contentVal
+        .replace(/\\n/g, "\n")
+        .replace(/\\"/g, '"')
+        .replace(/\\t/g, "\t")
+        .replace(/\\r/g, "\r");
+};
 
 /**
  * Safely sanitizes a raw JSON string returned by AI,
  * escaping unescaped literal control characters (newlines, carriage returns, tabs)
  * ONLY inside double-quoted string values, while preserving structural spacing outside strings.
  */
-const sanitizeJsonString = (rawStr) => {
-    let inString = false;
-    let result = "";
-    for (let i = 0; i < rawStr.length; i++) {
-        const char = rawStr[i];
-        if (char === '"' && (i === 0 || rawStr[i - 1] !== '\\')) {
-            inString = !inString;
-            result += char;
-        } else if (inString) {
-            if (char === '\n') {
-                result += '\\n';
-            } else if (char === '\r') {
-                result += '\\r';
-            } else if (char === '\t') {
-                result += '\\t';
-            } else {
-                result += char;
-            }
-        } else {
-            result += char;
-        }
-    }
-    return result.trim();
-};
 
 export default function Dashboard2() {
     const dispatch = useDispatch();
@@ -57,6 +49,30 @@ export default function Dashboard2() {
     // Note generation state
     const [isCreatingNote, setIsCreatingNote] = useState(false);
 
+    const sanitizeJsonString = (rawStr) => {
+        let inString = false;
+        let result = "";
+        for (let i = 0; i < rawStr.length; i++) {
+            const char = rawStr[i];
+            if (char === '"' && (i === 0 || rawStr[i - 1] !== '\\')) {
+                inString = !inString;
+                result += char;
+            } else if (inString) {
+                if (char === '\n') {
+                    result += '\\n';
+                } else if (char === '\r') {
+                    result += '\\r';
+                } else if (char === '\t') {
+                    result += '\\t';
+                } else {
+                    result += char;
+                }
+            } else {
+                result += char;
+            }
+        }
+        return result.trim();
+    };
 
     // handle search debouncing and ai mode
     useEffect(() => {
@@ -77,7 +93,7 @@ export default function Dashboard2() {
     // this is to reset the current note info when the component is mounted
     useEffect(() => {
         dispatch(resetcurrentnoteinfo());
-    }, []);
+    }, [dispatch]);
 
 
 
@@ -238,23 +254,35 @@ Return ONLY the JSON object.
 
                 // Enforce JSON Mode (fourth parameter set to true)
                 const responseText = await sendMessageToAI(prompt, [], null, true, DASHBOARD_CREATE_SYSTEM_PROMPT);
-                console.log(responseText)
+                // console.log(responseText)
                 // Extract the JSON object using regex to ignore any surrounding text or tags
+                let parsedData = null;
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                console.log(jsonMatch)
-                if (!jsonMatch) {
-                    throw new Error("No JSON object found in the AI response.");
+                if (jsonMatch) {
+                    const rawJsonStr = jsonMatch[0];
+                    const sanitizedJsonStr = sanitizeJsonString(rawJsonStr);
+                    try {
+                        parsedData = JSON.parse(sanitizedJsonStr);
+                    } catch (parseError) {
+                        console.warn("JSON.parse failed, falling back to regex extraction:", parseError);
+                    }
                 }
 
-                const rawJsonStr = jsonMatch[0];
-                const sanitizedJsonStr = sanitizeJsonString(rawJsonStr);
+                // Fallback to regex extraction if JSON parsing failed or object is empty
+                if (!parsedData || !parsedData.content) {
+                    console.log("Using regex fallback to extract content and title.");
+                    const extractedContent = extractStreamedContent(responseText);
+                    const extractedTitle = extractStreamedTitle(responseText) || topic;
+                    if (extractedContent) {
+                        parsedData = {
+                            title: extractedTitle,
+                            content: extractedContent
+                        };
+                    }
+                }
 
-                let parsedData;
-                try {
-                    parsedData = JSON.parse(sanitizedJsonStr);
-                } catch (parseError) {
-                    console.error("Failed to parse AI Note JSON. Sanitized raw string:", sanitizedJsonStr);
-                    throw parseError;
+                if (!parsedData || !parsedData.content) {
+                    throw new Error("No valid content found in the AI response.");
                 }
 
                 if (parsedData.title && parsedData.content) {
@@ -282,7 +310,7 @@ Return ONLY the JSON object.
                     }
                 }
             } catch (error) {
-                handleError(error, { action: "generating AI note" });
+             handleError(error, { action: "generating AI note" });
             } finally {
                 setIsCreatingNote(false);
             }
@@ -290,11 +318,12 @@ Return ONLY the JSON object.
     };
 
     return (
+
+
         <div className="flex w-full h-screen bg-background overflow-hidden font-sans text-foreground relative ashwin">
 
             {/* Sidebar Component */}
             <SideNavBar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
-
             {/* Main Content Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col">
 
@@ -306,6 +335,7 @@ Return ONLY the JSON object.
 
                         {/* Hamburger Menu for Mobile */}
                         <button
+                            type="button"
                             className="md:hidden text-foreground/80 hover:text-foreground"
                             onClick={() => setIsMobileMenuOpen(true)}
                         >

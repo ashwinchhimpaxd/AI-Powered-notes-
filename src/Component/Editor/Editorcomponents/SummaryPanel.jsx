@@ -17,9 +17,8 @@ const SummaryPanel = memo(function SummaryPanel({
 }) {
   return (
     <div
-      className={`fixed top-0 right-0 h-screen w-[380px] bg-card/98 backdrop-blur-3xl border-l border-border shadow-2xl z-[100] flex flex-col transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        open ? "translate-x-0" : "translate-x-full"
-      }`}
+      className={`fixed top-0 right-0 h-screen w-[380px] bg-card/98 backdrop-blur-3xl border-l border-border shadow-2xl z-[100] flex flex-col transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? "translate-x-0" : "translate-x-full"
+        }`}
     >
       {/* Header */}
       <div className="flex justify-between items-center px-6 py-5 border-b border-border flex-shrink-0">
@@ -28,6 +27,7 @@ const SummaryPanel = memo(function SummaryPanel({
           Document Summary
         </h2>
         <button
+          type="button"
           onClick={onClose}
           className="text-muted-foreground/40 hover:text-foreground p-1.5 rounded-full hover:bg-muted transition-colors cursor-pointer"
         >
@@ -89,7 +89,7 @@ const SummaryPanel = memo(function SummaryPanel({
             {data.tone && (
               <div className="px-4 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 inline-flex items-center gap-2">
                 <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest">Tone</span>
-                <span className="text-sm text-purple-300 font-medium">{data.tone}</span>
+                <span className="text-sm text-purple-600 dark:text-purple-300 font-medium">{data.tone}</span>
               </div>
             )}
           </>
@@ -107,8 +107,9 @@ const SummaryPanel = memo(function SummaryPanel({
       {!loading && (
         <div className="px-6 py-4 border-t border-border flex-shrink-0">
           <button
+            type="button"
             onClick={onGenerate}
-            className="w-full py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/20 text-purple-300 text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 rounded-xl bg-purple-600/10 dark:bg-purple-600/20 hover:bg-purple-600/20 dark:hover:bg-purple-600/30 border border-purple-500/20 text-purple-600 dark:text-purple-300 text-sm font-medium transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Sparkle weight="fill" size={14} />
             {data ? "Re-generate" : "Generate Summary"}

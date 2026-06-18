@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
     setcurrentnoteinfo,
@@ -24,13 +24,22 @@ const cleanText = (text) => {
     return (text || "").replace(/\s/g, "");
 };
 
+// Helper to strip basic layout tags and whitespace for rich-text/formatting comparison
+const cleanHtml = (html) => {
+    return (html || "")
+        .replace(/<\/?p>/g, "")
+        .replace(/<br\s*\/?>/g, "")
+        .replace(/&nbsp;/g, "")
+        .replace(/\s/g, "");
+};
+
 /**
  * useNoteSave
  * Handles all save logic: autosave (debounce), manual save,
  * slug generation, Redux dispatch.
  * Completely separate from UI — EditorToolbar just calls this hook.
  */
-export function useNoteSave(editor, slashOpenRef) {
+export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     const dispatch = useDispatch();
 
     // Redux state
@@ -58,6 +67,12 @@ export function useNoteSave(editor, slashOpenRef) {
     const [isSaving, setIsSaving] = useState(false);
     const [isNoteSaved, setIsNoteSaved] = useState(true);
 
+    // Track AI generation status
+    const isAiGeneratingRef = useRef(false);
+    useEffect(() => {
+        isAiGeneratingRef.current = isAiGenerating;
+    }, [isAiGenerating]);
+
     // Refs — keep latest values accessible inside async callbacks & timeouts
     const userDataRef = useRef(userData);
     const reduxNoteIdRef = useRef(reduxNoteId);
@@ -77,7 +92,7 @@ export function useNoteSave(editor, slashOpenRef) {
     const lastSavedText = useRef(noteData?.content ? getPlainText(noteData.content) : "");
     const lastSavedTitle = useRef(initialCleanTitle);
     const lastSavedSlug = useRef(initialGeneratedSlug);
-    
+
     const timeoutRef = useRef(null);
     const isSavingRef = useRef(false);
     const isLoaded = useRef(false);
@@ -98,18 +113,18 @@ export function useNoteSave(editor, slashOpenRef) {
         // Synchronize last saved refs to match the newly loaded note
         lastSavedTitle.current = cleanTitle;
         lastSavedSlug.current = generatedSlug;
-        
+
         if (noteDataRef.current?.content) {
             lastSavedContent.current = noteDataRef.current.content;
             lastSavedText.current = getPlainText(noteDataRef.current.content);
         }
 
-        dispatch(setcurrentnoteinfo({ 
-            ...noteDataRef.current, 
-            title: cleanTitle, 
-            slug: generatedSlug 
+        dispatch(setcurrentnoteinfo({
+            ...noteDataRef.current,
+            title: cleanTitle,
+            slug: generatedSlug
         }));
-    }, [reduxNoteId]); // Triggered when note ID loads or switches
+    }, [reduxNoteId, noteTitle, dispatch]); // Triggered when note ID loads or switches
 
     /**
      * commitTitle — call this onBlur or onEnter from the title input.
@@ -150,9 +165,13 @@ export function useNoteSave(editor, slashOpenRef) {
      * handleSave — safe to call from the save button OR autosave timer.
      * Guards: already saving, empty note, no meaningful changes.
      */
-    const handleSave = async (currentEditor) => {
+    const handleSave = useCallback(async (currentEditor) => {
         if (!currentEditor) return;
         if (isSavingRef.current) return;
+        if (isAiGeneratingRef.current) {
+            console.log("Save blocked: AI is currently generating content.");
+            return;
+        }
 
         // Cancel any pending autosave so it doesn't double-fire
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -179,9 +198,10 @@ export function useNoteSave(editor, slashOpenRef) {
             }
         };
 
-        // Detect if content changed (ignoring all whitespaces and newlines)
+        // Detect if content changed (ignoring all whitespaces and newlines, but including formatting changes)
         const contentChanged = cleanText(currentEditor.getText()) !== cleanText(lastSavedText.current) ||
-            getImagesString(currentContent) !== getImagesString(lastSavedContent.current);
+            getImagesString(currentContent) !== getImagesString(lastSavedContent.current) ||
+            cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
 
         // Detect if title or slug changed
         const metadataChanged = currentTitle !== lastSavedTitle.current ||
@@ -311,18 +331,22 @@ export function useNoteSave(editor, slashOpenRef) {
             setIsSaving(false);
             isSavingRef.current = false;
         }
-    };
+    }, [dispatch]);
 
     // Autosave: debounce 3 seconds after every editor change
     useEffect(() => {
         if (!editor) return;
+        let localTimeout = null;
 
         const handleUpdate = () => {
             // Ignore updates during programmatic loading phase
             if (!isLoaded.current) return;
 
+            // Ignore updates during AI generation
+            if (isAiGeneratingRef.current) return;
+
             const currentContent = editor.getHTML();
-            
+
             // Sync with Redux slice on every change to prevent data loss on unwanted refresh
             dispatch(setcurrentnoteinfo({
                 title: titleRef.current,
@@ -356,16 +380,20 @@ export function useNoteSave(editor, slashOpenRef) {
                 }
             };
 
-            // Only mark as unsaved and trigger autosave if meaningful text content or images changed
+            // Only mark as unsaved and trigger autosave if meaningful text content, images, or formatting changed
             // Stripping all whitespaces/newlines strictly ensures NO triggers on whitespace/empty line additions!
             if (cleanText(editor.getText()) !== cleanText(lastSavedText.current) ||
-                getImagesString(currentContent) !== getImagesString(lastSavedContent.current)) {
-                
+                getImagesString(currentContent) !== getImagesString(lastSavedContent.current) ||
+                cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current)) {
+
                 setIsNoteSaved(false);
 
                 // Only schedule handleSave when there is actual unsaved changes!
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
-                timeoutRef.current = setTimeout(() => handleSave(editor), 3000);
+                if (localTimeout) clearTimeout(localTimeout);
+                const nextTimeout = setTimeout(() => handleSave(editor), 3000);
+                timeoutRef.current = nextTimeout;
+                localTimeout = nextTimeout;
             }
         };
 
@@ -384,9 +412,48 @@ export function useNoteSave(editor, slashOpenRef) {
         return () => {
             editor.off("update", handleUpdate);
             clearTimeout(timer);
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (localTimeout) clearTimeout(localTimeout);
         };
-    }, [editor]);
+    }, [editor, dispatch, slashOpenRef, handleSave, noteDataRef, titleRef, slugRef]);
+
+    // Cancel pending saves when AI starts
+    useEffect(() => {
+        if (isAiGenerating) {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+        }
+    }, [isAiGenerating]);
+
+    // Save final content when AI completes
+    useEffect(() => {
+        if (!editor || editor.isDestroyed || !editor.state || isAiGenerating) return;
+
+        const currentContent = editor.getHTML();
+        const getImagesString = (html) => {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                return Array.from(doc.querySelectorAll('img'))
+                    .map(img => img.getAttribute('src'))
+                    .filter(Boolean)
+                    .join(",");
+            } catch (e) {
+                return "";
+            }
+        };
+
+        const hasChanged = cleanText(editor.getText()) !== cleanText(lastSavedText.current) ||
+            getImagesString(currentContent) !== getImagesString(lastSavedContent.current) ||
+            cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
+
+        if (hasChanged) {
+            setIsNoteSaved(false);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => handleSave(editor), 1000);
+        }
+    }, [isAiGenerating, editor, handleSave]);
 
     return { title, setTitle, slug, isSaving, isNoteSaved, commitTitle, handleSave, toggleImportant, isImportant: noteData?.isimportant };
 }

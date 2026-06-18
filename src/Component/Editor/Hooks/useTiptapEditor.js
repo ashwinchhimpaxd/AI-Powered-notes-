@@ -32,7 +32,7 @@ export function useTiptapEditor({
       return true; // Handled
     }
     return false;
-  }, []);
+  }, [slashOpenRef, onSlashCloseRef]);
 
   const editor = useEditor({
     extensions: TIPTAP_EXTENSIONS,
@@ -106,20 +106,22 @@ export function useTiptapEditor({
     },
   }, []);
 
+  const isHydratedRef = useRef(false);
+
   useEffect(() => {
     if (!editor) return;
 
     // Load existing note content from Redux (only on mount)
 
     if (editor.isDestroyed) return;
-    if (reduxNoteData?.content) {
-      editor.commands.setContent(reduxNoteData.content);
+    if (!isHydratedRef.current) {
+      if (reduxNoteData?.content) {
+        editor.commands.setContent(reduxNoteData.content);
+      }
+      if (onEditorReady) onEditorReady(editor);
+      isHydratedRef.current = true;
     }
-
-
-    if (onEditorReady) onEditorReady(editor);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor]);
+  }, [editor, reduxNoteData, onEditorReady]);
 
   return { editor };
 }

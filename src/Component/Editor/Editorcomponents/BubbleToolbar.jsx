@@ -3,7 +3,7 @@ import { BubbleMenu } from "@tiptap/react/menus";
 import {
   TextB, TextItalic, TextUnderline, TextHOne, TextHTwo,
   ListBullets, ListNumbers, Highlighter, Quotes,
-  LinkSimple, ChatTeardropText,
+  LinkSimple,
 } from "@phosphor-icons/react";
 import FormatButton from "./FormatButton.jsx";
 
@@ -21,7 +21,7 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
   return (
     <BubbleMenu
       editor={editor}
-      tippyOptions={{
+      tippyoptions={{
         placement: "top",
         appendTo: document.body,
         zIndex: 9999,
@@ -56,14 +56,17 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
       <FormatButton editor={editor} command="bulletList" icon={<ListBullets size={16} />} />
       <FormatButton editor={editor} command="orderedList" icon={<ListNumbers size={16} />} />
       <div className="w-px h-4 bg-border mx-1" />
-      <FormatButton editor={editor} command="highlight"   icon={<Highlighter size={16} />} />
-      <FormatButton editor={editor} command="blockquote"  icon={<Quotes size={16} />} />
-      <FormatButton editor={editor} command="link"        icon={<LinkSimple size={16} />} onClick={handleLinkClick} />
+      <FormatButton editor={editor} command="highlight" icon={<Highlighter size={16} />} />
+      <FormatButton editor={editor} command="blockquote" icon={<Quotes size={16} />} />
+      <FormatButton editor={editor} command="link" icon={<LinkSimple size={16} />} onClick={handleLinkClick} />
       <div className="w-px h-4 bg-border mx-1" />
-      <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-colors text-xs font-semibold cursor-pointer">
+      {/* <button
+        type="button"
+        onClick={() => onAiChat(pre => !pre)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-colors text-xs font-semibold cursor-pointer">
         <ChatTeardropText weight="fill" size={14} />
         AI
-      </button>
+      </button> */}
     </BubbleMenu>
   );
 });

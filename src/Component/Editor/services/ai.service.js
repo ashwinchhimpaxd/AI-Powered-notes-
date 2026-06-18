@@ -53,10 +53,6 @@ export function cleanHtmlResponse(text) {
 }
 
 export async function runAiCommand(commandId, commandLabel, commandMode, noteText, onChunk = null) {
-  console.log(commandId)
-  console.log(commandLabel)
-  console.log(commandMode)
-  console.log(noteText)
   const prompt = buildPrompt(commandId, noteText);
 
   if (onChunk) {
@@ -64,7 +60,14 @@ export async function runAiCommand(commandId, commandLabel, commandMode, noteTex
       prompt,
       undefined,
       (fullText) => {
-        onChunk(fullText);
+        // Strip markdown wrappers first, then convert any plain-text
+        // bullet characters (• / -) to proper <ul><li> HTML so Tiptap
+        // renders real list items instead of a single paragraph.
+        const stripped = cleanHtmlResponse(fullText);
+        const parsed = parseAiResponse(stripped);
+        // If parseAiResponse produced list markup, use it;
+        // otherwise fall back to the stripped HTML (already valid HTML).
+        onChunk(parsed || stripped);
       },
       false,
       null,

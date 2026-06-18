@@ -13,6 +13,7 @@ const FilterHeader = ({ onClose }) => {
         <h3 className="text-foreground text-lg font-bold tracking-wide">Filter Notes</h3>
       </div>
       <button
+        type="button"
         onClick={onClose}
         className="p-1.5 rounded-full hover:bg-muted text-muted-foreground/60 hover:text-foreground transition-colors cursor-pointer"
         aria-label="Close filters"

@@ -2,7 +2,7 @@ import { useEffect, useState, useDeferredValue, memo, useCallback, useRef } from
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { SquaresFour, List, CircleNotch, FadersHorizontal } from "@phosphor-icons/react";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteNote, setNotes, appendNotes, updateNoteInPlace, selectNoteIds, selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
+import { deleteNote,  updateNoteInPlace, selectNoteIds, selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
 import { setnoteid, setcurrentnoteinfo } from "../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
 import service from "@/AppWrite/Setgetuserdatas/config.js";
 import StorageService from "../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
@@ -158,6 +158,7 @@ const RecentNotes = memo((props) => {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
+                        type="button"
                         onClick={() => setIsFilterOpen(true)}
                         className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-muted border border-border rounded-lg text-sm font-medium text-foreground transition-colors cursor-pointer "
                     >
@@ -165,6 +166,7 @@ const RecentNotes = memo((props) => {
                     </button>
                     {/* Toggle Button */}
                     <button
+                        type="button"
                         id="grid-btn"
                         onClick={() => setIsGridView(!isGridView)}
                         className="flex items-center cursor-pointer justify-center p-1.5 bg-card hover:bg-muted border border-border rounded-lg text-foreground transition-colors"

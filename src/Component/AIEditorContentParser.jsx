@@ -59,14 +59,14 @@ const AIEditorContentParser = ({ content, isGenerating, editor }) => {
         <div className="flex flex-col gap-2">
             {/* Display the clean conversational text before any tags */}
             {cleanText && (
-                <p className="text-sm whitespace-pre-wrap text-white">
+                <p className="text-sm whitespace-pre-wrap text-foreground/90">
                     {cleanText}
                 </p>
             )}
 
             {/* Display the Status Widget if an editor action is triggered */}
             {actionStatus && (
-                <div className="mt-2 bg-black/20 border border-white/10 rounded-lg p-3 flex items-center gap-3">
+                <div className="mt-2 bg-card border border-border rounded-lg p-3 flex items-center gap-3 shadow-sm">
                     {(actionStatus === 'appending' || actionStatus === 'rewriting') && (
                         <>
                             <CircleNotch className="size-4 text-blue-400 animate-spin" />

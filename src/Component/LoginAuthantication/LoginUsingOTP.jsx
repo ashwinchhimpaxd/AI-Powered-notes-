@@ -29,32 +29,32 @@ const LoginUsingOTP = () => {
         return () => clearInterval(timer);
     }, [cooldown]);
 
+
+    const handleSendOTPClick = async () => {
+        if (cooldown > 0) return;
+        const success = await OnSendOtp();
+        if (success) {
+            setCooldown(60);
+        }
+
+    };
+
+
     const OnSendOtp = useCallback(async () => {
         const isValid = await trigger("Email");
         if (!isValid) return false;
 
         const Email = getValues("Email");
         try {
-            await userAuthService.sendOtp(Email);
+            let result = await userAuthService.sendOtp(Email);
+            console.log(result)
             showToast("success", "OTP sent successfully");
             return true;
         } catch (error) {
-            alert(error?.message);
+            showToast("error", "an error occur while sending OTP");
             return false;
         }
     }, [trigger, getValues]); // Dependencies
-
-    const handleSendOTPClick = async () => {
-        if (cooldown > 0) return;
-        // alert("button clicked")
-        const success = await OnSendOtp();
-        // alert(success + " this is success")
-        if (success) {
-            // alert("inner if console")
-            setCooldown(60);
-        }
-        // alert("complet handlesendotp")
-    };
 
     const onSubmit = async (data) => {
         try {

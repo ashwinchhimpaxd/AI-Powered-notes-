@@ -42,22 +42,22 @@ import { clearNotes } from "./redux/NotesCreation/NotesCreationSlice.js";
 function App() {
   const dispatch = useDispatch();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  let GetUser = useSelector((state) => state.UserAuthantication.Islogin);
+  const isLogin = useSelector((state) => state.UserAuthantication.Islogin);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        if (GetUser) {
+        if (isLogin) {
           console.log("user already online ")
           return;
         }
         console.log("user fetched from the server")
-        GetUser = await userAuthService.getCurrentUser();
-        if (GetUser) {
+        const currentUser = await userAuthService.getCurrentUser();
+        if (currentUser) {
           console.log("Login success")
           dispatch(login({
             UserData: {
-              userdetaild: GetUser
+              userdetaild: currentUser
             }
           }));
         } else {
@@ -74,7 +74,7 @@ function App() {
       }
     };
     checkSession();
-  }, [dispatch]);
+  }, [dispatch, isLogin]);
 
   if (isCheckingAuth) {
     return null;
