@@ -257,7 +257,6 @@ The JSON must be valid, complete, and parseable. Do NOT truncate or leave it unf
                         commitTitle(parsedData.title);
                     }
                 } else {
-                    const originalHtml = editor.getHTML();
                     const headerHtml = `<p><strong style="color:#a78bfa">✦ AI Response: ${parsedData.title}</strong></p>`;
                     editor.commands.setContent(originalHtml + headerHtml + parsedData.content);
                 }

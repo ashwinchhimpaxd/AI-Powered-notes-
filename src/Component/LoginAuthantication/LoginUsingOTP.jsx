@@ -102,7 +102,7 @@ const LoginUsingOTP = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                         {/* Email Field */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-[#e5e5e5] block">
+                            <label htmlFor="login-email" className="text-sm font-medium text-[#e5e5e5] block">
                                 Email Address
                             </label>
                             <div className="relative">
@@ -110,6 +110,7 @@ const LoginUsingOTP = () => {
                                     <EnvelopeSimple className="h-5 w-5 text-[#a1a1aa]" />
                                 </div>
                                 <input
+                                    id="login-email"
                                     type="email"
                                     placeholder="name@example.com"
                                     {...register("Email", {
@@ -128,7 +129,7 @@ const LoginUsingOTP = () => {
                         {/* OTP Field */}
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <label className="text-sm font-medium text-[#e5e5e5] block">
+                                <label htmlFor="login-otp" className="text-sm font-medium text-[#e5e5e5] block">
                                     OTP
                                 </label>
                                 <button
@@ -145,6 +146,7 @@ const LoginUsingOTP = () => {
                                     <Key className="h-5 w-5 text-[#a1a1aa]" />
                                 </div>
                                 <input
+                                    id="login-otp"
                                     type="text"
                                     maxLength={6}
                                     placeholder="Enter 6-digit code"
@@ -203,10 +205,10 @@ const LoginUsingOTP = () => {
             <div className="border-t border-[#262626] bg-[#0a0a0a] py-6 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-[#52525b] uppercase tracking-wider">
                 <p>© 2024 DEEP FOCUS AI. DESIGNED FOR PEAK COGNITIVE PERFORMANCE.</p>
                 <div className="flex gap-4 md:gap-6">
-                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">PRIVACY</a>
-                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">TERMS</a>
-                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">SUPPORT</a>
-                    <a href="#" className="hover:text-[#a1a1aa] transition-colors">GITHUB</a>
+                    <a href="/privacy" className="hover:text-[#a1a1aa] transition-colors">PRIVACY</a>
+                    <a href="/terms" className="hover:text-[#a1a1aa] transition-colors">TERMS</a>
+                    <a href="/support" className="hover:text-[#a1a1aa] transition-colors">SUPPORT</a>
+                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#a1a1aa] transition-colors">GITHUB</a>
                 </div>
             </div>
         </div>

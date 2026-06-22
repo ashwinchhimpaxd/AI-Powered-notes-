@@ -67,11 +67,11 @@ function NotesCreationForm({ setNewNotesClick }) {
                         
                         {/* Input Group */}
                         <div className="flex flex-col gap-2 relative">
-                            <label className="text-sm font-medium text-[#a1a1aa] ml-1">Note Title</label>
+                            <label htmlFor="note-title" className="text-sm font-medium text-[#a1a1aa] ml-1">Note Title</label>
                             <input 
+                                id="note-title"
                                 {...register("title", { required: "A title is required" })} 
                                 placeholder="E.g., Project Ideas..." 
-                                autoFocus
                                 className="w-full bg-[#0a0a0a] border border-[#262626] focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] text-white rounded-xl px-4 py-3 outline-none transition-all placeholder:text-[#52525b]" 
                             />
                             {errors.title && (

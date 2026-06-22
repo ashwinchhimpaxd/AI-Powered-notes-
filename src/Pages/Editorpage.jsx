@@ -45,20 +45,24 @@ function Editorpage() {
                 return;
             }
 
-            // 2. Check if the user is editing the title of the active note
-            // (either a saved note with reduxNoteId or a new unsaved note with reduxNoteId === null)
+            // Check actions on the active loaded note
             if (reduxNoteId) {
                 const activeNoteInCache = allNotes.find(note => note.$id === reduxNoteId);
-                if (activeNoteInCache && activeNoteInCache.slug === slug && currentNoteInfo?.slug) {
-                    // Update URL slug in address bar to match the new edited slug
-                    navigate(`/Dashboard/editor/${currentNoteInfo.slug}`, { replace: true });
-                    return;
+                if (activeNoteInCache) {
+                    // 1b. If the URL slug matches the cached slug of the active note,
+                    // but currentNoteInfo.slug has been edited and is different, we are currently saving.
+                    // Do nothing (don't reload the note and revert changes).
+                    if (activeNoteInCache.slug === slug) {
+                        return;
+                    }
+
+                    // 2. If the active note's slug in the cache has updated (after successful save),
+                    // but the URL slug is still the old one, update the URL slug.
+                    if (activeNoteInCache.slug && activeNoteInCache.slug !== slug) {
+                        navigate(`/Dashboard/editor/${activeNoteInCache.slug}`, { replace: true });
+                        return;
+                    }
                 }
-            } else if (currentNoteInfo?.title && currentNoteInfo?.slug &&!allNotes.some(note => note.slug === slug)) {
-                // For newly created unsaved notes, reduxNoteId is null but title/slug are in Redux.
-                // If they don't match the URL slug, it's because the user edited the title.
-                navigate(`/Dashboard/editor/${currentNoteInfo.slug}`, { replace: true });
-                return;
             }
 
             // 3. Try to find the note locally in Redux cache (allNotes)
@@ -117,7 +121,7 @@ function Editorpage() {
                 {/* Ambient background glows */}
                 <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/8 blur-[120px] rounded-full pointer-events-none z-0" />
                 <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-500/8 blur-[120px] rounded-full pointer-events-none z-0" />
-                
+
                 <div className="relative z-10 flex flex-col items-center gap-4 bg-[#18181b]/50 border border-white/10 rounded-2xl p-8 backdrop-blur-2xl shadow-2xl">
                     <CircleNotch className="size-10 text-purple-400 animate-spin" />
                     <p className="text-white/70 text-sm font-medium tracking-wide animate-pulse">Loading note content...</p>

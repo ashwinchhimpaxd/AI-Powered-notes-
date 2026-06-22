@@ -7,6 +7,8 @@ import {
 } from "@phosphor-icons/react";
 import FormatButton from "./FormatButton.jsx";
 
+// ... extensions: [StarterKit, Highlight, Blockquote, ...]
+
 /**
  * Glassmorphism bubble toolbar that appears on text selection.
  */
@@ -21,7 +23,7 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
   return (
     <BubbleMenu
       editor={editor}
-      tippyoptions={{
+      tippyOptions={{
         placement: "top",
         appendTo: document.body,
         zIndex: 9999,
@@ -44,8 +46,7 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
           ],
         },
       }}
-      className="flex items-center gap-0.5 p-1.5 rounded-2xl bg-card/90 backdrop-blur-2xl border border-border shadow-2xl z-50"
-    >
+      className="flex items-center gap-0.5 p-1.5 rounded-2xl bg-card/90 backdrop-blur-2xl border border-border shadow-2xl z-50">
       <FormatButton editor={editor} command="bold" icon={<TextB size={16} />} />
       <FormatButton editor={editor} command="italic" icon={<TextItalic size={16} />} />
       <FormatButton editor={editor} command="underline" icon={<TextUnderline size={16} />} />
@@ -59,14 +60,6 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
       <FormatButton editor={editor} command="highlight" icon={<Highlighter size={16} />} />
       <FormatButton editor={editor} command="blockquote" icon={<Quotes size={16} />} />
       <FormatButton editor={editor} command="link" icon={<LinkSimple size={16} />} onClick={handleLinkClick} />
-      <div className="w-px h-4 bg-border mx-1" />
-      {/* <button
-        type="button"
-        onClick={() => onAiChat(pre => !pre)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-colors text-xs font-semibold cursor-pointer">
-        <ChatTeardropText weight="fill" size={14} />
-        AI
-      </button> */}
     </BubbleMenu>
   );
 });

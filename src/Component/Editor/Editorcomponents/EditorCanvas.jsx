@@ -10,11 +10,11 @@ const EditorCanvas = memo(function EditorCanvas({ editor }) {
   if (!editor) return null;
 
   return (
-    <div className="w-full max-w-[75vw] mt-24 mb-40 px-6 z-10 ">
+    <div className="md:w-[80vw] lg:w-[70vw] mt-24 mb-40 px-4 z-10 ">
       <BubbleToolbar editor={editor} />
       <EditorContent
         editor={editor}
-        className="w-full text-[1.3rem] text-foreground/85 antialiased z-10!"
+        className="w-full text-[1.3rem] text-foreground/85 antialiased z-10! pb-10"
       />
     </div>
   );

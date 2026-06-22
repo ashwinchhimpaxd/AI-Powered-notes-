@@ -121,6 +121,7 @@ export class UserAuthentication {
     async UpdateUserName(name) {
         try {
             return await this.account.updateName(name);
+            // throw new Error("Error occurs when updaing the user name")
         } catch (error) {
             throw error;
         }

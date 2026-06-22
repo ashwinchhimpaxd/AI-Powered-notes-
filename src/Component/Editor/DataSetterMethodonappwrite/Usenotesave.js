@@ -96,10 +96,18 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     const timeoutRef = useRef(null);
     const isSavingRef = useRef(false);
     const isLoaded = useRef(false);
+    const hydratedNoteIdRef = useRef(null);
 
     // Hydrate title, slug, and refs when a note is loaded or switched (runs on mount and on noteid change)
     useEffect(() => {
         if (!reduxNoteId || !noteTitle) return;
+
+        // Skip hydration if we are already working on this note to prevent overwriting modified/unsaved title/slug
+        if (reduxNoteId === hydratedNoteIdRef.current) {
+            return;
+        }
+
+        hydratedNoteIdRef.current = reduxNoteId;
 
         const cleanTitle = noteTitle.trim().replace(/\s+/g, " ");
         const generatedSlug = cleanTitle
@@ -138,18 +146,25 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             .replace(/[^\w-]+/g, "");
 
         setTitle(cleanTitle);
+        titleRef.current = cleanTitle;
 
         if (cleanTitle.length > 0) {
             setSlug(generatedSlug);
+            slugRef.current = generatedSlug;
             dispatch(setcurrentnoteinfo({ ...noteDataRef.current, title: cleanTitle, slug: generatedSlug }));
         } else {
             setSlug("");
+            slugRef.current = "";
             dispatch(setcurrentnoteinfo({ ...noteDataRef.current, title: "", slug: "" }));
         }
 
         // Check if title or slug actually changed from last save
         if (cleanTitle !== lastSavedTitle.current || generatedSlug !== lastSavedSlug.current) {
             setIsNoteSaved(false);
+
+            // Schedule save after 1 second so updates propagate and are sent to the server
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => handleSave(editor), 1000);
         }
     };
 
@@ -453,6 +468,10 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => handleSave(editor), 1000);
         }
+
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
     }, [isAiGenerating, editor, handleSave]);
 
     return { title, setTitle, slug, isSaving, isNoteSaved, commitTitle, handleSave, toggleImportant, isImportant: noteData?.isimportant };

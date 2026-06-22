@@ -62,6 +62,11 @@ export function handleError(error, context = {}) {
   // Normalize the error into standard format
   const normalizedError = normalizeError(error);
   
+  // Override message if a custom one is provided in context
+  if (context.customMessage) {
+    normalizedError.message = context.customMessage;
+  }
+  
   // Log to console for debugging (with context if provided)
   console.error(`[ErrorHandler] ${context.action ? `Failed during: ${context.action}` : ''}`, {
     originalError: error,

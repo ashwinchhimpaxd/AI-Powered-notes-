@@ -33,13 +33,21 @@ function SideNavBar({ isOpen, setIsOpen }) {
                 <div>
                     {/* Logo Area & Mobile Close Button */}
                     <div className="p-6 pb-8 flex items-center justify-between">
-                        <div className="flex items-center gap-0.2">
-                            <div className="size-8 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-muted-foreground text-xl">✨</span>
+                        <div className="flex items-center gap-2 px-2">
+                            {/* Glowing Orb Container */}
+                            <div className="relative size-8 flex items-center justify-center flex-shrink-0">
+                                {/* Background Blur Glow */}
+                                <div className="absolute inset-0 bg-blue-500/30 blur-md rounded-full"></div>
+                                {/* Icon Wrapper */}
+                                <div className="relative size-7 rounded-full bg-slate-900 flex items-center justify-center shadow-md">
+                                    <span className="text-[14px]">✨</span>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className=" font-[800] text-[1.3rem] leading-tight tracking-tight bg-gradient-to-r from-[#8a2be2] via-[#43ADD0] via-[#998EE0] via-[#ffa500] to-[#EF9393] bg-clip-text text-transparent ">MindSync</h1>
-                            </div>
+
+                            {/* MindSync Text */}
+                            <h1 className="font-[900] text-[1.4rem] tracking-tighter bg-gradient-to-r from-white via-blue-100 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm">
+                                MindSync
+                            </h1>
                         </div>
                         {/* Mobile Close Button */}
                         <button

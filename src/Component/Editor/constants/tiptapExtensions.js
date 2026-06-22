@@ -14,12 +14,12 @@ import Placeholder from "@tiptap/extension-placeholder";
 export const TIPTAP_EXTENSIONS = [
   StarterKit.configure({
     blockquote: {
-      HTMLAttributes: { class: "border-l-2 border-foreground/20 pl-6 py-2 italic my-6 text-foreground/70" },
+      HTMLAttributes: { class: "my-6" },
     },
     heading: { levels: [1, 2, 3] },
   }),
   Highlight.configure({
-    HTMLAttributes: { class: "bg-foreground/10 text-foreground rounded px-1 py-0.5" },
+    HTMLAttributes: { class: "bg-yellow-200 dark:bg-yellow-500/30 text-foreground dark:text-yellow-200  px-1 py-0.5" },
   }),
   Image.configure({
     inline: true,

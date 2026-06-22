@@ -47,11 +47,12 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
       <div className="grid grid-cols-2 gap-4">
         {/* Start Date */}
         <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider">
+          <label htmlFor="filter-start-date" className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider">
             <CalendarBlank size={12} className="text-purple-400" />
             <span>Start</span>
           </label>
           <input
+            id="filter-start-date"
             type="text"
             placeholder="YYYY-MM-DD"
             value={startDate || ""}
@@ -63,11 +64,12 @@ const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
 
         {/* End Date */}
         <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider">
+          <label htmlFor="filter-end-date" className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground/50 uppercase tracking-wider">
             <CalendarBlank size={12} className="text-purple-400" />
             <span>End</span>
           </label>
           <input
+            id="filter-end-date"
             type="text"
             placeholder="YYYY-MM-DD"
             value={endDate || ""}

@@ -6,7 +6,7 @@ import { showToast } from '../../Editor/utils/showToast.js';
 import { useSelector, useDispatch } from 'react-redux';
 import userAuthService from '../../../AppWrite/auth.js';
 import { updateusername } from '@/redux/Authantication/UserAuthanticationSlice.js';
-
+import { handleError } from '@/utils/errorHandler.js';
 function EditProfile() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,7 +77,7 @@ function EditProfile() {
                 dispatch(updateusername(res))
             })
         } catch (error) {
-            showToast("error", "Something went wrong");
+            handleError(error, { action: "Updating username" })
         } finally {
             setIsSubmitting(false);
         }
@@ -117,12 +117,13 @@ function EditProfile() {
 
                         {/* Username Field */}
                         <div className="group/field">
-                            <label className="text-sm font-semibold text-muted-foreground ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
+                            <label htmlFor="profile-username" className="text-sm font-semibold text-muted-foreground ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
                                 <User size={16} weight="bold" />
                                 Username
                             </label>
                             <div className={`relative w-full h-14 bg-input/5 border rounded-xl px-4 flex items-center transition-all ${errors.username ? 'border-red-500/50 focus-within:border-red-500' : 'border-border/50 focus-within:border-primary group-hover/field:bg-input/10 group-hover/field:border-border'}`}>
                                 <input
+                                    id="profile-username"
                                     type="text"
                                     className="w-full h-full bg-transparent border-none outline-none text-foreground text-lg placeholder:text-muted-foreground/50 font-medium"
                                     placeholder="Enter your username"
@@ -142,12 +143,13 @@ function EditProfile() {
 
                         {/* Email Field with Verify Option */}
                         <div className="group/field relative">
-                            <label className="text-sm font-semibold text-muted-foreground ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
+                            <label htmlFor="profile-email" className="text-sm font-semibold text-muted-foreground ml-1 mb-2 block uppercase tracking-wider flex items-center gap-2">
                                 <EnvelopeSimple size={16} weight="bold" />
                                 Email Address
                             </label>
                             <div className={`relative w-full h-14 bg-input/5 border rounded-xl px-4 flex items-center transition-all ${errors.email ? 'border-red-500/50 focus-within:border-red-500' : 'border-border/50 focus-within:border-primary group-hover/field:bg-input/10 group-hover/field:border-border'}`}>
                                 <input
+                                    id="profile-email"
                                     type="email"
                                     className="w-full h-full bg-transparent border-none outline-none text-foreground text-lg placeholder:text-muted-foreground/50 font-medium"
                                     placeholder="Enter Your Email"
@@ -176,7 +178,7 @@ function EditProfile() {
                                 {isEmailChanged && !errors.email && (
                                     <button
                                         type="button"
-                                        onClick={handleSendlink}
+                                        // onClick={handleSendlink}
                                         disabled={isSendinglink}
                                         className="text-primary text-sm font-bold flex items-center gap-1.5 hover:text-primary/80 transition-colors disabled:opacity-50 px-2 py-1 mt-2  rounded-md hover:bg-primary/10 cursor-pointer"
                                     >

@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { shallowEqual } from "react-redux";
 import {
     selectAllNotes,
     selectNoteIds
@@ -17,18 +18,6 @@ export const selectFilteredNoteIds = createSelector(
             return noteIds;
         }
 
-        // return notes
-        //     .filter((note) => {
-        //         const title = note.notes_title?.toLowerCase() || "";
-        //         const content = note.notes_contect?.toLowerCase() || "";
-
-        //         return (
-        //             title.includes(query) ||
-        //             content.includes(query)
-        //         );
-        //     })
-        //     .map(note => note.$id);
-
         return notes.reduce((acc, note) => {
             const title = note.notes_title?.toLowerCase() || "";
             const content = note.notes_contect?.toLowerCase() || "";
@@ -40,6 +29,11 @@ export const selectFilteredNoteIds = createSelector(
 
             return acc;
         }, []);
+    },
+    {
+        memoizeOptions: {
+            resultEqualityCheck: shallowEqual
+        }
     }
 );
 

@@ -2,7 +2,7 @@ import { useEffect, useState, useDeferredValue, memo, useCallback, useRef } from
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { SquaresFour, List, CircleNotch, FadersHorizontal } from "@phosphor-icons/react";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteNote,  updateNoteInPlace, selectNoteIds, selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
+import { deleteNote, updateNoteInPlace, selectNoteIds, selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
 import { setnoteid, setcurrentnoteinfo } from "../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
 import service from "@/AppWrite/Setgetuserdatas/config.js";
 import StorageService from "../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
@@ -12,7 +12,7 @@ import NoteSkeleton from "./NoteSkeleton";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { selectFilteredNoteIds } from "../../redux/NotesCreation/NotesSelector.js";
 import FilterModal from "../../filternote/FilterModal.jsx";
-
+import { fetchNotesThunk } from "../../redux/NotesCreation/NotesCreationSlice.js";
 const RecentNotes = memo((props) => {
     const context = useOutletContext();
     const searchQuery = context?.searchQuery ?? props.searchQuery ?? "";
@@ -43,9 +43,7 @@ const RecentNotes = memo((props) => {
         const isSliceEmpty = noteIds.length === 0;
 
         if (isSliceEmpty || (!lastCursor && hasMore)) {
-            import("../../redux/NotesCreation/NotesCreationSlice.js").then((module) => {
-                dispatch(module.fetchNotesThunk({ userId: currentuserID }));
-            });
+            dispatch(fetchNotesThunk({ userId: currentuserID }));
         }
     }, [currentuserID, filter, lastCursor, hasMore, dispatch, noteIds.length]);
 
@@ -53,9 +51,7 @@ const RecentNotes = memo((props) => {
     const loadMoreNotes = useCallback(async () => {
         if (loading || !hasMore || !lastCursor || !currentuserID) return;
 
-        import("../../redux/NotesCreation/NotesCreationSlice.js").then((module) => {
-            dispatch(module.fetchNotesThunk({ userId: currentuserID }));
-        });
+        dispatch(fetchNotesThunk({ userId: currentuserID }));
     }, [loading, hasMore, lastCursor, currentuserID, dispatch]);
 
     // handle delete notes 
@@ -232,7 +228,7 @@ const RecentNotes = memo((props) => {
                     onClose={() => setNoteToDelete(null)}
                     onConfirm={confirmDelete}
                 />
-                
+
                 {/* FILTER MODAL */}
                 <FilterModal
                     isOpen={isFilterOpen}
