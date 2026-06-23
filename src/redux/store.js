@@ -4,6 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import NotesCreationReducer from "./NotesCreation/NotesCreationSlice.js";
 import userauthanticationReducer from "./Authantication/UserAuthanticationSlice.js";
 import currentnoteinfosliceReducer from "./currentnoteinfoslice/currentnoteinfoslice.js";
+import WebSettingConfigSliceReducer from "./SettingConfig/SettingconfigSlice.js";
 import storage from "redux-persist/lib/storage";
 import {
     persistReducer,
@@ -22,6 +23,7 @@ const appReducer = combineReducers({
     NotesCreation: NotesCreationReducer,
     UserAuthantication: userauthanticationReducer,
     currentnoteinfoslice: currentnoteinfosliceReducer,
+    WebSettingConfig: WebSettingConfigSliceReducer,
 });
 
 // Intercept logout to completely clear state and persisted store
@@ -37,7 +39,7 @@ const rootReducer = (state, action) => {
 const persistConfig = {
     key: "root",
     storage,
-    whitelist: ["currentnoteinfoslice", "UserAuthantication", "NotesCreation"],//"UserAuthantication",
+    whitelist: ["currentnoteinfoslice", "UserAuthantication", "NotesCreation", "WebSettingConfig"],//"UserAuthantication",
     // sirf auth persist karna hai (recommended)
 };
 

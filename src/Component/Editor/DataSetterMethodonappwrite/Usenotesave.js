@@ -1,18 +1,22 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-    setcurrentnoteinfo,
-    setnoteid,
-} from "../../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
+import { setcurrentnoteinfo, setnoteid } from "../../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
 import { addNoteToTop, updateNoteInSlice } from "../../../redux/NotesCreation/NotesCreationSlice.js";
+import { setSavingNoteTimer } from "../../../redux/SettingConfig/SettingconfigSlice.js";
 import service from "../../../AppWrite/Setgetuserdatas/config.js";
 import StorageService from "../../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
+
+
+
+// ── Cached DOM parser (created once, not per keystroke) ──────────────
+const domParser = new DOMParser();
+
 
 // Helper to extract plain text from HTML
 const getPlainText = (html) => {
     if (!html) return "";
     try {
-        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const doc = domParser.parseFromString(html, 'text/html');
         return doc.body.textContent.trim();
     } catch (e) {
         return html.replace(/<[^>]*>/g, '').trim();
@@ -31,6 +35,19 @@ const cleanHtml = (html) => {
         .replace(/<br\s*\/?>/g, "")
         .replace(/&nbsp;/g, "")
         .replace(/\s/g, "");
+};
+
+// Shared: extract image src strings from HTML
+const getImagesString = (html) => {
+    try {
+        const doc = domParser.parseFromString(html, 'text/html');
+        return Array.from(doc.querySelectorAll('img'))
+            .map(img => img.getAttribute('src'))
+            .filter(Boolean)
+            .join(",");
+    } catch (e) {
+        return "";
+    }
 };
 
 /**
@@ -93,11 +110,19 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     const lastSavedTitle = useRef(initialCleanTitle);
     const lastSavedSlug = useRef(initialGeneratedSlug);
 
+
+    const savingTimer = useSelector((state) => state.WebSettingConfig.SavingNoteTimer);
+    const savingTimerRef = useRef(savingTimer);
+
+    console.log(savingTimer, "time")
+    console.log(savingTimerRef.current, "timeref")
     const timeoutRef = useRef(null);
     const isSavingRef = useRef(false);
     const isLoaded = useRef(false);
     const hydratedNoteIdRef = useRef(null);
+    const reduxTimeoutRef = useRef(null);
 
+    useEffect(() => { savingTimerRef.current = savingTimer; }, [savingTimer]);
     // Hydrate title, slug, and refs when a note is loaded or switched (runs on mount and on noteid change)
     useEffect(() => {
         if (!reduxNoteId || !noteTitle) return;
@@ -172,8 +197,9 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
         const newValue = !noteDataRef.current.isimportant;
         dispatch(setcurrentnoteinfo({ ...noteDataRef.current, isimportant: newValue }));
         setIsNoteSaved(false);
+        const delay = savingTimer === "off" ? 3000 : savingTimer;
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => handleSave(editorInstance), 3000);
+        timeoutRef.current = setTimeout(() => handleSave(editorInstance), delay);
     };
 
     /**
@@ -192,30 +218,19 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
         const currentContent = currentEditor.getHTML();
-        const textContent = currentEditor.getText().trim();
+        const currentText = currentEditor.getText().trim();
         const currentTitle = titleRef.current;
         const currentSlug = slugRef.current;
 
         // Skip empty notes (no text and no images)
-        if (textContent === "" && !currentContent.includes("<img")) return;
+        if (currentText === "" && !currentContent.includes("<img")) return;
 
         // Extract images helper
-        const getImagesString = (html) => {
-            try {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                return Array.from(doc.querySelectorAll('img'))
-                    .map(img => img.getAttribute('src'))
-                    .filter(Boolean)
-                    .join(",");
-            } catch (e) {
-                return "";
-            }
-        };
+        const imagesString = getImagesString(currentContent);
 
         // Detect if content changed (ignoring all whitespaces and newlines, but including formatting changes)
-        const contentChanged = cleanText(currentEditor.getText()) !== cleanText(lastSavedText.current) ||
-            getImagesString(currentContent) !== getImagesString(lastSavedContent.current) ||
+        const contentChanged = cleanText(currentText) !== cleanText(lastSavedText.current) ||
+            imagesString !== getImagesString(lastSavedContent.current) ||
             cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
 
         // Detect if title or slug changed
@@ -236,8 +251,7 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             const currentUserData = userDataRef.current;
 
             // Extract images from the current HTML Content
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(currentContent, 'text/html');
+            const doc = domParser.parseFromString(currentContent, 'text/html');
             const images = Array.from(doc.querySelectorAll('img'))
                 .map(img => ({
                     fileId: img.getAttribute('data-file-id'),
@@ -352,24 +366,29 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     useEffect(() => {
         if (!editor) return;
         let localTimeout = null;
-
         const handleUpdate = () => {
             // Ignore updates during programmatic loading phase
             if (!isLoaded.current) return;
 
             // Ignore updates during AI generation
             if (isAiGeneratingRef.current) return;
-
             const currentContent = editor.getHTML();
+            const currentText = editor.getText();
+
 
             // Sync with Redux slice on every change to prevent data loss on unwanted refresh
-            dispatch(setcurrentnoteinfo({
-                title: titleRef.current,
-                slug: slugRef.current,
-                content: currentContent,
-                images: noteDataRef.current.images || [], // Maintain existing images in Redux
-                isimportant: noteDataRef.current.isimportant || false,
-            }));
+
+            if (reduxTimeoutRef.current) clearTimeout(reduxTimeoutRef.current);
+
+            reduxTimeoutRef.current = setTimeout(() => {
+                dispatch(setcurrentnoteinfo({
+                    title: titleRef.current,
+                    slug: slugRef.current,
+                    content: currentContent,
+                    images: noteDataRef.current.images || [], // Maintain existing images in Redux
+                    isimportant: noteDataRef.current.isimportant || false,
+                }));
+            }, 500)
 
             // 1. IGNORE updates completely if the AI slash menu is currently open!
             if (slashOpenRef?.current) {
@@ -377,36 +396,28 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             }
 
             // 2. IGNORE updates if the only change is a trailing '/' (menu trigger fallback)
-            if (editor.getText().trim().endsWith("/")) {
+            if (currentText.trim().endsWith("/")) {
                 return;
             }
 
             // Extract images helper
-            const getImagesString = (html) => {
-                try {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    return Array.from(doc.querySelectorAll('img'))
-                        .map(img => img.getAttribute('src'))
-                        .filter(Boolean)
-                        .join(",");
-                } catch (e) {
-                    return "";
-                }
-            };
-
+            const imagesString = getImagesString(currentContent);
             // Only mark as unsaved and trigger autosave if meaningful text content, images, or formatting changed
             // Stripping all whitespaces/newlines strictly ensures NO triggers on whitespace/empty line additions!
-            if (cleanText(editor.getText()) !== cleanText(lastSavedText.current) ||
-                getImagesString(currentContent) !== getImagesString(lastSavedContent.current) ||
+            if (cleanText(currentText) !== cleanText(lastSavedText.current) ||
+                imagesString !== getImagesString(lastSavedContent.current) ||
                 cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current)) {
 
                 setIsNoteSaved(false);
 
+                // autosave disable when setting is off
+                if (savingTimerRef.current === "off") return;
+
+
                 // Only schedule handleSave when there is actual unsaved changes!
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
                 if (localTimeout) clearTimeout(localTimeout);
-                const nextTimeout = setTimeout(() => handleSave(editor), 3000);
+                const nextTimeout = setTimeout(() => handleSave(editor), savingTimerRef.current);
                 timeoutRef.current = nextTimeout;
                 localTimeout = nextTimeout;
             }
@@ -442,31 +453,42 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     }, [isAiGenerating]);
 
     // Save final content when AI completes
+    // useEffect(() => {
+    //     if (!editor || editor.isDestroyed || !editor.state || isAiGenerating) return;
+
+    //     const currentContent = editor.getHTML();
+    //     const imagesString = getImagesString(currentContent);
+
+    //     const hasChanged = cleanText(editor.getText()) !== cleanText(lastSavedText.current) ||
+    //         imagesString !== getImagesString(lastSavedContent.current) ||
+    //         cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
+
+    //     if (hasChanged) {
+    //         setIsNoteSaved(false);
+    //         if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    //         timeoutRef.current = setTimeout(() => handleSave(editor), savingTimerRef.current);
+    //     }
+
+    //     return () => {
+    //         if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    //     };
+    // }, [isAiGenerating, editor, handleSave]);
+    // Save final content when AI completes
     useEffect(() => {
         if (!editor || editor.isDestroyed || !editor.state || isAiGenerating) return;
+        if (savingTimer === "off") return;         // ← ADD THIS LINE
 
         const currentContent = editor.getHTML();
-        const getImagesString = (html) => {
-            try {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                return Array.from(doc.querySelectorAll('img'))
-                    .map(img => img.getAttribute('src'))
-                    .filter(Boolean)
-                    .join(",");
-            } catch (e) {
-                return "";
-            }
-        };
+        const imagesString = getImagesString(currentContent);
 
         const hasChanged = cleanText(editor.getText()) !== cleanText(lastSavedText.current) ||
-            getImagesString(currentContent) !== getImagesString(lastSavedContent.current) ||
+            imagesString !== getImagesString(lastSavedContent.current) ||
             cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
 
         if (hasChanged) {
             setIsNoteSaved(false);
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            timeoutRef.current = setTimeout(() => handleSave(editor), 1000);
+            timeoutRef.current = setTimeout(() => handleSave(editor), savingTimerRef.current);  // ← CHANGE this
         }
 
         return () => {

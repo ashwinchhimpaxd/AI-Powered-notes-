@@ -112,18 +112,18 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
           <button
             type="button"
             onClick={() => onAiChat(pre => !pre)}
-            className="flex items-center gap-1 px-3 py-2 border border-border rounded-xl bg-[#e6b1e9] text-chart-4 hover:bg-[#f28bf8] transition-colors text-xs font-semibold cursor-pointer h-full">
+            className="flex items-center gap-1 p-2 border border-border rounded-xl bg-[#e6b1e9] text-chart-4 hover:bg-[#f28bf8] transition-colors text-xs font-semibold cursor-pointer h-full">
             <ChatTeardropText weight="fill" size={14} />
-            AI
+            <p className="lg:block hidden">ASK Ai</p>
           </button>
           {/* Summary */}
           <button
             type="button"
             onClick={onSummary}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-border text-foreground/80 hover:bg-muted hover:text-foreground backdrop-blur-md transition-all text-sm cursor-pointer  h-full"
+            className="flex items-center gap-1 p-2 rounded-full bg-card/50 border border-border text-foreground/80 hover:bg-muted hover:text-foreground backdrop-blur-md transition-all text-sm cursor-pointer  h-full"
           >
             <Sparkle weight="fill" size={14} className="text-purple-400" />
-            Summary
+            <p className="lg:block hidden">Summary</p>
           </button>
         </div>
         {/* Save */}
@@ -131,16 +131,16 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
           type="button"
           onClick={onSave}
           disabled={isSaving || isNoteSaved}
-          className={`flex  h-full items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
+          className={`flex lg:w-[100px] justify-center  h-full items-center gap-1 p-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
             ? "bg-card/55 border-border text-foreground/45 cursor-default"
             : "bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:border-primary/90 shadow-lg"
             }`}
         >
           {isSaving
-            ? <><CircleNotch className="animate-spin" size={14} /> Saving…</>
+            ? <><CircleNotch className="animate-spin" size={20} /> <p className="lg:block hidden">Saving…</p></>
             : isNoteSaved
-              ? <><FloppyDisk size={17} /> Saved</>
-              : <><FloppyDisk size={17} /> Save</>
+              ? <><FloppyDisk size={14} /> <p className="lg:block hidden">Saved</p></>
+              : <><FloppyDisk size={14} /> <p className="lg:block hidden">Save</p></>
           }
         </button>
       </div>

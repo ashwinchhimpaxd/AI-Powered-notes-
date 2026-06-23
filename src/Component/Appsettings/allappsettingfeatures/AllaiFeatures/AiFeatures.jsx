@@ -1,7 +1,19 @@
-import React from 'react'
-import { Sparkle, SlidersHorizontal, Brain, BookOpenText } from "@phosphor-icons/react"
-
+import React, { useRef } from 'react'
+import { Sparkle, SlidersHorizontal, Brain, BookOpenText, Clock } from "@phosphor-icons/react"
+import { setSavingNoteTimer } from '@/redux/SettingConfig/SettingconfigSlice';
+import { useSelector, useDispatch } from 'react-redux';
 function AiFeatures() {
+    const AutosaveTimeRef = useRef(null);
+    const dispatch = useDispatch();
+    const currentTimer = useSelector((state) => state.WebSettingConfig.SavingNoteTimer);
+
+
+    const handleAutosaveTimerChange = (event) => {
+        const value = setSavingNoteTimer(event.target.dataset.value)
+        console.log(value, "value")
+        dispatch(value);
+    }
+
     return (
         <section className="relative overflow-hidden group bg-card/80 backdrop-blur-2xl border border-border rounded-3xl p-6 sm:p-10 transition-all duration-500 hover:border-primary/50 shadow-sm">
             <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-primary/10 rounded-full blur-[80px] opacity-50 pointer-events-none group-hover:bg-primary/20 group-hover:scale-150 transition-all duration-700"></div>
@@ -21,7 +33,57 @@ function AiFeatures() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Feature 3: Auto-Save Note Timer */}
+                <div className="bg-background/50 border mb-5 border-border rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 hover:bg-muted/50 hover:border-primary/30 transition-all duration-300 group/card relative overflow-hidden ">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
+
+                    <div className="flex items-start gap-4 relative z-10 max-w-md ">
+                        <div className="p-3 bg-primary/20 rounded-xl text-primary group-hover/card:scale-110 transition-transform w-fit shrink-0">
+                            <Clock size={25} weight="fill" className="block" />
+                        </div>
+                        <div className="text-left ">
+                            <h3 className="text-foreground font-bold text-xl">Auto-Save Timer</h3>
+                            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">Automatically save your notes after a period of inactivity to prevent data loss.</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-3 relative z-10 shrink-0 self-end lg:self-center">
+                        {/* Segmented Control */}
+                        <div id="autoSaveTimer" ref={AutosaveTimeRef} className="flex items-center bg-black/20 dark:bg-muted/65 border border-border p-1 rounded-xl">
+                            <button onClick={handleAutosaveTimerChange} type="button"
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-all ${currentTimer === "off"
+                                    ? "bg-background dark:bg-card border border-border shadow-sm text-foreground font-medium"
+                                    : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                data-value="off">Off</button>
+
+                            <button onClick={handleAutosaveTimerChange} type="button"
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-all ${currentTimer === "10000"
+                                    ? "bg-background dark:bg-card border border-border shadow-sm text-foreground font-medium"
+                                    : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                data-value="10000">10s</button>
+
+                            <button onClick={handleAutosaveTimerChange} type="button"
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-all ${currentTimer === "30000"
+                                    ? "bg-background dark:bg-card border border-border shadow-sm text-foreground font-medium"
+                                    : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                data-value="30000">30s</button>
+
+                            <button onClick={handleAutosaveTimerChange} type="button"
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-all ${currentTimer === "60000"
+                                    ? "bg-background dark:bg-card border border-border shadow-sm text-foreground font-medium"
+                                    : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                data-value="60000">1m</button>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     {/* Feature 1 */}
                     <div className="bg-background/50 border border-border rounded-2xl p-6 flex flex-col justify-between hover:bg-muted/50 hover:border-primary/30 transition-all duration-300 group/card cursor-pointer relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-bl-full pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity"></div>
@@ -58,6 +120,7 @@ function AiFeatures() {
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     )

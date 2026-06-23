@@ -1,7 +1,9 @@
-import { memo, useMemo, useState, useEffect } from "react";
+import { memo, useMemo, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { FileText, Bookmark, ShareNetwork, DotsThreeVertical } from "@phosphor-icons/react";
 import { selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
+import { useExportPDF } from '../Editor/Editorcomponents/DropDownMenu/Hooks/useExportPDF';
+
 
 const NoteCard = memo(({
     noteId,
@@ -12,7 +14,55 @@ const NoteCard = memo(({
     onDelete,
     onClick
 }) => {
+
+    const { exportToPDF } = useExportPDF();
     const note = useSelector((state) => selectNoteById(state, noteId));
+
+    // note ko pdf me convert karne ke liye 
+    const htmlToTiptap = (html) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const walk = (parent) => {
+            const nodes = [];
+            for (const child of parent.childNodes) {
+                if (child.nodeType === 3) {
+                    if (child.textContent.trim()) nodes.push({ type: 'text', text: child.textContent });
+                } else if (child.nodeType === 1) {
+                    const tag = child.tagName.toLowerCase();
+                    const content = walk(child);
+                    const m = (t) => { const marks = []; if (['strong', 'b'].includes(t)) marks.push({ type: 'bold' }); if (['em', 'i'].includes(t)) marks.push({ type: 'italic' }); if (t === 'u') marks.push({ type: 'underline' }); return marks; };
+                    if (['strong', 'b', 'em', 'i', 'u'].includes(tag)) {
+                        const text = child.textContent.trim();
+                        if (text) nodes.push({ type: 'text', text, marks: m(tag) });
+                    } else if (tag === 'p') nodes.push({ type: 'paragraph', content });
+                    else if (tag.match(/^h[2-3]$/)) nodes.push({ type: 'heading', attrs: { level: +tag[1] }, content });
+                    else if (tag === 'ul') nodes.push({ type: 'bulletList', content });
+                    else if (tag === 'ol') nodes.push({ type: 'orderedList', content });
+                    else if (tag === 'li') nodes.push({ type: 'listItem', content });
+                    else if (tag === 'blockquote') nodes.push({ type: 'blockquote', content });
+                    else if (tag === 'hr') nodes.push({ type: 'horizontalRule' });
+                    else if (tag === 'img') nodes.push({ type: 'image', attrs: { src: child.getAttribute('src') || '' } });
+                    else if (tag === 'br') nodes.push({ type: 'text', text: '\n' });
+                    else if (content?.length) nodes.push(...content);
+                }
+            }
+            return nodes.length ? nodes : undefined;
+        };
+        return walk(doc.body) || [];
+    };
+
+    const handleExportPDF = useCallback(async (e, noteItem) => {
+        e.stopPropagation();
+        const content = noteItem.notes_contect || '';
+        const stripped = content.replace(/<[^>]+>/g, '').trim();
+        if (!stripped) {
+            const mod = await import("../Editor/utils/showToast.js");
+            mod.showToast("warning", "Note is empty to make PDF");
+            return;
+        }
+        const json = htmlToTiptap(content);
+        await exportToPDF(json);
+    }, [exportToPDF]);
 
     // Premium Date Formatter for Creation Date
     const formattedCreatedDate = useMemo(() => {
@@ -65,7 +115,7 @@ const NoteCard = memo(({
         }
         return "col-span-1";
     }, [isGridView, note?.notes_title, cleanContent]);
-    
+
     if (!note) return null;
     return (
         <div
@@ -213,6 +263,13 @@ const NoteCard = memo(({
                         className="px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-foreground text-left transition-colors cursor-pointer"
                     >
                         Open Editor
+                    </button>
+                    <button
+                        type="button"
+                        onClick={(e) => handleExportPDF(e, note)}
+                        className="px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-muted hover:text-foreground text-left transition-colors cursor-pointer"
+                    >
+                        Export as Pdf
                     </button>
                     <button
                         type="button"
