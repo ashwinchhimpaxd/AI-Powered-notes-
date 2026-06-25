@@ -2,7 +2,7 @@ import { memo, useMemo, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { FileText, Bookmark, ShareNetwork, DotsThreeVertical } from "@phosphor-icons/react";
 import { selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
-import { useExportPDF } from '../Editor/Editorcomponents/DropDownMenu/Hooks/useExportPDF';
+import { useExportPDF } from '../Editor/Editorcomponents/DropDownMenu/Hooks/useExportPDF.jsx';
 
 
 const NoteCard = memo(({
@@ -17,7 +17,6 @@ const NoteCard = memo(({
 
     const { exportToPDF } = useExportPDF();
     const note = useSelector((state) => selectNoteById(state, noteId));
-
     // note ko pdf me convert karne ke liye 
     const htmlToTiptap = (html) => {
         const parser = new DOMParser();
@@ -61,7 +60,7 @@ const NoteCard = memo(({
             return;
         }
         const json = htmlToTiptap(content);
-        await exportToPDF(json);
+        await exportToPDF(json, noteItem.notes_title || "Untitled Note");
     }, [exportToPDF]);
 
     // Premium Date Formatter for Creation Date

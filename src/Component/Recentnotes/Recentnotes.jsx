@@ -13,6 +13,11 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { selectFilteredNoteIds } from "../../redux/NotesCreation/NotesSelector.js";
 import FilterModal from "../../filternote/FilterModal.jsx";
 import { fetchNotesThunk } from "../../redux/NotesCreation/NotesCreationSlice.js";
+import NoteStatistics from "../AIActivity.jsx";
+
+
+
+
 const RecentNotes = memo((props) => {
     const context = useOutletContext();
     const searchQuery = context?.searchQuery ?? props.searchQuery ?? "";
@@ -128,14 +133,16 @@ const RecentNotes = memo((props) => {
 
             try {
                 if (targetNoteData && targetNoteData.notes_images && targetNoteData.notes_images.length > 0) {
-                    for (const imgRaw of targetNoteData.notes_images) {
-                        try {
-                            const img = typeof imgRaw === 'string' ? JSON.parse(imgRaw) : imgRaw;
-                            if (img.fileId) {
-                                await StorageService.deleteImage(img.fileId);
-                            }
-                        } catch (err) { }
-                    }
+                    await Promise.all(
+                        targetNoteData.notes_images.map(async (imgRaw) => {
+                            try {
+                                const img = typeof imgRaw === 'string' ? JSON.parse(imgRaw) : imgRaw;
+                                if (img.fileId) {
+                                    await StorageService.deleteImage(img.fileId);
+                                }
+                            } catch (err) { }
+                        })
+                    );
                 }
                 await service.deleteNote(targetNoteId);
             } catch (error) {
@@ -234,6 +241,9 @@ const RecentNotes = memo((props) => {
                     isOpen={isFilterOpen}
                     onClose={() => setIsFilterOpen(false)}
                 />
+            </div>
+            <div className="hidden md:block">
+                <NoteStatistics />
             </div>
         </div>
     );

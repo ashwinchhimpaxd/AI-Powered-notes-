@@ -66,7 +66,7 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 transition-transform duration-300 ease-in-out"
+      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 pt-1  transition-transform duration-300 ease-in-out  "
       style={{
         transform: isVisible ? "translateY(0)" : "translateY(-100%)"
       }}
@@ -112,7 +112,7 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
           <button
             type="button"
             onClick={() => onAiChat(pre => !pre)}
-            className="flex items-center gap-1 p-2 border border-border rounded-xl bg-[#e6b1e9] text-chart-4 hover:bg-[#f28bf8] transition-colors text-xs font-semibold cursor-pointer h-full">
+            className="flex items-center justify-center gap-1 p-2 border border-border rounded-xl bg-[#e6b1e9] text-chart-4 hover:bg-[#f28bf8] transition-colors text-xs font-semibold cursor-pointer h-full">
             <ChatTeardropText weight="fill" size={14} />
             <p className="lg:block hidden">ASK Ai</p>
           </button>
@@ -131,13 +131,13 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
           type="button"
           onClick={onSave}
           disabled={isSaving || isNoteSaved}
-          className={`flex lg:w-[100px] justify-center  h-full items-center gap-1 p-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
+          className={`flex lg:w-[100px] justify-center   items-center gap-1 p-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${isNoteSaved
             ? "bg-card/55 border-border text-foreground/45 cursor-default"
             : "bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:border-primary/90 shadow-lg"
             }`}
         >
           {isSaving
-            ? <><CircleNotch className="animate-spin" size={20} /> <p className="lg:block hidden">Saving…</p></>
+            ? <><CircleNotch className="animate-spin" size={14} /> <p className="lg:block hidden">Saving…</p></>
             : isNoteSaved
               ? <><FloppyDisk size={14} /> <p className="lg:block hidden">Saved</p></>
               : <><FloppyDisk size={14} /> <p className="lg:block hidden">Save</p></>

@@ -310,7 +310,7 @@ Return ONLY the JSON object.
                     }
                 }
             } catch (error) {
-             handleError(error, { action: "generating AI note" });
+                handleError(error, { action: "generating AI note" });
             } finally {
                 setIsCreatingNote(false);
             }
@@ -318,8 +318,6 @@ Return ONLY the JSON object.
     };
 
     return (
-
-
         <div className="flex w-full h-screen bg-background overflow-hidden font-sans text-foreground relative ashwin">
 
             {/* Sidebar Component */}
@@ -390,16 +388,7 @@ Return ONLY the JSON object.
                         }} />
                     </div>
 
-                    {/* Floating Statistics Widget (Hidden on small screens to save space) */}
-                    <div className="hidden md:block">
-                        <NoteStatistics />
-                    </div>
                 </main>
-
-                {/* Settings View */}
-                {/* <div className={`absolute inset-0 bg-[#0a0a0a] overflow-y-auto transition-transform duration-[600ms] ease-in-out z-20 ${settingState ? 'translate-x-0' : 'translate-x-full'}`}>
-                  <Appsetting />
-                </div> */}
             </div>
         </div>
     );

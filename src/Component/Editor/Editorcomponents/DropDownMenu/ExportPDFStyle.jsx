@@ -95,11 +95,12 @@ const renderNodes = (nodes) => {
     }
   });
 };
-export const ExportPDFStyle = ({ content }) => (
+export const ExportPDFStyle = ({ content, title }) => (
 
   < Document >
     <Page size="A4" style={styles.page}>
       {/* Yahan hum recursive function call kar rahe hain */}
+      <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' }}>{title}</Text>
       {renderNodes(content)}
     </Page>
   </Document >

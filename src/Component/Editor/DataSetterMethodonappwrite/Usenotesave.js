@@ -123,6 +123,22 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     const reduxTimeoutRef = useRef(null);
 
     useEffect(() => { savingTimerRef.current = savingTimer; }, [savingTimer]);
+
+    // Inline render-phase state adjustment to avoid React Doctor's state sync warning
+    const [prevAiGenerating, setPrevAiGenerating] = useState(isAiGenerating);
+    if (isAiGenerating !== prevAiGenerating) {
+        setPrevAiGenerating(isAiGenerating);
+        if (!isAiGenerating && editor && !editor.isDestroyed && editor.state) {
+            const currentContent = editor.getHTML();
+            const imagesString = getImagesString(currentContent);
+            const hasChanged = cleanText(editor.getText()) !== cleanText(lastSavedText.current) ||
+                imagesString !== getImagesString(lastSavedContent.current) ||
+                cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
+            if (hasChanged) {
+                setIsNoteSaved(false);
+            }
+        }
+    }
     // Hydrate title, slug, and refs when a note is loaded or switched (runs on mount and on noteid change)
     useEffect(() => {
         if (!reduxNoteId || !noteTitle) return;
@@ -327,13 +343,15 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             // Successfully saved — Cleanup unused storage images
             if (fileIdsToDelete.size > 0) {
                 const fileIdsArray = Array.from(fileIdsToDelete);
-                for (const id of fileIdsArray) {
-                    try {
-                        await StorageService.deleteImage(id);
-                    } catch (error) {
-                        console.error(`Failed to delete orphaned image ${id}:`, error);
-                    }
-                }
+                await Promise.all(
+                    fileIdsArray.map(async (id) => {
+                        try {
+                            await StorageService.deleteImage(id);
+                        } catch (error) {
+                            console.error(`Failed to delete orphaned image ${id}:`, error);
+                        }
+                    })
+                );
             }
 
             // Clear the pending images tracking as everything is properly vetted and saved/deleted now
@@ -486,7 +504,6 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             cleanHtml(currentContent) !== cleanHtml(lastSavedContent.current);
 
         if (hasChanged) {
-            setIsNoteSaved(false);
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => handleSave(editor), savingTimerRef.current);  // ← CHANGE this
         }

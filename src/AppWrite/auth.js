@@ -1,15 +1,18 @@
 import AppwriteConf from '../appwriteConfigrationKeys/ConfigrationofAppwrite'
-import { Client, Account, ID } from 'appwrite'
+import { Client, Account, ID, Functions } from 'appwrite'
 
 export class UserAuthentication {
+
     client = new Client();
     account;
     userid;
+    functions;
 
     constructor() {
         this.client.setEndpoint(AppwriteConf.appwriteUrl)
             .setProject(AppwriteConf.appwriteProjectId);
         this.account = new Account(this.client);
+        this.functions = new Functions(this.client)
     }
 
     // // 1. otp Based Account Creation
@@ -160,6 +163,27 @@ export class UserAuthentication {
         } catch (error) {
             console.error("Appwrite service :: logout From Current device :: error", error);
             return false;
+        }
+    }
+
+    // Naya function: AI ya OCR call karne ke liye
+    async triggerFunction(functionId, payload) {
+        try {
+            const execution = await this.functions.createExecution(
+                functionId,
+                JSON.stringify(payload)
+            );
+
+            // Debugging line
+            console.log("Raw Execution Response:", execution.responseBody);
+
+            if (!execution.responseBody) {
+                console.log("empty response")
+                // throw new Error("Function returned empty response!");
+            }
+            return JSON.parse(execution.responseBody);
+        } catch (error) {
+            throw error;
         }
     }
 }
