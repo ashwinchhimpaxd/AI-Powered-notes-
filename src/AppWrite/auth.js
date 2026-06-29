@@ -186,6 +186,22 @@ export class UserAuthentication {
             throw error;
         }
     }
+
+    // Auth.js mein ye change karke dekho
+    // async AiResponse_triggerFunction(functionId, payload) {
+    //     const execution = await this.functions.createExecution(
+    //         functionId,
+    //         JSON.stringify(payload),
+    //         false // path undefined hai, par ye check kar lo
+    //     );
+
+    //     // console.log("Status Code:", execution);
+    //     console.log("Status Code:", execution.responseStatusCode);
+    //     console.log("Response Body:", execution.responseBody);
+
+
+    //     return JSON.parse(execution.responseBody);
+    // }
 }
 
 const userAuthService = new UserAuthentication();

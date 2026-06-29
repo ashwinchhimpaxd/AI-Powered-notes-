@@ -58,7 +58,6 @@ export async function runAiCommand(commandId, commandLabel, commandMode, noteTex
   if (onChunk) {
     const resultText = await generateAIResponse(
       prompt,
-      undefined,
       (fullText) => {
         // Strip markdown wrappers first, then convert any plain-text
         // bullet characters (• / -) to proper <ul><li> HTML so Tiptap
@@ -75,7 +74,7 @@ export async function runAiCommand(commandId, commandLabel, commandMode, noteTex
     );
     return cleanHtmlResponse(resultText);
   } else {
-    const resultText = await generateAIResponse(prompt, undefined, undefined, false, null, EDITOR_SYSTEM_PROMPT);
+    const resultText = await generateAIResponse(prompt, null, false, null, EDITOR_SYSTEM_PROMPT);
     const bodyHtml = cleanHtmlResponse(resultText);
 
     if (commandMode === "replace") {

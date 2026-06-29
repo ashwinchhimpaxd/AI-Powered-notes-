@@ -1,5 +1,4 @@
 import SideNavBar from "../Component/Navbar";
-import NoteStatistics from "../Component/AIActivity";
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { resetcurrentnoteinfo } from "../redux/currentnoteinfoslice/currentnoteinfoslice";
@@ -254,7 +253,7 @@ Return ONLY the JSON object.
 
                 // Enforce JSON Mode (fourth parameter set to true)
                 const responseText = await sendMessageToAI(prompt, [], null, true, DASHBOARD_CREATE_SYSTEM_PROMPT);
-                // console.log(responseText)
+                
                 // Extract the JSON object using regex to ignore any surrounding text or tags
                 let parsedData = null;
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);

@@ -46,6 +46,7 @@ export function useAiSummary() {
     try {
       const noteText = editorRef.current?.getText()?.trim() || "";
       const data = await generateSummary(noteText, controller.signal);
+      console.log(data)
       setSummaryData(data);
     } catch (err) {
       // Check if error is due to request abort / cancellation
@@ -54,7 +55,7 @@ export function useAiSummary() {
         return; // Silently exit, do not show error/toast
       }
 
-      console.error("Summary error:", err);
+      console.error("Summary error:", err.message);
 
       const msg = err?.message || "";
       const status = err?.status ?? err?.statusCode;

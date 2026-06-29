@@ -1,6 +1,7 @@
 import React, { memo, useState, useEffect, useRef } from "react";
 import { Sparkle, FloppyDisk, CircleNotch, ChatTeardropText } from "@phosphor-icons/react";
 import { CustomDropdown } from "./DropDownMenu/DrowdownmenuWrapper";
+import TestAiAppwriteSDK from "../../Testing-components/TestAiAppwriteSDK"
 /**
  * Fixed top bar: title (click-to-edit), summary, export, and save buttons.
  *
@@ -146,7 +147,8 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
       </div>
       {/* drop down list actions */}
       <CustomDropdown editor={editor} />
-    </div>
+      {/* <TestAiAppwriteSDK /> */}
+    </div >
   );
 });
 

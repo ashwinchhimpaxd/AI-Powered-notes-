@@ -33,6 +33,7 @@ export function CustomDropdown({ editor }) {
                 });
             };
             const base64Data = await convertToBase64(file);
+            console.log(userAuthService.functions, "this is function")
             const result = await userAuthService.triggerFunction(
                 '6a3d7a620000844f5f7c',
                 { action: "ScanDoc", file: base64Data, endpoint: AppwriteConfig.ocrendpoint }
@@ -74,8 +75,6 @@ export function CustomDropdown({ editor }) {
             if (e.target) e.target.value = ''; // Input clear reset
         }
     };
-
-
 
     // Menu for list items 
     const menuItems = [

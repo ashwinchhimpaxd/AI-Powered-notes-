@@ -1,3 +1,4 @@
+
 import { generateAIResponse } from "../../../AiAssistancefiles/AiResponse.js";
 
 const SUMMARY_PROMPT = (text) => `Analyze the following note and respond with a JSON object (no markdown code block, raw JSON only) in this exact shape:
@@ -33,7 +34,7 @@ export async function generateSummary(noteText, signal = null) {
   }
 
   // Use the loosely-coupled AI interface
-  const responseText = await generateAIResponse(SUMMARY_PROMPT(text), undefined, undefined, false, signal, SUMMARY_SYSTEM_PROMPT);
+  const responseText = await generateAIResponse(SUMMARY_PROMPT(text), null, false, signal, SUMMARY_SYSTEM_PROMPT);
 
   const raw = (responseText || "").trim();
 

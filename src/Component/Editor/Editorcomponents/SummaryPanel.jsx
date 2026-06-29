@@ -12,9 +12,7 @@ import { CircleNotch, Sparkle, Warning, X } from "@phosphor-icons/react";
  * @param {function} props.onClose
  * @param {function} props.onGenerate  - called to (re-)generate summary
  */
-const SummaryPanel = memo(function SummaryPanel({
-  open, loading, data, error, onClose, onGenerate,
-}) {
+const SummaryPanel = memo(function SummaryPanel({ open, loading, data, error, onClose, onGenerate }) {
   return (
     <div
       className={`fixed top-0 right-0 h-screen w-[380px] bg-card/98 backdrop-blur-3xl border-l border-border shadow-2xl z-[100] flex flex-col transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${open ? "translate-x-0" : "translate-x-full"

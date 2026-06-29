@@ -648,7 +648,7 @@ html:not(.dark) :not(button):not(button *):not(a):not(a *):not(.toast):not(.toas
     0% {
         opacity: 0;
         width: 70px;
-        height: 70px;
+        height: 60px;
 
         border-radius: 999px;
 
@@ -660,7 +660,7 @@ html:not(.dark) :not(button):not(button *):not(a):not(a *):not(.toast):not(.toas
     25% {
         opacity: 1;
         width: 70px;
-        height: 70px;
+        height: 60px;
 
         border-radius: 999px;
 
@@ -672,7 +672,7 @@ html:not(.dark) :not(button):not(button *):not(a):not(a *):not(.toast):not(.toas
     40% {
         opacity: 1;
         width: 70px;
-        height: 70px;
+        height: 60px;
 
         border-radius: 999px;
 
@@ -683,7 +683,7 @@ html:not(.dark) :not(button):not(button *):not(a):not(a *):not(.toast):not(.toas
     /* ONLY horizontal expansion */
     65% {
         width: min(700px, 90vw);
-        height: 70px;
+        height: 60px;
 
         border-radius: 999px;
 
@@ -694,21 +694,21 @@ html:not(.dark) :not(button):not(button *):not(a):not(a *):not(.toast):not(.toas
     /* Island bounce */
     78% {
         width: min(700px, 95vw);
-        height: 70px;
+        height: 60px;
         border-radius: 999px;
     }
 
     /* Settle island */
     85% {
         width: min(700px, 95vw);
-        height: 70px;
+        height: 60px;
         border-radius: 999px;
     }
 
     /* Grow vertically */
     100% {
         width: min(700px, 95vw);
-        height: 70px;
+        height: 60px;
         border-radius: 999px;
         transform:
             translateX(-50%) translateY(0);

@@ -23,21 +23,13 @@ class AIService {
     /**
      * Standardized AI request
      * @param {string} prompt
-     * @param {Array} history
      * @param {Function|null} onChunk
      */
 
-    async sendMessage(prompt, history = [], onChunk = null, jsonMode = false, signal = null, systemPrompt = null) {
+    async sendMessage(prompt, onChunk = null, jsonMode = false, signal = null, systemPrompt = null) {
 
         try {
-            const mappedHistory = history.map(msg => ({
-                role:
-                    (msg.role || msg.type) === "user"
-                        ? "user"
-                        : "assistant",
 
-                content: msg.content
-            }));
 
             const messages = [
 
@@ -62,8 +54,6 @@ class AIService {
                             - Use proper HTML formatting
                             - Be concise and readable`
                 },
-
-                ...mappedHistory,
 
                 {
                     role: "user",
@@ -195,15 +185,11 @@ class AIService {
             /**
              * NORMAL RESPONSE
              */
-
             else {
 
                 const response = await axios.post(
-
                     this.invokeUrl,
-
                     payload,
-
                     {
                         headers: {
                             ...this.headers,
@@ -234,10 +220,38 @@ class AIService {
                 error?.response?.data || error.message
             );
 
-            throw new Error(
-                error?.message ||
-                "Failed to communicate with AI"
-            );
+            let status = error?.response?.status;
+            let originalMsg = error.message || "";
+
+            if (!status && originalMsg.startsWith("AI service error:")) {
+                const match = originalMsg.match(/AI service error:\s*(\d+)/);
+                if (match) {
+                    status = parseInt(match[1], 10);
+                }
+            }
+
+            let cleanMsg = "Failed to communicate with AI.";
+            if (status) {
+                if (status === 400) {
+                    cleanMsg = "Invalid request to AI service.";
+                } else if (status === 401) {
+                    cleanMsg = "Authentication failed. Please verify your AI API key.";
+                } else if (status === 429) {
+                    cleanMsg = "AI rate limit reached. Please wait a moment and try again.";
+                } else if (status >= 500) {
+                    cleanMsg = "AI service is temporarily unavailable. Please try again later.";
+                }
+            } else {
+                if (originalMsg.toLowerCase().includes("network")) {
+                    cleanMsg = "Network error. Check your internet connection.";
+                }
+            }
+
+            const cleanError = new Error(cleanMsg);
+            if (status) {
+                cleanError.status = status;
+            }
+            throw cleanError;
         }
     }
 }
@@ -249,11 +263,10 @@ const aiService = new AIService();
  * Entire app uses this function only
  */
 
-export const generateAIResponse = (prompt, history, onChunk, jsonMode = false, signal = null, systemPrompt = null) => {
+export const generateAIResponse = (prompt, onChunk, jsonMode = false, signal = null, systemPrompt = null) => {
 
     return aiService.sendMessage(
         prompt,
-        history,
         onChunk,
         jsonMode,
         signal,

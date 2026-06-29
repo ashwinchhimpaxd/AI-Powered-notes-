@@ -36,8 +36,6 @@ function Aichatbox({ editor, onClose, setLoading, setStatus, setTitle, commitTit
     } = useForm()
 
     const quickaichat = async (data) => {
-        console.log(data)
-        console.log(watch("aiquickchat"))
         if (watch("aiquickchat").trim() !== '') {
             const topic = watch("aiquickchat").trim();
 
@@ -113,7 +111,7 @@ function Aichatbox({ editor, onClose, setLoading, setStatus, setTitle, commitTit
                 : `You MUST write an EXTREMELY DETAILED, IN-DEPTH, AND COMPREHENSIVE document. Do NOT give brief summaries or short sentences. Write extensively about every aspect of the topic. Focus on information density.`;
 
 
-            
+
             try {
                 // 3. Ab aapka prompt aisa dikhega:
 
@@ -197,7 +195,6 @@ The JSON must be valid, complete, and parseable. Do NOT truncate or leave it unf
                 // Enforce JSON Mode (fourth parameter set to true)
                 const responseText = await sendMessageToAI(
                     prompt,
-                    [],
                     (fullText) => {
                         const streamedContent = extractStreamedContent(fullText);
                         const streamedTitle = extractStreamedTitle(fullText) || topic;
@@ -234,7 +231,6 @@ The JSON must be valid, complete, and parseable. Do NOT truncate or leave it unf
 
                 // Fallback to regex extraction if JSON parsing failed or object is empty
                 if (!parsedData || !parsedData.content) {
-                    console.log("Using regex fallback to extract content and title.");
                     const extractedContent = extractStreamedContent(responseText);
                     const extractedTitle = extractStreamedTitle(responseText) || topic;
                     if (extractedContent) {
@@ -264,7 +260,6 @@ The JSON must be valid, complete, and parseable. Do NOT truncate or leave it unf
                 showToast("success", "AI response applied successfully!");
 
             } catch (error) {
-                console.log("error", error)
                 handleError(error, { action: "generating AI note" });
                 // showToast("error", "Something went wrong while generating AI response.");
             } finally {

@@ -9,6 +9,7 @@ const AppwriteConf = {
     nvidiaBaseUrl: String(import.meta.env.VITE_NVIDIA_BASE_URL),
     ocrkey: String(import.meta.env.VITE_OCR_KEY),
     ocrendpoint: String(import.meta.env.VITE_OCR_ENDPOINT),
+    appwriteAiFunctionId: String(import.meta.env.VITE_APPWRITE_AI_FUNCTION_ID || '6a417832003108691f78'),
 }
 
 export default AppwriteConf

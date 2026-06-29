@@ -5,6 +5,7 @@ import { addNoteToTop, updateNoteInSlice } from "../../../redux/NotesCreation/No
 import { setSavingNoteTimer } from "../../../redux/SettingConfig/SettingconfigSlice.js";
 import service from "../../../AppWrite/Setgetuserdatas/config.js";
 import StorageService from "../../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
+import { showToast } from "../utils/showToast.js";
 
 
 
@@ -114,8 +115,6 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
     const savingTimer = useSelector((state) => state.WebSettingConfig.SavingNoteTimer);
     const savingTimerRef = useRef(savingTimer);
 
-    console.log(savingTimer, "time")
-    console.log(savingTimerRef.current, "timeref")
     const timeoutRef = useRef(null);
     const isSavingRef = useRef(false);
     const isLoaded = useRef(false);
@@ -226,7 +225,7 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
         if (!currentEditor) return;
         if (isSavingRef.current) return;
         if (isAiGeneratingRef.current) {
-            console.log("Save blocked: AI is currently generating content.");
+            showToast('warning', 'Please wait for AI to finish generating content.')
             return;
         }
 
@@ -239,7 +238,11 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
         const currentSlug = slugRef.current;
 
         // Skip empty notes (no text and no images)
-        if (currentText === "" && !currentContent.includes("<img")) return;
+        if (currentText === "" && !currentContent.includes("<img>")) {
+
+            showToast('warning', 'Note cannot be empty.')
+            return
+        };
 
         // Extract images helper
         const imagesString = getImagesString(currentContent);
