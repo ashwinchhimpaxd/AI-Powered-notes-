@@ -43,8 +43,10 @@ const getImagesString = (html) => {
     try {
         const doc = domParser.parseFromString(html, 'text/html');
         return Array.from(doc.querySelectorAll('img'))
-            .map(img => img.getAttribute('src'))
-            .filter(Boolean)
+            .flatMap(img => {
+                const src = img.getAttribute('src');
+                return src ? [src] : [];
+            })
             .join(",");
     } catch (e) {
         return "";
@@ -272,11 +274,14 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
             // Extract images from the current HTML Content
             const doc = domParser.parseFromString(currentContent, 'text/html');
             const images = Array.from(doc.querySelectorAll('img'))
-                .map(img => ({
-                    fileId: img.getAttribute('data-file-id'),
-                    url: img.getAttribute('src')
-                }))
-                .filter(img => img.fileId && img.url && img.url.startsWith('http')); // Only keep valid ones
+                .flatMap(img => {
+                    const fileId = img.getAttribute('data-file-id');
+                    const url = img.getAttribute('src');
+                    if (fileId && url && url.startsWith('http')) {
+                        return [{ fileId, url }];
+                    }
+                    return [];
+                });
 
             const stringifiedImages = images.map(img => JSON.stringify(img)); // Array of JSON {fileId, url} strings
             const currentImagesFileIds = images.map(img => img.fileId);
@@ -297,9 +302,14 @@ export function useNoteSave(editor, slashOpenRef, isAiGenerating) {
                 const oldNote = notesEntitiesRef.current[currentNoteId];
                 const oldImagesRaw = oldNote?.notes_images || [];
 
-                const oldImages = oldImagesRaw.map(str => {
-                    try { return JSON.parse(str); } catch (e) { return null; }
-                }).filter(Boolean);
+                const oldImages = oldImagesRaw.flatMap(str => {
+                    try {
+                        const parsed = JSON.parse(str);
+                        return parsed ? [parsed] : [];
+                    } catch (e) {
+                        return [];
+                    }
+                });
 
                 oldImages.forEach(img => {
                     if (img.fileId && !currentImagesFileIds.includes(img.fileId)) {

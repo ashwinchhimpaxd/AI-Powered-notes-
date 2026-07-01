@@ -116,16 +116,16 @@ class AIService {
                     throw new Error(`AI service error: ${response.status} - ${errText}`);
                 }
 
-                const reader = response.body.getReader();
+                if (!response.body) {
+                    throw new Error("Response body is empty");
+                }
+
                 const decoder = new TextDecoder("utf-8");
                 let fullText = "";
                 let buffer = "";
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    buffer += decoder.decode(value, { stream: true });
+                for await (const chunk of response.body) {
+                    buffer += decoder.decode(chunk, { stream: true });
                     const lines = buffer.split("\n");
                     buffer = lines.pop() || "";
 
