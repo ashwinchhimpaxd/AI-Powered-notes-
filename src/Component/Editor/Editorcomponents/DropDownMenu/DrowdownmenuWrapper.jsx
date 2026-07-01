@@ -33,7 +33,7 @@ export function CustomDropdown({ editor }) {
                 });
             };
             const base64Data = await convertToBase64(file);
-            console.log(userAuthService.functions, "this is function")
+            console.log(base64Data)
             const result = await userAuthService.triggerFunction(
                 '6a3d7a620000844f5f7c',
                 { action: "ScanDoc", file: base64Data, endpoint: AppwriteConfig.ocrendpoint }

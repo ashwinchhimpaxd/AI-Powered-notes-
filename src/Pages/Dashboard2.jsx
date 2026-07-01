@@ -1,5 +1,6 @@
+import { useReducer } from "react";
 import SideNavBar from "../Component/Navbar";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { resetcurrentnoteinfo } from "../redux/currentnoteinfoslice/currentnoteinfoslice";
 import { MagnifyingGlass, Sparkle, List } from "@phosphor-icons/react";
@@ -9,6 +10,8 @@ import { handleError } from "../utils/errorHandler.js";
 import { addNoteToTop } from "../redux/NotesCreation/NotesCreationSlice.js";
 import { showToast } from "../Component/Editor/utils/showToast.js";
 import { Outlet } from "react-router-dom";
+
+
 const extractStreamedTitle = (streamedText) => {
     const match = streamedText.match(/"title"\s*:\s*"([^"]*)"?/);
     return match ? match[1] : "";
@@ -35,18 +38,39 @@ const extractStreamedContent = (streamedText) => {
 export default function Dashboard2() {
     const dispatch = useDispatch();
     const userData = useSelector((state) => state.UserAuthantication.UserData);
-
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-    const [isAiMode, setIsAiMode] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Animation states for sliding text
-    const [slideText, setSlideText] = useState("");
-    const [showSlideText, setShowSlideText] = useState(false);
+    const initialUIState = {
+        isAiMode: false,
+        isMobileMenuOpen: false,
+        slideText: "",
+        showSlideText: false,
+        isCreatingNote: false,
+    };
+    function uiReducer(state, action) {
+        switch (action.type) {
+            case "TOGGLE_AI_MODE":
+                return {
+                    ...state,
+                    isAiMode: !state.isAiMode,
+                    slideText: !state.isAiMode ? "AI mode ON" : "AI mode OFF",
+                    showSlideText: true,
+                };
+            case "HIDE_SLIDE_TEXT":
+                return { ...state, showSlideText: false };
+            case "SET_MOBILE_MENU":
+                return { ...state, isMobileMenuOpen: action.payload };
+            case "SET_CREATING_NOTE":
+                return { ...state, isCreatingNote: action.payload };
+            default:
+                return state;
+        }
+    }
+    const [uiState, uiDispatch] = useReducer(uiReducer, initialUIState);
+    const { isAiMode, isMobileMenuOpen, slideText, showSlideText, isCreatingNote } = uiState;
 
-    // Note generation state
-    const [isCreatingNote, setIsCreatingNote] = useState(false);
+
 
     const sanitizeJsonString = (rawStr) => {
         let inString = false;
@@ -99,16 +123,11 @@ export default function Dashboard2() {
 
     // Handle AI Toggle
     const handleToggleAiMode = () => {
-        const newMode = !isAiMode;
-        setIsAiMode(newMode);
-
-        // Trigger sliding animation text
-        setSlideText(newMode ? "AI mode ON" : "AI mode OFF");
-        setShowSlideText(true);
+        uiDispatch({ type: "TOGGLE_AI_MODE" });
 
         // Hide it after a short delay
         setTimeout(() => {
-            setShowSlideText(false);
+            uiDispatch({ type: "HIDE_SLIDE_TEXT" });
         }, 2500);
     };
 
@@ -118,7 +137,7 @@ export default function Dashboard2() {
             e.preventDefault();
             const topic = searchQuery.trim();
             setSearchQuery("");
-            setIsCreatingNote(true);
+            uiDispatch({ type: "SET_CREATING_NOTE", payload: true });
 
             const NOTE_PATTERNS = [
                 "make a note",
@@ -253,7 +272,7 @@ Return ONLY the JSON object.
 
                 // Enforce JSON Mode (fourth parameter set to true)
                 const responseText = await sendMessageToAI(prompt, [], null, true, DASHBOARD_CREATE_SYSTEM_PROMPT);
-                
+
                 // Extract the JSON object using regex to ignore any surrounding text or tags
                 let parsedData = null;
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
@@ -311,7 +330,7 @@ Return ONLY the JSON object.
             } catch (error) {
                 handleError(error, { action: "generating AI note" });
             } finally {
-                setIsCreatingNote(false);
+                uiDispatch({ type: "SET_CREATING_NOTE", payload: false });
             }
         }
     };
@@ -320,7 +339,7 @@ Return ONLY the JSON object.
         <div className="flex w-full h-screen bg-background overflow-hidden font-sans text-foreground relative ashwin">
 
             {/* Sidebar Component */}
-            <SideNavBar isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
+            <SideNavBar isOpen={uiState.isMobileMenuOpen} setIsOpen={(open) => uiDispatch({ type: "SET_MOBILE_MENU", payload: open })} />
             {/* Main Content Area */}
             <div className="flex-1 relative overflow-hidden flex flex-col">
 
@@ -334,7 +353,7 @@ Return ONLY the JSON object.
                         <button
                             type="button"
                             className="md:hidden text-foreground/80 hover:text-foreground"
-                            onClick={() => setIsMobileMenuOpen(true)}
+                            onClick={() => uiDispatch({ type: "SET_MOBILE_MENU", payload: true })}
                         >
                             <List size={28} />
                         </button>
@@ -343,11 +362,11 @@ Return ONLY the JSON object.
                             {/* Sliding Text Animation */}
                             <div
                                 className={`hidden md:block absolute left-full ml-4 whitespace-nowrap text-sm font-semibold transition-all duration-500 ease-out z-0
-                                    ${showSlideText ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'}
-                                    ${isAiMode ? 'text-purple-400' : 'text-muted-foreground'}
+                                    ${uiState.showSlideText ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'}
+                                    ${uiState.isAiMode ? 'text-purple-400' : 'text-muted-foreground'}
                                 `}
                             >
-                                {slideText}
+                                {uiState.slideText}
                             </div>
 
                             {/* Responsive Search Bar */}
@@ -357,22 +376,23 @@ Return ONLY the JSON object.
                                 </div>
                                 <input
                                     type="text"
+                                    spellCheck="false"
                                     className="w-full h-full bg-transparent text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/50 placeholder:transition-all"
-                                    placeholder={isAiMode ? "give topic & make note automatically" : "Search or ask your notes..."}
+                                    placeholder={uiState.isAiMode ? "give topic & make note automatically" : "Search or ask your notes..."}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearchKeyDown}
                                 />
                                 <div className="pr-4 pl-2 flex items-center gap-3">
-                                    <Sparkle weight="fill" className={`size-4 transition-colors ${isAiMode ? 'text-[#8b5cf6]' : 'text-muted-foreground/50'}`} />
+                                    <Sparkle weight="fill" className={`size-4 transition-colors ${uiState.isAiMode ? 'text-[#8b5cf6]' : 'text-muted-foreground/50'}`} />
                                     {/* Toggle Switch */}
                                     <button
                                         type="button"
                                         onClick={handleToggleAiMode}
-                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAiMode ? 'bg-[#8b5cf6]' : 'bg-muted'}`}
+                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${uiState.isAiMode ? 'bg-[#8b5cf6]' : 'bg-muted'}`}
                                     >
                                         {/* <span className="sr-only">Toggle AI Mode</span> */}
-                                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAiMode ? 'translate-x-4' : 'translate-x-0'}`} />
+                                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${uiState.isAiMode ? 'translate-x-4' : 'translate-x-0'}`} />
                                     </button>
                                 </div>
                             </div>
@@ -382,8 +402,8 @@ Return ONLY the JSON object.
                     {/* Content Scrollable Area */}
                     <div className="flex-1 overflow-y-auto p-4 md:p-8">
                         <Outlet context={{
-                            searchQuery: isAiMode ? "" : debouncedSearchQuery,
-                            isCreatingNote: isCreatingNote
+                            searchQuery: uiState.isAiMode ? "" : debouncedSearchQuery,
+                            isCreatingNote: uiState.isCreatingNote
                         }} />
                     </div>
 

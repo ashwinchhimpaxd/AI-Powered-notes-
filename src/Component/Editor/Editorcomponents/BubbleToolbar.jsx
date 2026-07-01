@@ -4,6 +4,7 @@ import {
   TextB, TextItalic, TextUnderline, TextHOne, TextHTwo,
   ListBullets, ListNumbers, Highlighter, Quotes,
   LinkSimple,
+  TextAlignLeft, TextAlignCenter, TextAlignRight, TextAlignJustify,
 } from "@phosphor-icons/react";
 import FormatButton from "./FormatButton.jsx";
 
@@ -53,6 +54,11 @@ const BubbleToolbar = memo(function BubbleToolbar({ editor }) {
       <div className="w-px h-4 bg-border mx-1" />
       <FormatButton editor={editor} command="heading" level={1} icon={<TextHOne size={16} />} />
       <FormatButton editor={editor} command="heading" level={2} icon={<TextHTwo size={16} />} />
+      <div className="w-px h-4 bg-border mx-1" />
+      <FormatButton editor={editor} align="left" icon={<TextAlignLeft size={16} />} />
+      <FormatButton editor={editor} align="center" icon={<TextAlignCenter size={16} />} />
+      <FormatButton editor={editor} align="right" icon={<TextAlignRight size={16} />} />
+      <FormatButton editor={editor} align="justify" icon={<TextAlignJustify size={16} />} />
       <div className="w-px h-4 bg-border mx-1" />
       <FormatButton editor={editor} command="bulletList" icon={<ListBullets size={16} />} />
       <FormatButton editor={editor} command="orderedList" icon={<ListNumbers size={16} />} />

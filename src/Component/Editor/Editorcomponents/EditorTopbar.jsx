@@ -147,9 +147,8 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
       </div>
       {/* drop down list actions */}
       <CustomDropdown editor={editor} />
-      {/* <TestAiAppwriteSDK /> */}
+      {/* <TestAiAppwriteSDK />   this is for texting UI   */}
     </div >
   );
 });
-
 export default EditorTopbar;

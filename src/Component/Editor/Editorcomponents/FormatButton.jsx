@@ -4,7 +4,7 @@ import React, { memo } from "react";
  * A single formatting button for the BubbleMenu toolbar.
  * Uses onMouseDown + preventDefault so the editor doesn't lose focus.
  */
-const FormatButton = memo(function FormatButton({ editor, command, icon, level, onClick }) {
+const FormatButton = memo(function FormatButton({ editor, command, icon, level, align, onClick }) {
   // Mapping for commands that don't follow the simple "toggleX" pattern
   const commandMap = {
     highlight: "toggleHighlight",
@@ -17,12 +17,22 @@ const FormatButton = memo(function FormatButton({ editor, command, icon, level, 
     link: "setLink" // Link ka scene alag hota hai
   };
 
-  const isActive = level
-    ? editor.isActive(command, { level })
-    : editor.isActive(command);
+  let isActive = false;
+  if (align) {
+    isActive = editor.isActive({ textAlign: align });
+  } else if (level) {
+    isActive = editor.isActive(command, { level });
+  } else {
+    isActive = editor.isActive(command);
+  }
 
   const handleClick = () => {
     if (onClick) return onClick();
+
+    if (align) {
+      editor.chain().focus().setTextAlign(align).run();
+      return;
+    }
 
     if (level) {
       editor.chain().focus().toggleHeading({ level }).run();

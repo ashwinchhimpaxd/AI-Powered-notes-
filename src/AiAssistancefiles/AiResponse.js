@@ -74,28 +74,21 @@ class AIService {
                 // model: "google/gemma-4-31b-it", //i think is the best model for this project it is fast and advanced
                 // model: "meta/llama-3.3-70b-instruct",
                 // model: "google/gemma-4-31b-it",
-                // model: "google/gemma-3-27b-it",
+                //  model="google/gemma-2-2b-it",
                 // model: "google/gemma-3n-e4b-it",
+                //  "model": "google/diffusiongemma-26b-a4b-it"
                 // model: "meta/llama-3.1-8b-instruct",google/gemma-3n-e4b-it
                 // model: "minimaxai/minimax-m2.7",
                 // model: "minimaxai/minimax-m3",
-                // model: "nvidia/nemotron-3-nano-30b-a3b",
-                model: "deepseek-ai/deepseek-v4-flash",
-
+                // model: "meta/llama-3.3-70b-instruct",
+                model: "google/gemma-3n-e2b-it",
                 messages,
-
-                max_tokens: 4096,
-
-                temperature: 1,
-
-                top_p: 0.95,
-
-                frequency_penalty: 0,
-
-                presence_penalty: 0,
-
+                max_tokens: 2048,            // 4096 se kam — enough for notes, faster response
+                temperature: 0.6,            // 0.3 → 0.6: natural, detailed, but still factual
+                top_p: 0.9,                  // 0.95 → 0.9: focused, less randomness
+                frequency_penalty: 0.2,      // Naya: repeats se bachega
+                presence_penalty: 0.1,       // Naya: thoda variety aayega
                 stream: isStreaming,
-                chat_template_kwargs: { "thinking": true, "reasoning_effort": "high" },
             };
 
             if (jsonMode) {
