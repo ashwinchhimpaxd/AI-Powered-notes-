@@ -1,4 +1,4 @@
-import './wdyr.js' 
+import './wdyr.js'
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -11,7 +11,7 @@ import { store, persistor } from "./redux/store.js";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
+  <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
@@ -19,5 +19,5 @@ createRoot(document.getElementById("root")).render(
         </ThemeProvider>
       </PersistGate>
     </Provider>
-  // </StrictMode>
+  </StrictMode>
 );

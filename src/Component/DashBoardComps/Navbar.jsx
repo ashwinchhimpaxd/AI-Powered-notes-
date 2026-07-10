@@ -1,6 +1,5 @@
 // SideNavBar.jsx
-import { Star, Note, Robot, GearSix, Plus, X } from "@phosphor-icons/react";
-import { useDispatch } from "react-redux";
+import { Note, GearSix, Plus, X } from "@phosphor-icons/react";
 import { useState } from "react";
 import NotesCreationForm from "./NotesCreationForm";
 import { memo } from "react";
@@ -74,10 +73,6 @@ function SideNavBar({ isOpen, setIsOpen }) {
                             </div>
                         </Link>
 
-                        {/* <div className={`flex items-center gap-3 px-3 h-[42px] rounded-lg cursor-pointer z-10 group transition-colors ${activeIndex === 1 ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
-                            <Star className={`size-5 transition-colors ${activeIndex === 1 ? 'text-[#8b5cf6]' : 'group-hover:text-foreground'}`} weight={activeIndex === 1 ? "fill" : "regular"} />
-                            <span className="font-medium text-sm">Important</span>
-                        </div> */}
 
                         <Link to={'/dashboard/setting'} className="z-10">
                             <div className={`flex items-center gap-3 px-3 h-[42px] rounded-lg cursor-pointer group transition-colors ${activeIndex === 1 ? 'text-foreground' : 'text-muted-foreground  hover:text-foreground'}`}>

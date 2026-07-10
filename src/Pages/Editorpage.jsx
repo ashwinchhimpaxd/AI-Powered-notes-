@@ -14,12 +14,6 @@ function Editorpage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    // Cleanup active note state from Redux on unmount
-    useEffect(() => {
-        return () => {
-            dispatch(resetcurrentnoteinfo());
-        };
-    }, [dispatch]);
 
     const [editorInstance, seteditorInstance] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -102,11 +96,11 @@ function Editorpage() {
                 } else {
                     console.warn("Note slug not found on server:", slug);
                     // Redirect back to Dashboard
-                    navigate("/Dashboard");
+                    navigate("/Dashboard/recent-notes");
                 }
             } catch (error) {
                 console.error("Failed to fetch note by slug:", error);
-                navigate("/Dashboard");
+                navigate("/Dashboard/recent-notes");
             } finally {
                 setIsLoading(false);
             }

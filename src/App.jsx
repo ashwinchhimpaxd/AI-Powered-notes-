@@ -4,14 +4,14 @@ import { useSelector, useDispatch } from "react-redux";
 import React, { Suspense, lazy, useEffect, useState } from "react";
 
 // Standard Components (Lightweight)
-import Login from "./Component/Login";
+import Login from "./Pages/LoginPage";
 import LandingPage from "./Pages/LandingPage";
 import Notfoundpage from "./Pages/Notfoundpage";
 import ToastContainer from "./Component/Toast/ToastContainer";
 import Appsetting from "./Component/Appsettings/Appsetting";
-import RecentNotes from "./Component/Recentnotes";
+import RecentNotes from "./Component/DashBoardComps/Recentnotes";
 // Lazy Loaded Components (Heavy chunks)
-const Dashboard2 = lazy(() => import("./Pages/Dashboard2.jsx"));
+const Dashboard2 = lazy(() => import("./Pages/Dashboard.jsx"));
 const Editorpage = lazy(() => import("./Pages/Editorpage.jsx"));
 const EditProfile = lazy(() => import("./Component/Appsettings/allappsettingfeatures/EditProfile.jsx"));
 
@@ -107,6 +107,7 @@ function App() {
             element={
               <ProtectedRoute authentication={true}>
                 <Suspense fallback={null}>
+                  {/* <p>ashwin only </p> */}
                   <Dashboard2 />
                 </Suspense>
               </ProtectedRoute>

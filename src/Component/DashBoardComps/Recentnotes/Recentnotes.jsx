@@ -1,20 +1,20 @@
 import { useEffect, useState, useDeferredValue, memo, useCallback, useRef } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { SquaresFour, List, CircleNotch, FadersHorizontal } from "@phosphor-icons/react";
+import { SquaresFour, List, CircleNotch, FadersHorizontal, Plus } from "@phosphor-icons/react";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteNote, updateNoteInPlace, selectNoteIds, selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
-import { setnoteid, setcurrentnoteinfo } from "../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
+import { deleteNote, updateNoteInPlace, selectNoteIds, selectNoteById } from "../../../redux/NotesCreation/NotesCreationSlice.js";
+import { setnoteid, setcurrentnoteinfo } from "../../../redux/currentnoteinfoslice/currentnoteinfoslice.js";
 import service from "@/AppWrite/Setgetuserdatas/config.js";
-import StorageService from "../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
-import { executeOptimisticToggle } from "../../utils/optimisticToggle.js";
-import NoteCard from "./NoteCard";
-import NoteSkeleton from "./NoteSkeleton";
-import DeleteConfirmationModal from "./DeleteConfirmationModal";
-import { selectFilteredNoteIds } from "../../redux/NotesCreation/NotesSelector.js";
-import FilterModal from "../../filternote/FilterModal.jsx";
-import { fetchNotesThunk } from "../../redux/NotesCreation/NotesCreationSlice.js";
-import NoteStatistics from "../AIActivity.jsx";
-
+import StorageService from "../../../AppWrite/Setgetuserdatas/StorageImages/ImageUpload.js";
+import { executeOptimisticToggle } from "../../../utils/optimisticToggle.js";
+import NoteCard from "./NoteCard.jsx";
+import NoteSkeleton from "./NoteSkeleton.jsx";
+import DeleteConfirmationModal from "./DeleteConfirmationModal.jsx";
+import { selectFilteredNoteIds } from "../../../redux/NotesCreation/NotesSelector.js";
+import FilterModal from "../filternote/FilterModal.jsx";
+import { fetchNotesThunk } from "../../../redux/NotesCreation/NotesCreationSlice.js";
+import NoteStatistics from "../../AIActivity.jsx";
+import NotesCreationForm from "../NotesCreationForm.jsx";
 
 
 
@@ -29,6 +29,7 @@ const RecentNotes = memo((props) => {
     const [openNoteMenuId, setOpenNoteMenuId] = useState(null);
     const [noteToDelete, setNoteToDelete] = useState(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [NewNotesClick, setNewNotesClick] = useState(false);
 
     const noteIds = useSelector(selectNoteIds);
     const noteData = useSelector((state) =>
@@ -192,9 +193,22 @@ const RecentNotes = memo((props) => {
 
                 {/* EMPTY STATE */}
                 {!loading && filteredNoteIds.length === 0 && !isCreatingNote && (
-                    <div className="flex flex-col items-center justify-center py-20 border border-dashed border-border rounded-xl bg-card">
-                        <p className="text-muted-foreground text-sm font-medium">Notes not found.</p>
-                    </div>
+                    <div className="flex flex-col  items-center justify-center py-20 border border-dashed border-border rounded-xl bg-card">
+                        <p className="text-muted-foreground text-xl font-medium flex w-fit justify-center items-center gap-4  ">
+                            <span>Create your first note</span>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setNewNotesClick(true);
+                                }}
+                                className="p-2 sm:p-3 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                            >
+                                <Plus className="size-4" weight="bold" />
+                            </button>
+                        </p>
+                        {NewNotesClick && <NotesCreationForm setNewNotesClick={setNewNotesClick} />}
+                    </div>  
                 )}
 
                 {/* NOTES GRID */}
@@ -229,6 +243,7 @@ const RecentNotes = memo((props) => {
                         )}
                     </div>
                 )}
+
                 {/* CONFIRMATION MODAL */}
                 <DeleteConfirmationModal
                     isOpen={!!noteToDelete}

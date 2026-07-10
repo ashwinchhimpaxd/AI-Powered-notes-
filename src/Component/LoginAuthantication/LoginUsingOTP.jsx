@@ -30,15 +30,15 @@ const LoginUsingOTP = () => {
     }, [cooldown]);
 
 
-    const handleSendOTPClick = async () => {
-        if (cooldown > 0) return;
-        const success = await OnSendOtp();
-        if (success) {
-            setCooldown(60);
+    const handleSendOTPClick = useCallback(
+        async () => {
+            if (cooldown > 0) return;
+            const success = await OnSendOtp();
+            if (success) {
+                setCooldown(60);
+            }
         }
-
-    };
-
+    )
 
     const OnSendOtp = useCallback(async () => {
         const isValid = await trigger("Email");

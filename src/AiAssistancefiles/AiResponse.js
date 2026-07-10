@@ -54,7 +54,6 @@ class AIService {
                             - Use proper HTML formatting
                             - Be concise and readable`
                 },
-
                 {
                     role: "user",
                     content: prompt

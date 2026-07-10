@@ -1,5 +1,5 @@
 
-import LoginUsingOTP from "./LoginAuthantication/LoginUsingOTP"
+import LoginUsingOTP from "../Component/LoginAuthantication/LoginUsingOTP"
 
 export default function Login() {
     return (

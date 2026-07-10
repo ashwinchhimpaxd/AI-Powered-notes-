@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setFilters, resetFilters } from "../redux/NotesCreation/NotesCreationSlice";
+import { setFilters, resetFilters } from "../../../redux/NotesCreation/NotesCreationSlice";
 import FilterHeader from "./FilterHeader";
 import NoteTypeFilter from "./NoteTypeFilter";
 import SortOrderFilter from "./SortOrderFilter";
@@ -83,7 +83,7 @@ const FilterModal = ({ isOpen, onClose }) => {
 
       {/* Modal card container */}
       <div className="relative w-full max-w-[400px] bg-card/90 backdrop-blur-2xl border border-border rounded-[28px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] flex flex-col gap-6 p-6 transition-all duration-300 transform scale-100 animate-in fade-in zoom-in-95 duration-200">
-        
+
         {/* Header */}
         <FilterHeader onClose={onClose} />
 
@@ -91,11 +91,11 @@ const FilterModal = ({ isOpen, onClose }) => {
         <div className="flex flex-col gap-6 overflow-y-auto max-h-[70vh] pr-1.5 scrollbar-none">
           <NoteTypeFilter selectedType={stagedState.importance} setSelectedType={(val) => setStagedState(s => ({ ...s, importance: val }))} />
           <SortOrderFilter sortOrder={stagedState.sort} setSortOrder={(val) => setStagedState(s => ({ ...s, sort: val }))} />
-          <DateRangeFilter 
-            startDate={stagedState.startDate} 
-            setStartDate={(val) => setStagedState(s => ({ ...s, startDate: val }))} 
-            endDate={stagedState.endDate} 
-            setEndDate={(val) => setStagedState(s => ({ ...s, endDate: val }))} 
+          <DateRangeFilter
+            startDate={stagedState.startDate}
+            setStartDate={(val) => setStagedState(s => ({ ...s, startDate: val }))}
+            endDate={stagedState.endDate}
+            setEndDate={(val) => setStagedState(s => ({ ...s, endDate: val }))}
           />
         </div>
 

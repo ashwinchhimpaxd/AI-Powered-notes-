@@ -1,8 +1,8 @@
 import { memo, useMemo, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { FileText, Bookmark, ShareNetwork, DotsThreeVertical } from "@phosphor-icons/react";
-import { selectNoteById } from "../../redux/NotesCreation/NotesCreationSlice.js";
-import { useExportPDF } from '../Editor/Editorcomponents/DropDownMenu/Hooks/useExportPDF.jsx';
+import { selectNoteById } from "../../../redux/NotesCreation/NotesCreationSlice.js";
+import { useExportPDF } from '../../Editor/Editorcomponents/DropDownMenu/Hooks/useExportPDF.jsx';
 
 
 const NoteCard = memo(({
@@ -55,7 +55,7 @@ const NoteCard = memo(({
         const content = noteItem.notes_contect || '';
         const stripped = content.replace(/<[^>]+>/g, '').trim();
         if (!stripped) {
-            const mod = await import("../Editor/utils/showToast.js");
+            const mod = await import("../../Editor/utils/showToast.js");
             mod.showToast("warning", "Note is empty to make PDF");
             return;
         }
@@ -217,7 +217,7 @@ const NoteCard = memo(({
                         onClick={(e) => {
                             e.stopPropagation();
                             if (!note.slug) {
-                                import("../Editor/utils/showToast.js").then((module) => {
+                                import("../../Editor/utils/showToast.js").then((module) => {
                                     module.showToast("warning", "Cannot share a note without a slug!");
                                 });
                                 return;
@@ -233,12 +233,12 @@ const NoteCard = memo(({
                             } else {
                                 navigator.clipboard.writeText(noteUrl)
                                     .then(() => {
-                                        import("../Editor/utils/showToast.js").then((module) => {
+                                        import("../../Editor/utils/showToast.js").then((module) => {
                                             module.showToast("success", "Link copied to clipboard!");
                                         });
                                     })
                                     .catch(() => {
-                                        import("../Editor/utils/showToast.js").then((module) => {
+                                        import("../../Editor/utils/showToast.js").then((module) => {
                                             module.showToast("error", "Failed to copy link.");
                                         });
                                     });
