@@ -302,6 +302,7 @@ The JSON must be valid, complete, and parseable. Do NOT truncate or leave it unf
 
 
                         <button
+                            type="submit"
                             className="
                         p-3
                         rounded-NPMxl
@@ -311,6 +312,7 @@ The JSON must be valid, complete, and parseable. Do NOT truncate or leave it unf
                         cursor-pointer
                         text-primary
                         "
+                            aria-label="Send message"
                         >
                             <ArrowCircleUpIcon size={30} weight="fill" />
                         </button>

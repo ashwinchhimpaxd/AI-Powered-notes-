@@ -56,6 +56,7 @@ function NotesCreationForm({ setNewNotesClick }) {
                             reset();
                         }}
                         className="text-[#a1a1aa] hover:text-white transition-colors p-1"
+                        aria-label="Close modal"
                     >
                         <X className="size-5" />
                     </button>

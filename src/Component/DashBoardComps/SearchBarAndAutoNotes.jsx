@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { MagnifyingGlass, Sparkle } from "@phosphor-icons/react";
 import { sendMessageToAI } from "../../AiAssistancefiles/Aimethods/AiassistentLogic.js";
@@ -58,18 +58,34 @@ export default function SearchBarAndAutoNotes({ onSearchChange, setIsCreatingNot
     const [slideText, setSlideText] = useState("");
     const [showSlideText, setShowSlideText] = useState(false);
 
-    // Sync search query changes to Dashboard2 (only when NOT in AI mode)
-    useEffect(() => {
-        if (isAiMode) {
-            onSearchChange("");
-            return;
-        }
-        const timer = setTimeout(() => {
-            onSearchChange(searchQuery);
-        }, 300);
+    const debounceTimerRef = useRef(null);
 
-        return () => clearTimeout(timer);
-    }, [searchQuery, isAiMode, onSearchChange]);
+    const debouncedSearchChange = useCallback((query) => {
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            onSearchChange(query);
+        }, 300);
+    }, [onSearchChange]);
+
+    // Handle input query change
+    const handleSearchQueryChange = (e) => {
+        const val = e.target.value;
+        setSearchQuery(val);
+        if (!isAiMode) {
+            debouncedSearchChange(val);
+        }
+    };
+
+    // Clean up timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
 
     // Handle AI Toggle
     const handleToggleAiMode = () => {
@@ -77,6 +93,16 @@ export default function SearchBarAndAutoNotes({ onSearchChange, setIsCreatingNot
         setIsAiMode(newMode);
         setSlideText(newMode ? "AI mode ON" : "AI mode OFF");
         setShowSlideText(true);
+
+        // Sync change immediately to parent
+        if (newMode) {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+            onSearchChange("");
+        } else {
+            onSearchChange(searchQuery);
+        }
 
         // Hide slide text after a short delay
         setTimeout(() => {
@@ -309,7 +335,7 @@ Return ONLY the JSON object.
                     className="w-full h-full bg-transparent text-foreground text-sm focus:outline-none placeholder:text-muted-foreground/50 placeholder:transition-all"
                     placeholder={isAiMode ? "give topic & make note automatically" : "Search or ask your notes..."}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchQueryChange}
                     onKeyDown={handleSearchKeyDown}
                 />
                 <div className="pr-4 pl-2 flex items-center gap-3">
@@ -319,6 +345,7 @@ Return ONLY the JSON object.
                         type="button"
                         onClick={handleToggleAiMode}
                         className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAiMode ? 'bg-[#8b5cf6]' : 'bg-muted'}`}
+                        aria-label="Toggle AI Mode"
                     >
                         <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAiMode ? 'translate-x-4' : 'translate-x-0'}`} />
                     </button>

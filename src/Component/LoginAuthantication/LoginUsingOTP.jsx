@@ -27,7 +27,9 @@ const LoginUsingOTP = () => {
             setCooldown((prev) => prev - 1);
         }, 1000);
         return () => clearInterval(timer);
-    }, [cooldown]);
+    }, [
+        
+    ]);
 
 
     const handleSendOTPClick = useCallback(

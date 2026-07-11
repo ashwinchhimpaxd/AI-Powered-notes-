@@ -32,6 +32,7 @@ const SlashCommandMenu = memo(function SlashCommandMenu({
           type="button"
           onMouseDown={(e) => { e.preventDefault(); onClose(); }}
           className="text-muted-foreground/40 hover:text-foreground transition-colors cursor-pointer"
+          aria-label="Close menu"
         >
           <X size={12} />
         </button>

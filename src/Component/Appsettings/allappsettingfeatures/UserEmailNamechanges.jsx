@@ -39,6 +39,7 @@ function UserEmailNamechanges() {
                             onClick={() => navigate('/profile/edit')}
                             className="absolute size-fit  z-20 top-5 right-6 text-muted-foreground hover:text-foreground transition-all duration-200 cursor-pointer p-1.5 rounded-full hover:bg-border hover:scale-115 scale-105 active:scale-95"
                             title="Edit Profile"
+                            aria-label="Edit Profile"
                         >
                             <DotsThree size={20} weight="bold" className="cursor-pointer" />
                         </button>

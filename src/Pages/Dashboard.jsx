@@ -6,25 +6,25 @@ import { List } from "@phosphor-icons/react";
 import { Outlet } from "react-router-dom";
 import SearchBarAndAutoNotes from "../Component/DashBoardComps/SearchBarAndAutoNotes";
 
+const initialUIState = {
+    isMobileMenuOpen: false,
+    isCreatingNote: false,
+};
+
+function uiReducer(state, action) {
+    switch (action.type) {
+        case "SET_MOBILE_MENU":
+            return { ...state, isMobileMenuOpen: action.payload };
+        case "SET_CREATING_NOTE":
+            return { ...state, isCreatingNote: action.payload };
+        default:
+            return state;
+    }
+}
+
 export default function Dashboard2() {
     const dispatch = useDispatch();
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-
-    const initialUIState = {
-        isMobileMenuOpen: false,
-        isCreatingNote: false,
-    };
-
-    function uiReducer(state, action) {
-        switch (action.type) {
-            case "SET_MOBILE_MENU":
-                return { ...state, isMobileMenuOpen: action.payload };
-            case "SET_CREATING_NOTE":
-                return { ...state, isCreatingNote: action.payload };
-            default:
-                return state;
-        }
-    }
 
     const [uiState, uiDispatch] = useReducer(uiReducer, initialUIState);
     const { isMobileMenuOpen, isCreatingNote } = uiState;
@@ -53,6 +53,7 @@ export default function Dashboard2() {
                             type="button"
                             className="md:hidden text-foreground/80 hover:text-foreground"
                             onClick={() => uiDispatch({ type: "SET_MOBILE_MENU", payload: true })}
+                            aria-label="Open sidebar"
                         >
                             <List size={28} />
                         </button>

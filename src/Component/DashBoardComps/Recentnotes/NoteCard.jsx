@@ -5,6 +5,39 @@ import { selectNoteById } from "../../../redux/NotesCreation/NotesCreationSlice.
 import { useExportPDF } from '../../Editor/Editorcomponents/DropDownMenu/Hooks/useExportPDF.jsx';
 
 
+// note ko pdf me convert karne ke liye 
+const htmlToTiptap = (html) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const walk = (parent) => {
+        const nodes = [];
+        for (const child of parent.childNodes) {
+            if (child.nodeType === 3) {
+                if (child.textContent.trim()) nodes.push({ type: 'text', text: child.textContent });
+            } else if (child.nodeType === 1) {
+                const tag = child.tagName.toLowerCase();
+                const content = walk(child);
+                const m = (t) => { const marks = []; if (['strong', 'b'].includes(t)) marks.push({ type: 'bold' }); if (['em', 'i'].includes(t)) marks.push({ type: 'italic' }); if (t === 'u') marks.push({ type: 'underline' }); return marks; };
+                if (['strong', 'b', 'em', 'i', 'u'].includes(tag)) {
+                    const text = child.textContent.trim();
+                    if (text) nodes.push({ type: 'text', text, marks: m(tag) });
+                } else if (tag === 'p') nodes.push({ type: 'paragraph', content });
+                else if (tag.match(/^h[2-3]$/)) nodes.push({ type: 'heading', attrs: { level: +tag[1] }, content });
+                else if (tag === 'ul') nodes.push({ type: 'bulletList', content });
+                else if (tag === 'ol') nodes.push({ type: 'orderedList', content });
+                else if (tag === 'li') nodes.push({ type: 'listItem', content });
+                else if (tag === 'blockquote') nodes.push({ type: 'blockquote', content });
+                else if (tag === 'hr') nodes.push({ type: 'horizontalRule' });
+                else if (tag === 'img') nodes.push({ type: 'image', attrs: { src: child.getAttribute('src') || '' } });
+                else if (tag === 'br') nodes.push({ type: 'text', text: '\n' });
+                else if (content?.length) nodes.push(...content);
+            }
+        }
+        return nodes.length ? nodes : undefined;
+    };
+    return walk(doc.body) || [];
+};
+
 const NoteCard = memo(({
     noteId,
     isGridView,
@@ -17,38 +50,6 @@ const NoteCard = memo(({
 
     const { exportToPDF } = useExportPDF();
     const note = useSelector((state) => selectNoteById(state, noteId));
-    // note ko pdf me convert karne ke liye 
-    const htmlToTiptap = (html) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const walk = (parent) => {
-            const nodes = [];
-            for (const child of parent.childNodes) {
-                if (child.nodeType === 3) {
-                    if (child.textContent.trim()) nodes.push({ type: 'text', text: child.textContent });
-                } else if (child.nodeType === 1) {
-                    const tag = child.tagName.toLowerCase();
-                    const content = walk(child);
-                    const m = (t) => { const marks = []; if (['strong', 'b'].includes(t)) marks.push({ type: 'bold' }); if (['em', 'i'].includes(t)) marks.push({ type: 'italic' }); if (t === 'u') marks.push({ type: 'underline' }); return marks; };
-                    if (['strong', 'b', 'em', 'i', 'u'].includes(tag)) {
-                        const text = child.textContent.trim();
-                        if (text) nodes.push({ type: 'text', text, marks: m(tag) });
-                    } else if (tag === 'p') nodes.push({ type: 'paragraph', content });
-                    else if (tag.match(/^h[2-3]$/)) nodes.push({ type: 'heading', attrs: { level: +tag[1] }, content });
-                    else if (tag === 'ul') nodes.push({ type: 'bulletList', content });
-                    else if (tag === 'ol') nodes.push({ type: 'orderedList', content });
-                    else if (tag === 'li') nodes.push({ type: 'listItem', content });
-                    else if (tag === 'blockquote') nodes.push({ type: 'blockquote', content });
-                    else if (tag === 'hr') nodes.push({ type: 'horizontalRule' });
-                    else if (tag === 'img') nodes.push({ type: 'image', attrs: { src: child.getAttribute('src') || '' } });
-                    else if (tag === 'br') nodes.push({ type: 'text', text: '\n' });
-                    else if (content?.length) nodes.push(...content);
-                }
-            }
-            return nodes.length ? nodes : undefined;
-        };
-        return walk(doc.body) || [];
-    };
 
     const handleExportPDF = useCallback(async (e, noteItem) => {
         e.stopPropagation();
@@ -119,6 +120,15 @@ const NoteCard = memo(({
     return (
         <div
             onClick={() => onClick(note)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onClick(note);
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Open note: ${note.notes_title || "Untitled"}`}
             className={`relative  flex flex-row bg-card hover:bg-muted/40 border border-border rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden group shadow-md ${isGridView
                 ? `h-56 ${spanClass}`
                 : "h-auto min-h-fit"

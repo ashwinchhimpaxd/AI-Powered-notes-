@@ -76,9 +76,11 @@ const FilterModal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop overlay with blur effect */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 w-full h-full border-none outline-none cursor-default"
         onClick={onClose}
+        aria-label="Close filter modal backdrop"
       />
 
       {/* Modal card container */}

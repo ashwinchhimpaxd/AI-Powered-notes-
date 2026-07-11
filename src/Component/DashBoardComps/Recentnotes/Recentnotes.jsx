@@ -175,6 +175,7 @@ const RecentNotes = memo((props) => {
                         onClick={() => setIsGridView(!isGridView)}
                         className="flex items-center cursor-pointer justify-center p-1.5 bg-card hover:bg-muted border border-border rounded-lg text-foreground transition-colors"
                         title={isGridView ? "Switch to List View" : "Switch to Grid View"}
+                        aria-label={isGridView ? "Switch to List View" : "Switch to Grid View"}
                     >
                         {/* Swaps the icon based on the current state */}
                         {isGridView ? <List className="size-5" /> : <SquaresFour className="size-5" />}
@@ -203,6 +204,7 @@ const RecentNotes = memo((props) => {
                                     setNewNotesClick(true);
                                 }}
                                 className="p-2 sm:p-3 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                                aria-label="Create note"
                             >
                                 <Plus className="size-4" weight="bold" />
                             </button>

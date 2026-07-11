@@ -19,9 +19,11 @@ function SideNavBar({ isOpen, setIsOpen }) {
         <>
             {/* Mobile Backdrop Overlay */}
             {isOpen && (
-                <div
+                <button
+                    type="button"
                     className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
                     onClick={() => setIsOpen(false)}
+                    aria-label="Close menu backdrop"
                 />
             )}
 
@@ -53,6 +55,7 @@ function SideNavBar({ isOpen, setIsOpen }) {
                             type="button"
                             className="md:hidden text-muted-foreground hover:text-foreground"
                             onClick={() => setIsOpen(false)}
+                            aria-label="Close sidebar"
                         >
                             <X size={24} />
                         </button>

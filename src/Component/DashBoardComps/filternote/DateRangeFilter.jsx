@@ -1,6 +1,35 @@
 import React, { useState } from "react";
 import { CalendarBlank, X, Plus } from "@phosphor-icons/react";
 
+const handleDateChange = (val, setter, prevValue) => {
+  // If user is deleting, just let them delete.
+  if (prevValue && val.length < prevValue.length) {
+    if (prevValue.endsWith("-") && val.endsWith("-")) {
+      val = val.slice(0, -1);
+    }
+    setter(val);
+    return;
+  }
+
+  // Only keep digits
+  const clean = val.replace(/\D/g, "");
+
+  let formatted = "";
+  if (clean.length > 0) {
+    if (clean.length <= 4) {
+      formatted = clean;
+      if (clean.length === 4) formatted += "-";
+    } else if (clean.length <= 6) {
+      formatted = `${clean.slice(0, 4)}-${clean.slice(4)}`;
+      if (clean.length === 6) formatted += "-";
+    } else {
+      formatted = `${clean.slice(0, 4)}-${clean.slice(4, 6)}-${clean.slice(6, 8)}`;
+    }
+  }
+
+  setter(formatted);
+};
+
 /**
  * DateRangeFilter Component
  * Input fields for Start and End date, along with toggleable Drafts/Shared status tags.
@@ -8,35 +37,6 @@ import { CalendarBlank, X, Plus } from "@phosphor-icons/react";
 const DateRangeFilter = ({ startDate, setStartDate, endDate, setEndDate }) => {
   const [draftsActive, setDraftsActive] = useState(false);
   const [sharedActive, setSharedActive] = useState(false);
-
-  const handleDateChange = (val, setter, prevValue) => {
-    // If user is deleting, just let them delete.
-    if (prevValue && val.length < prevValue.length) {
-      if (prevValue.endsWith("-") && val.endsWith("-")) {
-        val = val.slice(0, -1);
-      }
-      setter(val);
-      return;
-    }
-
-    // Only keep digits
-    const clean = val.replace(/\D/g, "");
-
-    let formatted = "";
-    if (clean.length > 0) {
-      if (clean.length <= 4) {
-        formatted = clean;
-        if (clean.length === 4) formatted += "-";
-      } else if (clean.length <= 6) {
-        formatted = `${clean.slice(0, 4)}-${clean.slice(4)}`;
-        if (clean.length === 6) formatted += "-";
-      } else {
-        formatted = `${clean.slice(0, 4)}-${clean.slice(4, 6)}-${clean.slice(6, 8)}`;
-      }
-    }
-
-    setter(formatted);
-  };
 
   return (
     <div className="flex flex-col gap-4">

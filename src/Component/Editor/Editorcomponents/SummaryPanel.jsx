@@ -28,6 +28,7 @@ const SummaryPanel = memo(function SummaryPanel({ open, loading, data, error, on
           type="button"
           onClick={onClose}
           className="text-muted-foreground/40 hover:text-foreground p-1.5 rounded-full hover:bg-muted transition-colors cursor-pointer"
+          aria-label="Close summary"
         >
           <X size={14} />
         </button>

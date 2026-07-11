@@ -78,8 +78,17 @@ const EditorTopbar = memo(function EditorTopbar({ title, setTitle, commitTitle, 
         {!isEditing && title.trim().length > 0 ? (
           <h2
             onClick={() => setIsEditing(true)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setIsEditing(true);
+                }
+            }}
+            role="button"
+            tabIndex={0}
             className="text-lg font-semibold text-foreground/90 cursor-text truncate hover:text-foreground transition-colors wrap-none"
             title="Click to edit title"
+            aria-label="Edit title"
           >
             {title}
           </h2>
